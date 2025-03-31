@@ -1,7 +1,9 @@
 # Options Dashboard
 ## Tasks
-Translate Fidelity CSV to our own data format
-Database to store stuff
+Translate Fidelity CSV to our own data format  
+Database to store stuff  
+Deploy to Netlify  
+Netlify status badge on git  
 
 ## Dashboard features
 - Options Performance - Table of options (ticker, expiry date, type of option, premiums earned, current price (from Fidelity CSV), % of money made, APR) with filter for current
