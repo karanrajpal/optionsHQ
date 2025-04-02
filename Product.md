@@ -4,6 +4,9 @@ Translate Fidelity CSV to our own data format
 Database to store stuff  
 Deploy to Netlify  
 Netlify status badge on git  
+Pre-process spread options and insert only 1 row in the DB
+Get stock price of related tickers for past 2 years stored for daily frequency from [polygon](https://polygon.io/pricing)
+Later backfill stock prices if needed from a different API
 
 ## Dashboard features
 - Options Performance - Table of options (ticker, expiry date, type of option, premiums earned, current price (from Fidelity CSV), % of money made, APR) with filter for current
@@ -32,6 +35,11 @@ Income target 2% -> 80 | 20
 
 Roll = Pay 2000, Earn 3000
 Roll Closer to Target (185) = Pay 2000, Earn 3000
+
+URNM price = 45$.
+Total Premiums earned = 75$
+Total Locked up amt = 45 * 100$ = 4500
+Percentage earned for the option trade = 75/4500
 
 
 ## Terms
