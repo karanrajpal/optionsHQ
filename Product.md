@@ -1,12 +1,23 @@
 # Options Dashboard
 ## Tasks
-Translate Fidelity CSV to our own data format  
-Database to store stuff  
-Deploy to Netlify  
-Netlify status badge on git  
-Pre-process spread options and insert only 1 row in the DB
-Get stock price of related tickers for past 2 years stored for daily frequency from [polygon](https://polygon.io/pricing)
+Translate Fidelity CSV to our own data format - Karan
+    Pre-process spread options and insert only 1 row in the DB
+Configure database to store stuff - Viha DONE
+Deploy to Netlify and synology(docker) - Viha
+Configure Docker - Viha/Karan
+Get stock price of related tickers for past 2 years stored for daily frequency from [polygon](https://polygon.io/pricing) - Viha
+    create a price table in neon
+    create a watchlist table in neon
+    use n8n to call an endpoint in the app / historic_prices
+    find out netflify limits
+    figure out how polygon api works and create an algo
+Neon DB backup script/automation - Karan
+Create arch diagram - Viha
+Create the watchlist ui (crud)
 Later backfill stock prices if needed from a different API
+Later add admin password feature
+Later add Netlify status badge on git 
+Later add feature to parse transactions and auto add to watchlist
 
 ## Dashboard features
 - Options Performance - Table of options (ticker, expiry date, type of option, premiums earned, current price (from Fidelity CSV), % of money made, APR) with filter for current
