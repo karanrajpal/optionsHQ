@@ -1,8 +1,14 @@
-"use server";
 import { neon } from "@neondatabase/serverless";
 
-export async function getData() {
-    const sql = neon(process.env.NEXT_PUBLIC_NEON_URL);
-    const data = await sql`select * from options_transactions`;
-    return data;
+export class OptionsDatabase {
+    private sql: any;
+
+    constructor() {
+        this.sql = neon(process.env.NEXT_PUBLIC_NEON_URL);
+    }
+
+    async getData() {
+        const data = await this.sql`select * from options_transactions`;
+        return data;
+    }
 }

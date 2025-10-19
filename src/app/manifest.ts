@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "optionsHQ",
     short_name: "optionsHQ",
-    description: "An app to view ayour options trading data",
+    description: "An app to view your options trading data",
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',

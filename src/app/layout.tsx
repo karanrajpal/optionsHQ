@@ -4,6 +4,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { PWAWrapper } from "@/components/pwa-wrapper";
 import Script from "next/script";
+import Header from "@/components/header";
+import { AuthProvider } from "@/context/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,8 +13,8 @@ const inter = Inter({ subsets: ["latin"] });
  * Exporting this metadata object is enough for Next.JS to pick it up for the page and SEO.
  */
 export const metadata: Metadata = {
-    title: "optionsHQ",
-    description: "An app to view ayour options trading data",
+    title: "OptionsHQ",
+    description: "An app to view your options trading data",
 };
 
 export default function RootLayout({
@@ -22,7 +24,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <Script async src="https://analysticsk.karanrajpal.net/script.js" data-website-id="36e23ca2-95a7-49fe-986a-5fbce6bc4b76"></Script>
+            <Script async src="https://analystics.karanrajpal.net/script.js" data-website-id="36e23ca2-95a7-49fe-986a-5fbce6bc4b76"></Script>
             <body className={inter.className}>
                 <PWAWrapper>
                     <ThemeProvider
@@ -31,7 +33,10 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        {children}
+                        <AuthProvider>
+                            <Header />
+                            {children}
+                        </AuthProvider>
                     </ThemeProvider>
                 </PWAWrapper>
             </body>
