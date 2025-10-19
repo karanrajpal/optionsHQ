@@ -12,7 +12,7 @@ export default function AboutPage() {
             <div className="max-w-3xl mx-auto px-6 py-16">
                 <header className="mb-8">
                     <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">
-                        About Options Journal
+                        About OptionsHQ
                     </h1>
                     <p className="mt-3 text-lg text-gray-600 dark:text-gray-300">
                         A lightweight journal for option strategies — built to view historical
@@ -26,7 +26,7 @@ export default function AboutPage() {
                             What this is
                         </h2>
                         <p className="mt-2 text-gray-600 dark:text-gray-300">
-                            Options Journal catalogs trade outcomes, visualizes historical results,
+                            OptionsHQ catalogs trade outcomes, visualizes historical results,
                             and makes it easier to analyze which setups, timing, and adjustments
                             have worked best over time.
                         </p>
