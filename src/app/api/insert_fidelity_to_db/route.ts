@@ -25,7 +25,7 @@ const parseCSV = async (filePath: string): Promise<Transaction[]> => {
             if (err) {
                 return reject(err);
             }
-            Papa.parse(data, {
+            Papa.parse(data as any, {
                 header: true,
                 skipEmptyLines: true,
                 complete: (results) => {

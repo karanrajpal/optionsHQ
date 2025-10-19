@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useLocalStorage } from '@/lib/useLocalStorage';
 
-type Brokerage = 'CHASE' | 'FIDELITY';
+type Brokerage = 'CHASE' | 'FIDELITY' | 'ALPACA';
 const ConnectBrokerage = () => {
     const [open, setOpen] = useState(false);
     const [redirectLink, setRedirectLink] = useState('');
@@ -34,8 +34,9 @@ const ConnectBrokerage = () => {
         } catch (error) {
             console.error("Error fetching redirect URI:", error);
         }
-
     };
+
+    console.log(userId, userSecret, brokerage, !userId || !userSecret);
     return (
         <div>
             <h2 className='text-lg font-bold mb-4'>Add your Snaptrade deets</h2>
@@ -62,10 +63,11 @@ const ConnectBrokerage = () => {
                     <SelectContent>
                         <SelectItem value="FIDELITY">Fidelity</SelectItem>
                         <SelectItem value="CHASE">Chase</SelectItem>
+                        <SelectItem value="ALPACA">Alpaca</SelectItem>
                     </SelectContent>
                 </Select>
                 {/* your Connect button */}
-                <Button className='mt-4' disabled={!userId || !userSecret} onClick={connectionProcess}>Connect</Button>
+                <Button className='mt-4' onClick={connectionProcess}>Connect</Button>
 
             </div>
 
