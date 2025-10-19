@@ -29,6 +29,9 @@ const parseCSV = async (filePath: string): Promise<Transaction[]> => {
                 header: true,
                 skipEmptyLines: true,
                 complete: (results) => {
+                    if (results.errors && results.errors.length > 0) {
+                        return reject(results.errors[0]);
+                    }
                     const transactions = results.data.map((data: any) => ({
                         runDate: data['Run Date'],
                         account: 'Fidelity',
@@ -46,7 +49,6 @@ const parseCSV = async (filePath: string): Promise<Transaction[]> => {
                     }));
                     resolve(transactions);
                 },
-                error: (error: ParseError) => reject(error),
             });
         });
     });
