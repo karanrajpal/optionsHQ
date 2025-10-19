@@ -4,7 +4,7 @@ export class OptionsDatabase {
     private sql: any;
 
     constructor() {
-        this.sql = neon(process.env.NEXT_PUBLIC_NEON_URL);
+        this.sql = neon(process.env.NEXT_PUBLIC_NEON_URL as string);
     }
 
     async getData() {

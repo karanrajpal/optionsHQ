@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
-import Papa, { ParseError } from 'papaparse';
+import Papa from 'papaparse';
 
 type Transaction = {
     runDate: string;
