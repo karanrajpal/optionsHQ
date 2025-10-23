@@ -8,11 +8,11 @@ import { useAuth } from '@/context/AuthProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useLocalStorage } from '@/lib/useLocalStorage';
 
-type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA';
+export type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA';
 const ConnectBroker = () => {
     const [open, setOpen] = useState(false);
     const [redirectLink, setRedirectLink] = useState('');
-    const { userId, userSecret, setUserId, setUserSecret, setIsLoggedIn } = useAuth();
+    const { userId, userSecret, setUserId, setUserSecret, setIsLoggedIn, addBrokerAccount } = useAuth();
     const [broker, setBroker] = useLocalStorage<Broker>('broker', 'CHASE');
 
     const connectionProcess = async () => {
@@ -77,8 +77,8 @@ const ConnectBroker = () => {
                 onSuccess={(data) => {
                     // Handle successful connection here
                     console.log('Connection successful:', data);
+                    addBrokerAccount({ name: broker, accountId: data });
                     setIsLoggedIn(true);
-                    console.log('User logged in:', data);
                 }}
                 onError={(errorData) => {
                     // Handle connection error here

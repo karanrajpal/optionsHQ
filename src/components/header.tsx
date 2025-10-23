@@ -1,13 +1,16 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { LuSettings } from 'react-icons/lu';
+import { LuCheck, LuPlus, LuSettings } from 'react-icons/lu';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from './ui/navigation-menu';
 import { DarkModeToggle } from './dark-mode-toggle';
 import { Button } from './ui/button';
 import { useAuth } from '@/context/AuthProvider';
+import { MdOutlineAccountBalance } from 'react-icons/md';
+import { select } from 'framer-motion/client';
 
 export default function Header() {
+    const { currentBroker, setCurrentBroker, brokerAccounts } = useAuth();
     return (
         <header role="banner" className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -38,6 +41,31 @@ export default function Header() {
                                     <NavigationMenuLink className="block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
                                         <AuthMenuButton />
                                     </NavigationMenuLink>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+
+                            <NavigationMenuItem>
+                                <NavigationMenuTrigger className="text-gray-600 hover:text-gray-900 bg-inherit dark:text-gray-300 dark:hover:text-white">
+                                    <MdOutlineAccountBalance size={18} />
+                                </NavigationMenuTrigger>
+                                <NavigationMenuContent className="w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm left-auto right-0 origin-top-right">
+                                    {brokerAccounts && Object.keys(brokerAccounts).length > 0 ? (
+                                        Object.values(brokerAccounts).map((account) => (
+                                            <NavigationMenuLink key={account.accountId} className="block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                                {currentBroker === account.name && <LuCheck className="text-green-500" />}
+                                                {account.name}
+                                            </NavigationMenuLink>
+                                        ))
+                                    ) : (
+                                        <NavigationMenuLink className="w-48 block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                            <Link href="/add-broker">
+                                                <div className="flex items-center gap-2">
+                                                    <LuPlus className="text-gray-400" />
+                                                    Add Broker
+                                                </div>
+                                            </Link>
+                                        </NavigationMenuLink>
+                                    )}
                                 </NavigationMenuContent>
                             </NavigationMenuItem>
                         </NavigationMenuList>

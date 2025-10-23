@@ -1,5 +1,5 @@
 
-import { OptionsDatabase } from "@/utils/neon/server";
+import { OptionsDatabase } from "@/utils/neon/service";
 import { NextResponse } from "next/server";
 
 export async function GET() {
