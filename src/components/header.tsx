@@ -23,6 +23,9 @@ export default function Header() {
                     <Link href="/holdings" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
                         Holdings
                     </Link>
+                    <Link href="/options" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
+                        Options
+                    </Link>
 
                     <NavigationMenu>
                         <NavigationMenuList>
