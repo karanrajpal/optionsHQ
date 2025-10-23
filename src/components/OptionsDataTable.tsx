@@ -83,7 +83,7 @@ export const columns: ColumnDef<AlpacaOptionContractWithSnapshot>[] = [
     accessorKey: 'open_interest',
     header: 'Open Interest',
     cell: ({ row }) => {
-      const openInterest = row.getValue('open_interest');
+      const openInterest = row.getValue('open_interest') as string;
       return <div>{openInterest || '-'}</div>;
     },
   },
