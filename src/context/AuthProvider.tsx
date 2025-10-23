@@ -9,6 +9,7 @@ type AuthContextType = {
   userSecret: string;
   isLoggedIn: boolean;
   currentBroker: Broker | null;
+  currentBrokerId: string | null;
   brokerAccounts: Partial<Record<Broker, BrokerAccount>>;
   setUserId: Dispatch<SetStateAction<string>>;
   setUserSecret: Dispatch<SetStateAction<string>>;
@@ -35,6 +36,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     {}
   );
 
+  const currentBrokerId = useMemo(() => {
+    if (!currentBroker) return null;
+    const account = brokerAccounts[currentBroker];
+    return account ? account.accountId : null;
+  }, [currentBroker, brokerAccounts]);
+
   const addBrokerAccount = (account: BrokerAccount) => {
     setBrokerAccounts((prev) => ({ ...prev, [account.name]: account }));
   };
@@ -60,8 +67,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const value = useMemo(
-    () => ({ userId, userSecret, setUserId, setUserSecret, isLoggedIn, setIsLoggedIn, logout, brokerAccounts, addBrokerAccount, currentBroker, setCurrentBroker }),
-    [userId, userSecret, setUserId, setUserSecret, isLoggedIn, setIsLoggedIn, logout, brokerAccounts, addBrokerAccount, currentBroker, setCurrentBroker]
+    () => ({ userId, userSecret, setUserId, setUserSecret, isLoggedIn, setIsLoggedIn, logout, brokerAccounts, addBrokerAccount, currentBroker, setCurrentBroker, currentBrokerId }),
+    [userId, userSecret, setUserId, setUserSecret, isLoggedIn, setIsLoggedIn, logout, brokerAccounts, addBrokerAccount, currentBroker, setCurrentBroker, currentBrokerId]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -6,6 +6,7 @@ import { PWAWrapper } from "@/components/pwa-wrapper";
 import Script from "next/script";
 import Header from "@/components/header";
 import { AuthProvider } from "@/context/AuthProvider";
+import { AccountProvider } from "@/context/AccountProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,8 +35,10 @@ export default function RootLayout({
                         disableTransitionOnChange
                     >
                         <AuthProvider>
-                            <Header />
-                            {children}
+                            <AccountProvider>
+                                <Header />
+                                {children}
+                            </AccountProvider>
                         </AuthProvider>
                     </ThemeProvider>
                 </PWAWrapper>

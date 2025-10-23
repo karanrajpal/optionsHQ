@@ -12,7 +12,7 @@ export type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA';
 const ConnectBroker = () => {
     const [open, setOpen] = useState(false);
     const [redirectLink, setRedirectLink] = useState('');
-    const { userId, userSecret, setUserId, setUserSecret, setIsLoggedIn, addBrokerAccount } = useAuth();
+    const { userId, userSecret, setCurrentBroker, setUserId, setUserSecret, setIsLoggedIn, addBrokerAccount } = useAuth();
     const [broker, setBroker] = useLocalStorage<Broker>('broker', 'CHASE');
 
     const connectionProcess = async () => {
@@ -78,6 +78,7 @@ const ConnectBroker = () => {
                     // Handle successful connection here
                     console.log('Connection successful:', data);
                     addBrokerAccount({ name: broker, accountId: data });
+                    setCurrentBroker(broker);
                     setIsLoggedIn(true);
                 }}
                 onError={(errorData) => {
