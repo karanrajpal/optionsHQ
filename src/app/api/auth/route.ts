@@ -5,8 +5,6 @@ import { LoginRedirectURI } from "snaptrade-typescript-sdk/dist/models/login-red
 // Return the redirectURL from SnapTrade so the UI can use it
 export async function GET(request: NextRequest) {
     try {
-        console.log("Received request for SnapTrade login");
-        console.log(process.env.NEXT_SNAPTRADE_CLIENT_ID, process.env.NEXT_SNAPTRADE_CONSUMER_KEY);
         const snaptrade = new Snaptrade({
             clientId: process.env.NEXT_SNAPTRADE_CLIENT_ID as string,
             consumerKey: process.env.NEXT_SNAPTRADE_CONSUMER_KEY as string,
@@ -15,8 +13,7 @@ export async function GET(request: NextRequest) {
         const userId = request.headers.get("x-snaptrade-user-id");
         const userSecret = request.headers.get("x-snaptrade-user-secret");
 
-        const broker = request.nextUrl.searchParams.get("broker") ?? "CHASE";
-        console.log("Broker from URL:", broker);
+        const broker = request.nextUrl.searchParams.get("broker");
 
         if (!userId || !userSecret) {
             return NextResponse.json(
@@ -39,7 +36,6 @@ export async function GET(request: NextRequest) {
                 broker,
             },
         );
-        console.log(response.data);
 
         const data = response.data as LoginRedirectURI;
         return NextResponse.json(data);

@@ -8,16 +8,16 @@ import { useAuth } from '@/context/AuthProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useLocalStorage } from '@/lib/useLocalStorage';
 
-type Brokerage = 'CHASE' | 'FIDELITY' | 'ALPACA';
-const ConnectBrokerage = () => {
+type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA';
+const ConnectBroker = () => {
     const [open, setOpen] = useState(false);
     const [redirectLink, setRedirectLink] = useState('');
     const { userId, userSecret, setUserId, setUserSecret, setIsLoggedIn } = useAuth();
-    const [brokerage, setBrokerage] = useLocalStorage<Brokerage>('brokerage', 'CHASE');
+    const [broker, setBroker] = useLocalStorage<Broker>('broker', 'CHASE');
 
     const connectionProcess = async () => {
         try {
-            const response = await fetch(`/api/auth?brokerage=${brokerage}`, {
+            const response = await fetch(`/api/auth?broker=${broker}`, {
                 headers: {
                     'x-snaptrade-user-id': userId,
                     'x-snaptrade-user-secret': userSecret,
@@ -36,7 +36,6 @@ const ConnectBrokerage = () => {
         }
     };
 
-    console.log(userId, userSecret, brokerage, !userId || !userSecret);
     return (
         <div>
             <h2 className='text-lg font-bold mb-4'>Add your Snaptrade deets</h2>
@@ -56,9 +55,9 @@ const ConnectBrokerage = () => {
                     onChange={(e) => setUserSecret(e.target.value)}
                     className="mb-4 w-[300px]"
                 />
-                <Select value={brokerage} onValueChange={(e) => setBrokerage(e as Brokerage)}>
+                <Select value={broker} onValueChange={(e) => setBroker(e as Broker)}>
                     <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder="Select Brokerage" />
+                        <SelectValue placeholder="Select Broker" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="FIDELITY">Fidelity</SelectItem>
@@ -93,4 +92,4 @@ const ConnectBrokerage = () => {
     );
 };
 
-export default ConnectBrokerage;
+export default ConnectBroker;
