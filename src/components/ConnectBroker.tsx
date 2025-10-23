@@ -78,6 +78,7 @@ const ConnectBroker = () => {
                     // Handle successful connection here
                     console.log('Connection successful:', data);
                     setIsLoggedIn(true);
+                    console.log('User logged in:', data);
                 }}
                 onError={(errorData) => {
                     // Handle connection error here
