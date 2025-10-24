@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { PWAWrapper } from "@/components/pwa-wrapper";
@@ -8,7 +8,7 @@ import Header from "@/components/header";
 import { AuthProvider } from "@/context/AuthProvider";
 import { AccountProvider } from "@/context/AccountProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 /**
  * Exporting this metadata object is enough for Next.JS to pick it up for the page and SEO.
@@ -26,7 +26,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <Script async src="https://analystics.karanrajpal.net/script.js" data-website-id="36e23ca2-95a7-49fe-986a-5fbce6bc4b76"></Script>
-            <body className={inter.className}>
+            <body className="font-sans">
                 <PWAWrapper>
                     <ThemeProvider
                         attribute="class"
