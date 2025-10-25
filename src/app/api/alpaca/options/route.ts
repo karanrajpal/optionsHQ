@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAlpacaOptionsService, AlpacaOptionsRequest } from '@/lib/alpaca';
+import { createAlpacaOptionsService } from '@/lib/alpaca';
+import { GetOptionChainParams } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/rest_v2';
 
 /**
  * GET /api/alpaca/options
@@ -7,7 +8,7 @@ import { createAlpacaOptionsService, AlpacaOptionsRequest } from '@/lib/alpaca';
  * Fetch options contracts from Alpaca Options API
  * 
  * Query Parameters:
- * - underlying_symbols: Ticker symbol (e.g., "AAPL") - Required
+ * - root_symbol: Ticker symbol (e.g., "AAPL") - Required
  * - type: "call" or "put" - Optional
  * - status: "active" or "inactive" - Optional (default: "active")
  * - expiration_date_gte: Filter by expiration date >= this date (YYYY-MM-DD) - Optional
@@ -15,27 +16,27 @@ import { createAlpacaOptionsService, AlpacaOptionsRequest } from '@/lib/alpaca';
  * - strike_price_gte: Filter by strike price >= this value - Optional
  * - strike_price_lte: Filter by strike price <= this value - Optional
  * - limit: Number of results to return (max 10000) - Optional
- * 
- * Example: /api/alpaca/options?underlying_symbols=AAPL&type=call&limit=50
+ *
+ * Example: /api/alpaca/options?root_symbol=AAPL&type=call&limit=50
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     
     // Extract and validate required parameters
-    const underlying_symbols = searchParams.get('underlying_symbols');
-    
-    if (!underlying_symbols) {
+    const root_symbol = searchParams.get('root_symbol');
+
+    if (!root_symbol) {
       return NextResponse.json(
-        { error: 'Missing required parameter: underlying_symbols' },
+        { error: 'Missing required parameter: root_symbol' },
         { status: 400 }
       );
     }
 
     // Build request parameters
-    const requestParams: AlpacaOptionsRequest = {
-      underlying_symbols,
-      status: (searchParams.get('status') as 'active' | 'inactive') || 'active',
+    const requestParams: GetOptionChainParams = {
+      root_symbol,
+      // status: (searchParams.get('status') as 'active' | 'inactive') || 'active',
     };
 
     // Add optional parameters if provided
@@ -56,22 +57,22 @@ export async function GET(request: NextRequest) {
 
     const strike_price_gte = searchParams.get('strike_price_gte');
     if (strike_price_gte) {
-      requestParams.strike_price_gte = strike_price_gte;
+      requestParams.strike_price_gte = Number(strike_price_gte);
     }
 
     const strike_price_lte = searchParams.get('strike_price_lte');
     if (strike_price_lte) {
-      requestParams.strike_price_lte = strike_price_lte;
+      requestParams.strike_price_lte = Number(strike_price_lte);
     }
 
     const limit = searchParams.get('limit');
     if (limit) {
-      requestParams.limit = parseInt(limit, 10);
+      requestParams.totalLimit = parseInt(limit, 10);
     }
 
     // Create service and fetch data
     const optionsService = createAlpacaOptionsService();
-    const data = await optionsService.getOptionsWithSnapshots(requestParams);
+    const data = await optionsService.getOptionsChain(requestParams);
 
     return NextResponse.json({
       success: true,

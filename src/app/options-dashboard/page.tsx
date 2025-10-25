@@ -1,18 +1,18 @@
 'use client';
 
-import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OptionsDataTable } from '@/components/OptionsDataTable';
-import { AlpacaOptionContractWithSnapshot } from '@/lib/alpaca';
+import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
+import { useState } from 'react';
 
 export default function OptionsDashboard() {
-  const [ticker, setTicker] = React.useState('');
-  const [optionType, setOptionType] = React.useState<'all' | 'call' | 'put'>('all');
-  const [data, setData] = React.useState<AlpacaOptionContractWithSnapshot[]>([]);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [ticker, setTicker] = useState('');
+  const [optionType, setOptionType] = useState<'all' | 'call' | 'put'>('all');
+  const [data, setData] = useState<AlpacaOptionSnapshot[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGetOptions = async () => {
     if (!ticker.trim()) {
@@ -27,7 +27,7 @@ export default function OptionsDashboard() {
     try {
       // Build query parameters
       const params = new URLSearchParams({
-        underlying_symbols: ticker.toUpperCase(),
+        root_symbol: ticker.toUpperCase(),
         limit: '100',
       });
 

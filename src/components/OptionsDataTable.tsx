@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import {
   ColumnDef,
   flexRender,
@@ -18,22 +17,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { AlpacaOptionContractWithSnapshot } from '@/lib/alpaca';
+import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
+import { useState } from 'react';
 
-export const columns: ColumnDef<AlpacaOptionContractWithSnapshot>[] = [
+export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
   {
     accessorKey: 'symbol',
     header: 'Symbol',
-    cell: ({ row }) => <div className="font-mono text-xs">{row.getValue('symbol')}</div>,
+    cell: ({ row }) => <div className="font-mono text-xs">{row?.original?.Symbol}</div>,
   },
   {
     accessorKey: 'type',
     header: 'Type',
     cell: ({ row }) => {
-      const type = row.getValue('type') as string;
+      const match = row?.original?.Symbol?.match(/\d{6}(\w)/);
+      const type = match ? match[1] === 'C' ? 'call' : 'put' : null;
       return (
         <div className={`font-semibold ${type === 'call' ? 'text-green-600' : 'text-red-600'}`}>
-          {type.toUpperCase()}
+          {type?.toUpperCase()}
         </div>
       );
     },
@@ -42,7 +43,8 @@ export const columns: ColumnDef<AlpacaOptionContractWithSnapshot>[] = [
     accessorKey: 'strike_price',
     header: 'Strike Price',
     cell: ({ row }) => {
-      const strikePrice = parseFloat(row.getValue('strike_price'));
+      const strikePriceMatch = row?.original?.Symbol?.match(/\d{6}[CP](\d+)/);
+      const strikePrice = strikePriceMatch ? parseFloat(strikePriceMatch[1]) / 1000 : 0;
       return <div>${strikePrice.toFixed(2)}</div>;
     },
   },
@@ -50,16 +52,20 @@ export const columns: ColumnDef<AlpacaOptionContractWithSnapshot>[] = [
     accessorKey: 'expiration_date',
     header: 'Expiration Date',
     cell: ({ row }) => {
-      const date = new Date(row.getValue('expiration_date'));
-      return <div>{date.toLocaleDateString()}</div>;
+      const dateMatch = row?.original?.Symbol?.match(/\d+/);
+      const dateString = dateMatch ? dateMatch[0] : '';
+      const date = new Date(
+        `20${dateString.substring(0, 2)}-${dateString.substring(2, 4)}-${dateString.substring(4, 6)}`
+      );
+      return <div>{date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })}</div>;
     },
   },
   {
     accessorKey: 'snapshot',
     header: 'Last Price',
     cell: ({ row }) => {
-      const snapshot = row.original.snapshot;
-      const lastPrice = snapshot?.latestTrade?.p || snapshot?.latestQuote?.ap;
+      const snapshot = row.original;
+      const lastPrice = snapshot?.LatestTrade?.Price || snapshot?.LatestQuote?.AskPrice || snapshot?.LatestQuote?.BidPrice || 0;
       return lastPrice ? <div>${lastPrice.toFixed(2)}</div> : <div className="text-gray-400">-</div>;
     },
   },
@@ -67,7 +73,7 @@ export const columns: ColumnDef<AlpacaOptionContractWithSnapshot>[] = [
     accessorKey: 'snapshot.latestQuote.bp',
     header: 'Bid',
     cell: ({ row }) => {
-      const bid = row.original.snapshot?.latestQuote?.bp;
+      const bid = row.original?.LatestQuote?.BidPrice;
       return bid ? <div>${bid.toFixed(2)}</div> : <div className="text-gray-400">-</div>;
     },
   },
@@ -75,7 +81,7 @@ export const columns: ColumnDef<AlpacaOptionContractWithSnapshot>[] = [
     accessorKey: 'snapshot.latestQuote.ap',
     header: 'Ask',
     cell: ({ row }) => {
-      const ask = row.original.snapshot?.latestQuote?.ap;
+      const ask = row.original?.LatestQuote?.AskPrice;
       return ask ? <div>${ask.toFixed(2)}</div> : <div className="text-gray-400">-</div>;
     },
   },
@@ -91,20 +97,20 @@ export const columns: ColumnDef<AlpacaOptionContractWithSnapshot>[] = [
     accessorKey: 'snapshot.impliedVolatility',
     header: 'IV',
     cell: ({ row }) => {
-      const iv = row.original.snapshot?.impliedVolatility;
+      const iv = (row.original as any).ImpliedVolatility;
       return iv ? <div>{(iv * 100).toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
     },
   },
 ];
 
 interface OptionsDataTableProps {
-  data: AlpacaOptionContractWithSnapshot[];
+  data: AlpacaOptionSnapshot[];
   isLoading?: boolean;
   error?: string | null;
 }
 
 export function OptionsDataTable({ data, isLoading, error }: OptionsDataTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
     data,

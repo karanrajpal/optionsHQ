@@ -8,5 +8,4 @@
  * - Account Management
  */
 
-export * from './types';
 export * from './options-service';
