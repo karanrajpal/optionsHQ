@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./
 import ConnectBroker from "./ConnectBroker";
 import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
+import { useUser } from "@stackframe/stack";
 
 /**
  * Account Checkup component
@@ -14,14 +15,15 @@ import Link from "next/link";
  * Uses the connected user_data_accounts type from the API
  */
 export const AccountCheckup = () => {
-    const { snaptradeUserId, snaptradeUserSecret, alpacaApiKey, alpacaApiSecret, userDisplayName, isLoading } = useUserDataAccounts();
+    const { snaptradeUserId, snaptradeUserSecret, alpacaApiKey, alpacaApiSecret, isLoading } = useUserDataAccounts();
     const isSnaptradeConnected = snaptradeUserId && snaptradeUserSecret;
     const isAlpacaConnected = alpacaApiKey && alpacaApiSecret;
     const { accounts } = useSnaptradeAccount();
+    const user = useUser();
 
     return (
         <div>
-            <h2 className="font-bold text-3xl mb-6">Welcome, {userDisplayName ?? 'Options Lover'}</h2>
+            <h2 className="font-bold text-3xl mb-6">Welcome, {user?.displayName ?? 'Options Lover'}</h2>
             <div className="flex justify-center">
                 {isLoading ? (
                     <Skeleton className="w-40 h-10 rounded" />

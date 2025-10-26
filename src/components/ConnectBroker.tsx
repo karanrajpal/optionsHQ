@@ -4,16 +4,14 @@ import { SnapTradeReact } from 'snaptrade-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { LoginRedirectURI } from 'snaptrade-typescript-sdk';
-import { useSnaptradeAuth } from '@/context/SnaptradeAuthProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useUserDataAccounts } from '@/context/UserDataAccountsProvider';
+import { useUser } from '@stackframe/stack';
 
 export type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA';
 const ConnectBroker = () => {
     const [open, setOpen] = useState(false);
     const [redirectLink, setRedirectLink] = useState('');
-    const { setIsLoggedIn } = useSnaptradeAuth();
-    const { userId } = useUserDataAccounts();
+    const user = useUser();
     const [broker, setBroker] = useState<Broker>('CHASE');
     const [snaptradeUserId, setSnaptradeUserId] = useState('');
     const [snaptradeUserSecret, setSnaptradeUserSecret] = useState('');
@@ -81,7 +79,6 @@ const ConnectBroker = () => {
                 onSuccess={async (data) => {
                     // Handle successful connection here
                     console.log('Connection successful:', data);
-                    setIsLoggedIn(true);
 
                     // Save Snaptrade credentials in the database
                     await fetch('/api/user_data_accounts', {
@@ -92,7 +89,7 @@ const ConnectBroker = () => {
                         body: JSON.stringify({
                             snaptradeUserId,
                             snaptradeUserSecret,
-                            userId,
+                            userId: user?.id,
                         }),
                     });
                 }}

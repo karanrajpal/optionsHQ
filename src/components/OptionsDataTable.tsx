@@ -20,6 +20,15 @@ import {
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useState } from 'react';
 
+const extractDateFromContractSymbol = (contract: string) => {
+  const dateMatch = contract.match(/\d+/);
+  const dateString = dateMatch ? dateMatch[0] : '';
+  const date = new Date(
+    `20${dateString.substring(0, 2)}-${dateString.substring(2, 4)}-${dateString.substring(4, 6)}`
+  );
+  return date;
+};
+
 export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
   {
     accessorKey: 'symbol',
@@ -52,12 +61,8 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
     accessorKey: 'expiration_date',
     header: 'Expiration Date',
     cell: ({ row }) => {
-      const dateMatch = row?.original?.Symbol?.match(/\d+/);
-      const dateString = dateMatch ? dateMatch[0] : '';
-      const date = new Date(
-        `20${dateString.substring(0, 2)}-${dateString.substring(2, 4)}-${dateString.substring(4, 6)}`
-      );
-      return <div>{date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })}</div>;
+      const date = extractDateFromContractSymbol(row?.original?.Symbol);
+      return <div>{date?.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })}</div>;
     },
   },
   {
@@ -86,11 +91,13 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
     },
   },
   {
-    accessorKey: 'open_interest',
-    header: 'Open Interest',
+    accessorKey: 'days_to_expiration',
+    header: 'Days to Expiration',
     cell: ({ row }) => {
-      const openInterest = row.getValue('open_interest') as string;
-      return <div>{openInterest || '-'}</div>;
+      const date = extractDateFromContractSymbol(row?.original?.Symbol);
+      const today = new Date();
+      const daysToExpiration = date ? Math.ceil((date.getTime() - today.getTime()) / (1000 * 3600 * 24)) : null;
+      return <div>{daysToExpiration || '-'}</div>;
     },
   },
   {

@@ -4,7 +4,6 @@ import { LuCheck, LuSettings } from 'react-icons/lu';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from './ui/navigation-menu';
 import { DarkModeToggle } from './dark-mode-toggle';
 import { Button } from './ui/button';
-import { useSnaptradeAuth } from '@/context/SnaptradeAuthProvider';
 import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
 import { SiChase } from 'react-icons/si';
 import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
@@ -42,7 +41,7 @@ export default function Header() {
                                                 onClick={() => account.id ? setSelectedAccountId(account.id) : null}
                                                 key={account.id}
                                                 title={`${account.institution_name} - ${account.name}`}
-                                                className="w-48 cursor-pointer block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                                                className="w-56 cursor-pointer block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                                             >
                                                 <div className="flex items-center gap-2">
                                                     {account.institution_name === 'Fidelity' ? <img src={'/fidelity.png'} alt="Fidelity Logo" className="w-4 h-4" /> : null}

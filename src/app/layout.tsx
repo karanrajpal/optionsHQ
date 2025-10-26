@@ -7,9 +7,8 @@ import "./globals.css";
 import { PWAWrapper } from "@/components/pwa-wrapper";
 import Script from "next/script";
 import Header from "@/components/header";
-import { SnaptradeAuthProvider } from "@/context/SnaptradeAuthProvider";
 import { SnaptradeAccountsProvider } from "@/context/SnaptradeAccountsProvider";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { UserDataAccountsProvider } from "@/context/UserDataAccountsProvider";
 
 // const inter = Inter({ subsets: ["latin"] });
@@ -40,14 +39,14 @@ export default function RootLayout({
                                 enableSystem
                                 disableTransitionOnChange
                             >
-                                <UserDataAccountsProvider>
-                                    <SnaptradeAuthProvider>
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <UserDataAccountsProvider>
                                         <SnaptradeAccountsProvider>
                                             {stackClientApp.getUser().then(user => user && <Header />)}
                                             {children}
                                         </SnaptradeAccountsProvider>
-                                    </SnaptradeAuthProvider>
-                                </UserDataAccountsProvider>
+                                    </UserDataAccountsProvider>
+                                </Suspense>
                             </ThemeProvider>
                         </PWAWrapper>
                     </StackTheme>

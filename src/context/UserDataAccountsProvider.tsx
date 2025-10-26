@@ -1,15 +1,13 @@
 "use client";
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { useLocalStorage } from "@/lib/useLocalStorage";
-import { stackClientApp } from "@/stack/client";
+import { useUser } from "@stackframe/stack";
 
 type UserDataAccountsContextType = {
   alpacaApiKey: string | null;
   alpacaApiSecret: string | null;
   snaptradeUserId: string | null;
   snaptradeUserSecret: string | null;
-  userId: string | null;
-  userDisplayName: string | null;
   isLoading: boolean;
 };
 
@@ -20,22 +18,13 @@ export const UserDataAccountsProvider = ({ children }: { children: ReactNode }) 
   const [alpacaApiSecret, setAlpacaApiSecret] = useLocalStorage<string | null>("alpaca_api_secret", null);
   const [snaptradeUserId, setSnaptradeUserId] = useLocalStorage<string | null>("snaptrade_user_id", null);
   const [snaptradeUserSecret, setSnaptradeUserSecret] = useLocalStorage<string | null>("snaptrade_user_secret", null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [userDisplayName, setUserDisplayName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-        const fetchUserData = async () => {
-            const user = await stackClientApp.getUser();
-            setUserId(user?.id || null);
-            setUserDisplayName(user?.displayName || null);
-        };
-        fetchUserData();
-    }, []);
+  const user = useUser();
 
   useEffect(() => {
     const fetchUserDataAccounts = async () => {
-      const response = await fetch(`/api/user_data_accounts?user_id=${userId}`);
+      const response = await fetch(`/api/user_data_accounts?user_id=${user?.id}`);
       const data = await response.json();
       if (data) {
         setAlpacaApiKey(data.alpaca_api_key);
@@ -45,14 +34,14 @@ export const UserDataAccountsProvider = ({ children }: { children: ReactNode }) 
       }
       setIsLoading(false);
     };
-    if (userId) {
+    if (user?.id) {
       fetchUserDataAccounts();
     }
-  }, [userId]);
+  }, [user?.id]);
 
   const value = useMemo(
-    () => ({ alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, userId, userDisplayName, isLoading }),
-    [alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, userId, userDisplayName, isLoading]
+    () => ({ alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, isLoading }),
+    [alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, isLoading]
   );
 
   return <UserDataAccountsContext.Provider value={value}>{children}</UserDataAccountsContext.Provider>;
