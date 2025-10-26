@@ -6,21 +6,24 @@ import { Input } from './ui/input';
 import { LoginRedirectURI } from 'snaptrade-typescript-sdk';
 import { useSnaptradeAuth } from '@/context/SnaptradeAuthProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useLocalStorage } from '@/lib/useLocalStorage';
+import { useUserDataAccounts } from '@/context/UserDataAccountsProvider';
 
 export type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA';
 const ConnectBroker = () => {
     const [open, setOpen] = useState(false);
     const [redirectLink, setRedirectLink] = useState('');
-    const { userId, userSecret, setCurrentBroker, setUserId, setUserSecret, setIsLoggedIn, addBrokerAccount } = useSnaptradeAuth();
-    const [broker, setBroker] = useLocalStorage<Broker>('broker', 'CHASE');
+    const { setIsLoggedIn } = useSnaptradeAuth();
+    const { userId } = useUserDataAccounts();
+    const [broker, setBroker] = useState<Broker>('CHASE');
+    const [snaptradeUserId, setSnaptradeUserId] = useState('');
+    const [snaptradeUserSecret, setSnaptradeUserSecret] = useState('');
 
     const connectionProcess = async () => {
         try {
             const response = await fetch(`/api/auth?broker=${broker}`, {
                 headers: {
-                    'x-snaptrade-user-id': userId,
-                    'x-snaptrade-user-secret': userSecret,
+                    'x-snaptrade-user-id': snaptradeUserId,
+                    'x-snaptrade-user-secret': snaptradeUserSecret,
                 },
             });
             const data: LoginRedirectURI = await response.json();
@@ -38,21 +41,22 @@ const ConnectBroker = () => {
 
     return (
         <div>
-            <h2 className='text-lg font-bold mb-4'>Add your Snaptrade deets</h2>
+            {/* <h2 className='text-lg font-bold mb-4'>Add your Snaptrade deets</h2> */}
 
+            <div className='text-center mb-3'>Request this from the admin</div>
             <div className="flex flex-col justify-center items-center">
                 <Input
                     type="text"
                     placeholder="Snaptrade User ID"
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
+                    value={snaptradeUserId}
+                    onChange={(e) => setSnaptradeUserId(e.target.value)}
                     className="mb-4 w-[300px]"
                 />
                 <Input
                     type="password"
                     placeholder="Snaptrade User Secret"
-                    value={userSecret}
-                    onChange={(e) => setUserSecret(e.target.value)}
+                    value={snaptradeUserSecret}
+                    onChange={(e) => setSnaptradeUserSecret(e.target.value)}
                     className="mb-4 w-[300px]"
                 />
                 <Select value={broker} onValueChange={(e) => setBroker(e as Broker)}>
@@ -74,12 +78,23 @@ const ConnectBroker = () => {
                 loginLink={redirectLink}
                 isOpen={open}
                 close={() => setOpen(false)}
-                onSuccess={(data) => {
+                onSuccess={async (data) => {
                     // Handle successful connection here
                     console.log('Connection successful:', data);
-                    addBrokerAccount({ name: broker, accountId: data });
-                    setCurrentBroker(broker);
                     setIsLoggedIn(true);
+
+                    // Save Snaptrade credentials in the database
+                    await fetch('/api/user_data_accounts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            snaptradeUserId,
+                            snaptradeUserSecret,
+                            userId,
+                        }),
+                    });
                 }}
                 onError={(errorData) => {
                     // Handle connection error here

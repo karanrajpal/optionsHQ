@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
-import { useSnaptradeAuth } from "@/context/SnaptradeAuthProvider";
+import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
 import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";
 
@@ -11,7 +11,7 @@ export default function HoldingsPage() {
     const { selectedAccount } = useSnaptradeAccount();
     const [holdings, setHoldings] = useState<AccountHoldingsAccount | null>(null);
     const [loading, setLoading] = useState(true);
-    const { userId, userSecret } = useSnaptradeAuth();
+    const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
 
     useEffect(() => {
         const fetchHoldings = async () => {
@@ -19,8 +19,8 @@ export default function HoldingsPage() {
             if (selectedAccount?.id) {
                 const response = await fetch(`/api/holdings?accountId=${selectedAccount.id}`, {
                     headers: {
-                        "user-id": userId,
-                        "user-secret": userSecret
+                        "user-id": snaptradeUserId as string,
+                        "user-secret": snaptradeUserSecret as string
                     }
                 });
                 const data = await response.json();

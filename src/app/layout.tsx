@@ -40,14 +40,14 @@ export default function RootLayout({
                                 enableSystem
                                 disableTransitionOnChange
                             >
-                                <SnaptradeAuthProvider>
-                                    <SnaptradeAccountsProvider>
-                                        <UserDataAccountsProvider>
+                                <UserDataAccountsProvider>
+                                    <SnaptradeAuthProvider>
+                                        <SnaptradeAccountsProvider>
                                             {stackClientApp.getUser().then(user => user && <Header />)}
                                             {children}
-                                        </UserDataAccountsProvider>
-                                    </SnaptradeAccountsProvider>
-                                </SnaptradeAuthProvider>
+                                        </SnaptradeAccountsProvider>
+                                    </SnaptradeAuthProvider>
+                                </UserDataAccountsProvider>
                             </ThemeProvider>
                         </PWAWrapper>
                     </StackTheme>

@@ -1,34 +1,37 @@
 "use client";
-import { createContext, ReactNode, useContext, useEffect, useMemo } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { Dispatch, SetStateAction } from "react";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 import { SnapTradeHoldingsAccount } from "snaptrade-typescript-sdk";
-import { useSnaptradeAuth } from "./SnaptradeAuthProvider";
+import { useUserDataAccounts } from "./UserDataAccountsProvider";
 
-type AccountContextType = {
+type SnaptradeAccountContextType = {
   accounts: Record<string, SnapTradeHoldingsAccount>;
   selectedAccount: SnapTradeHoldingsAccount | null;
   setSelectedAccountId: Dispatch<SetStateAction<string | null>>;
 };
 
-const AccountContext = createContext<AccountContextType | undefined>(undefined);
+const SnapTradeAccountsContext = createContext<SnaptradeAccountContextType | undefined>(undefined);
 
 export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode }) => {
-  const [accounts, setAccounts] = useLocalStorage<Record<string, SnapTradeHoldingsAccount>>("broker_accounts", {});
-  const [selectedAccountId, setSelectedAccountId] = useLocalStorage<string | null>("selected_account_id", null);
+  const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
 
-  const { userId, userSecret } = useSnaptradeAuth();
+  const [accounts, setAccounts] = useState<Record<string, SnapTradeHoldingsAccount>>({});
+
+  // Storing some of the user preferences for defaults in local storage
+  const [selectedAccountId, setSelectedAccountId] = useLocalStorage<string | null>("selected_account_id", null);
 
   const selectedAccount = useMemo(() => {
     return selectedAccountId ? accounts[selectedAccountId] : null;
   }, [selectedAccountId, accounts]);
 
+
   useEffect(() => {
     const fetchAccounts = async () => {
       const accounts: SnapTradeHoldingsAccount[] = await fetch("/api/snaptrade/accounts", {
         headers: {
-          "user-id": userId as string,
-          "user-secret": userSecret as string,
+          "user-id": snaptradeUserId as string,
+          "user-secret": snaptradeUserSecret as string,
         },
       }).then(res => res.json());
       if (accounts && accounts.length > 0) {
@@ -45,15 +48,15 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
   }, []);
 
   const value = useMemo(
-    () => ({ accounts, setSelectedAccountId, selectedAccount }),
-    [accounts, setSelectedAccountId, selectedAccount]
+    () => ({ accounts, selectedAccount, setSelectedAccountId }),
+    [accounts, selectedAccount, setSelectedAccountId]
   );
 
-  return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;
+  return <SnapTradeAccountsContext.Provider value={value}>{children}</SnapTradeAccountsContext.Provider>;
 };
 
 export const useSnaptradeAccount = () => {
-  const ctx = useContext(AccountContext);
+  const ctx = useContext(SnapTradeAccountsContext);
   if (!ctx) {
     throw new Error("useSnaptradeAccount must be used within an SnaptradeAccountProvider");
   }
