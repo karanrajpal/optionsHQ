@@ -30,4 +30,15 @@ export class SnaptradeService {
             userSecret: this.userSecret,
         });
     }
+
+    public async getAccountActivities(startDate?: string | Date, endDate?: string | Date, type?: string) {
+        return await this.snaptrade.accountInformation.getAccountActivities({
+            accountId: this.accountId as string,
+            userId: this.userId,
+            userSecret: this.userSecret,
+            startDate,
+            endDate,
+            type,
+        });
+    }
 }
