@@ -28,6 +28,10 @@ export async function middleware(request: NextRequest) {
     const signInUrl = new URL('/handler/sign-in', request.url);
     return NextResponse.redirect(signInUrl);
   }
+  if (user && pathname.includes('/sign-in')) {
+    const homeUrl = new URL('/', request.url);
+    return NextResponse.redirect(homeUrl);
+  }
   return NextResponse.next();
 }
 
