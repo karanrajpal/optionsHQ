@@ -7,7 +7,7 @@ import { OptionsDataTable } from '@/components/OptionsDataTable';
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useState } from 'react';
 
-export default function OptionsDashboard() {
+export default function Discover() {
   const [ticker, setTicker] = useState('');
   const [optionType, setOptionType] = useState<'all' | 'call' | 'put'>('all');
   const [data, setData] = useState<AlpacaOptionSnapshot[]>([]);
