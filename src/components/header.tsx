@@ -25,6 +25,9 @@ export default function Header() {
                     <Link href="/options" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
                         Options
                     </Link>
+                    <Link href="/watchlist" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
+                        Watchlist
+                    </Link>
                     <Link href="/discover" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
                         Discover
                     </Link>
