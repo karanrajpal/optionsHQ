@@ -79,13 +79,11 @@ export default function Header() {
                                             </NavigationMenuLink>
                                         ))
                                     ) : null}
-                                    <NavigationMenuLink className="w-48 cursor-pointer block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
-                                        <Link href="/add-broker">
-                                            <div className="flex items-center gap-2">
-                                                <LuPlus className="text-gray-400" />
-                                                Add Broker
-                                            </div>
-                                        </Link>
+                                    <NavigationMenuLink href='/add-broker' className="w-48 cursor-pointer block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
+                                        <div className="flex items-center gap-2">
+                                            <LuPlus className="text-gray-400" />
+                                            Add Broker
+                                        </div>
                                     </NavigationMenuLink>
                                 </NavigationMenuContent>
                             </NavigationMenuItem>

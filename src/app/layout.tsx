@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-// import { Inter } from "next/font/google";
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackClientApp } from "../stack/client";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { PWAWrapper } from "@/components/pwa-wrapper";
@@ -25,23 +27,27 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <Script async src="https://analystics.karanrajpal.net/script.js" data-website-id="36e23ca2-95a7-49fe-986a-5fbce6bc4b76"></Script>
+            <Script async src="https://analytics.karanrajpal.net/script.js" data-website-id="36e23ca2-95a7-49fe-986a-5fbce6bc4b76"></Script>
             <body className="font-sans">
-                <PWAWrapper>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                    >
-                        <AuthProvider>
-                            <AccountProvider>
-                                <Header />
-                                {children}
-                            </AccountProvider>
-                        </AuthProvider>
-                    </ThemeProvider>
-                </PWAWrapper>
+                <StackProvider app={stackClientApp}>
+                    <StackTheme>
+                        <PWAWrapper>
+                            <ThemeProvider
+                                attribute="class"
+                                defaultTheme="system"
+                                enableSystem
+                                disableTransitionOnChange
+                            >
+                                <AuthProvider>
+                                    <AccountProvider>
+                                        {stackClientApp.getUser().then(user => user && <Header />)}
+                                        {children}
+                                    </AccountProvider>
+                                </AuthProvider>
+                            </ThemeProvider>
+                        </PWAWrapper>
+                    </StackTheme>
+                </StackProvider>
             </body>
         </html>
     );
