@@ -213,12 +213,12 @@ export default function WatchlistPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
-                                            {item.latest_price !== null
+                                            {item.latest_price !== null && item.latest_price !== undefined
                                                 ? `$${item.latest_price.toFixed(2)}`
                                                 : "—"}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                            {item.change !== null ? (
+                                            {item.change !== null && item.change !== undefined ? (
                                                 <span
                                                     className={
                                                         item.change >= 0
@@ -234,7 +234,7 @@ export default function WatchlistPage() {
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                            {item.change_percent !== null ? (
+                                            {item.change_percent !== null && item.change_percent !== undefined ? (
                                                 <div className="flex items-center justify-end gap-1">
                                                     {item.change_percent >= 0 ? (
                                                         <LuTrendingUp className="text-green-600 dark:text-green-400" />

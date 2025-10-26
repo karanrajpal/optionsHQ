@@ -114,7 +114,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [selectedWatchlistId, fetchWatchlistItems]);
 
-  const createWatchlist = async (name: string) => {
+  const createWatchlist = useCallback(async (name: string) => {
     if (!user?.id) return;
 
     try {
@@ -131,9 +131,9 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error creating watchlist:", error);
       throw error;
     }
-  };
+  }, [user?.id, fetchWatchlists]);
 
-  const updateWatchlist = async (watchlistId: number, name: string) => {
+  const updateWatchlist = useCallback(async (watchlistId: number, name: string) => {
     try {
       const response = await fetch('/api/watchlist', {
         method: 'PUT',
@@ -148,9 +148,9 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error updating watchlist:", error);
       throw error;
     }
-  };
+  }, [fetchWatchlists]);
 
-  const deleteWatchlist = async (watchlistId: number) => {
+  const deleteWatchlist = useCallback(async (watchlistId: number) => {
     try {
       const response = await fetch(`/api/watchlist?watchlist_id=${watchlistId}`, {
         method: 'DELETE',
@@ -166,9 +166,9 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error deleting watchlist:", error);
       throw error;
     }
-  };
+  }, [selectedWatchlistId, fetchWatchlists]);
 
-  const addWatchlistItem = async (tickerSymbol: string) => {
+  const addWatchlistItem = useCallback(async (tickerSymbol: string) => {
     if (!selectedWatchlistId) return;
 
     try {
@@ -185,9 +185,9 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error adding watchlist item:", error);
       throw error;
     }
-  };
+  }, [selectedWatchlistId, fetchWatchlistItems]);
 
-  const removeWatchlistItem = async (tickerSymbol: string) => {
+  const removeWatchlistItem = useCallback(async (tickerSymbol: string) => {
     if (!selectedWatchlistId) return;
 
     try {
@@ -203,7 +203,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error removing watchlist item:", error);
       throw error;
     }
-  };
+  }, [selectedWatchlistId, fetchWatchlistItems]);
 
   const value = useMemo(
     () => ({
@@ -227,6 +227,11 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       isLoading,
       fetchWatchlists,
       fetchWatchlistItems,
+      createWatchlist,
+      updateWatchlist,
+      deleteWatchlist,
+      addWatchlistItem,
+      removeWatchlistItem,
     ]
   );
 
