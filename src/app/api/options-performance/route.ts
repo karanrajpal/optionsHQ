@@ -26,12 +26,12 @@ export async function GET(request: NextRequest) {
         // Filter for option-related transactions
         const optionTypes = "BUY,SELL,OPTIONEXPIRATION,OPTIONASSIGNMENT,OPTIONEXERCISE";
         
-        const data = await snaptradeService.getAccountActivities(
+        const response = await snaptradeService.getAccountActivities(
             startDate || undefined,
             endDate || undefined,
             optionTypes
         );
-        return NextResponse.json(data.data);
+        return NextResponse.json(response.data);
     } catch (error) {
         console.error("Error fetching options performance:", error);
         return NextResponse.json({ error: "Failed to fetch options performance" }, { status: 500 });

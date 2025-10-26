@@ -5,38 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
-
-interface OptionActivity {
-    id?: string;
-    symbol?: {
-        id?: string;
-        symbol?: string;
-        description?: string;
-    };
-    option_symbol?: {
-        ticker?: string;
-        option_type?: string;
-        strike_price?: number;
-        expiration_date?: string;
-    };
-    price?: number;
-    units?: number;
-    amount?: number | null;
-    type?: string;
-    option_type?: string;
-    description?: string;
-    trade_date?: string | null;
-    fee?: number;
-}
-
-interface PaginatedActivities {
-    activities?: OptionActivity[];
-    total?: number;
-}
+import { PaginatedUniversalActivity, AccountUniversalActivity } from "snaptrade-typescript-sdk";
 
 export default function OptionsPerformancePage() {
     const { selectedAccount } = useSnaptradeAccount();
-    const [activities, setActivities] = useState<OptionActivity[]>([]);
+    const [activities, setActivities] = useState<AccountUniversalActivity[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
@@ -58,8 +31,8 @@ export default function OptionsPerformancePage() {
                         throw new Error(`Failed to fetch options performance: ${response.statusText}`);
                     }
                     
-                    const data: PaginatedActivities = await response.json();
-                    setActivities(data.activities || []);
+                    const data: PaginatedUniversalActivity = await response.json();
+                    setActivities(data.data || []);
                 } catch (err) {
                     console.error("Error fetching options performance:", err);
                     setError(err instanceof Error ? err.message : "Failed to fetch options performance");
@@ -85,7 +58,7 @@ export default function OptionsPerformancePage() {
         return new Date(dateString).toLocaleDateString();
     };
 
-    const getProfitLoss = (activity: OptionActivity) => {
+    const getProfitLoss = (activity: AccountUniversalActivity) => {
         if (activity.amount !== null && activity.amount !== undefined) {
             return activity.amount;
         }
