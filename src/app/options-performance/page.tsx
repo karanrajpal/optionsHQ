@@ -38,21 +38,34 @@ export default function OptionsPerformancePage() {
     const { selectedAccount } = useSnaptradeAccount();
     const [activities, setActivities] = useState<OptionActivity[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
 
     useEffect(() => {
         const fetchActivities = async () => {
             setLoading(true);
+            setError(null);
             if (selectedAccount?.id) {
-                const response = await fetch(`/api/options-performance?accountId=${selectedAccount.id}`, {
-                    headers: {
-                        "user-id": snaptradeUserId as string,
-                        "user-secret": snaptradeUserSecret as string,
+                try {
+                    const response = await fetch(`/api/options-performance?accountId=${selectedAccount.id}`, {
+                        headers: {
+                            "user-id": snaptradeUserId as string,
+                            "user-secret": snaptradeUserSecret as string,
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch options performance: ${response.statusText}`);
                     }
-                });
-                const data: PaginatedActivities = await response.json();
-                setActivities(data.activities || []);
-                setLoading(false);
+                    
+                    const data: PaginatedActivities = await response.json();
+                    setActivities(data.activities || []);
+                } catch (err) {
+                    console.error("Error fetching options performance:", err);
+                    setError(err instanceof Error ? err.message : "Failed to fetch options performance");
+                } finally {
+                    setLoading(false);
+                }
             }
         };
 
@@ -98,7 +111,10 @@ export default function OptionsPerformancePage() {
             
             {loading ? (
                 <div className="mt-4 w-full">
-                    <div className="grid grid-cols-7 gap-4 mb-2">
+                    <div className="grid grid-cols-10 gap-4 mb-2">
+                        <Skeleton className="h-8 rounded" />
+                        <Skeleton className="h-8 rounded" />
+                        <Skeleton className="h-8 rounded" />
                         <Skeleton className="h-8 rounded" />
                         <Skeleton className="h-8 rounded" />
                         <Skeleton className="h-8 rounded" />
@@ -109,7 +125,10 @@ export default function OptionsPerformancePage() {
                     </div>
 
                     {Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="grid grid-cols-7 gap-4 py-2">
+                        <div key={i} className="grid grid-cols-10 gap-4 py-2">
+                            <Skeleton className="h-16 rounded" />
+                            <Skeleton className="h-16 rounded" />
+                            <Skeleton className="h-16 rounded" />
                             <Skeleton className="h-16 rounded" />
                             <Skeleton className="h-16 rounded" />
                             <Skeleton className="h-16 rounded" />
@@ -122,7 +141,14 @@ export default function OptionsPerformancePage() {
                 </div>
             ) : null}
 
-            {!loading && activities && activities.length > 0 ? (
+            {error && !loading && (
+                <div className="mt-4 p-4 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-md">
+                    <p className="font-semibold">Error</p>
+                    <p>{error}</p>
+                </div>
+            )}
+
+            {!loading && !error && activities && activities.length > 0 ? (
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader>
@@ -172,7 +198,7 @@ export default function OptionsPerformancePage() {
                         </TableBody>
                     </Table>
                 </div>
-            ) : (!loading ? (
+            ) : (!loading && !error ? (
                 <p className="text-gray-600 dark:text-gray-400">No options trading activity to display.</p>
             ) : null)}
         </div>
