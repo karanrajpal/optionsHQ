@@ -7,8 +7,9 @@ import "./globals.css";
 import { PWAWrapper } from "@/components/pwa-wrapper";
 import Script from "next/script";
 import Header from "@/components/header";
-import { AuthProvider } from "@/context/AuthProvider";
-import { AccountProvider } from "@/context/AccountProvider";
+import { SnaptradeAuthProvider } from "@/context/SnaptradeAuthProvider";
+import { SnaptradeAccountProvider } from "@/context/SnaptradeAccountProvider";
+import { ReactNode } from "react";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
     children,
 }: Readonly<{
-    children: React.ReactNode;
+    children: ReactNode;
 }>) {
     return (
         <html lang="en">
@@ -38,12 +39,12 @@ export default function RootLayout({
                                 enableSystem
                                 disableTransitionOnChange
                             >
-                                <AuthProvider>
-                                    <AccountProvider>
+                                <SnaptradeAuthProvider>
+                                    <SnaptradeAccountProvider>
                                         {stackClientApp.getUser().then(user => user && <Header />)}
                                         {children}
-                                    </AccountProvider>
-                                </AuthProvider>
+                                    </SnaptradeAccountProvider>
+                                </SnaptradeAuthProvider>
                             </ThemeProvider>
                         </PWAWrapper>
                     </StackTheme>

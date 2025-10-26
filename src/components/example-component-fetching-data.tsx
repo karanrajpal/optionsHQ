@@ -1,5 +1,5 @@
 "use client";
-import { useAccount } from "@/context/AccountProvider";
+import { useSnaptradeAccount } from "@/context/SnaptradeAccountProvider";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 import { useEffect, useState } from "react";
 
@@ -8,7 +8,7 @@ export default function ExampleComponentFetchingData() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const { selectedAccount } = useAccount();
+    const { selectedAccount } = useSnaptradeAccount();
 
     const [userId, _] = useLocalStorage<string | null>("user_id", null);
     const [userSecret, __] = useLocalStorage<string | null>("user_secret", null);

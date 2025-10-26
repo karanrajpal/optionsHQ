@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useMemo } from "react";
 import { Dispatch, SetStateAction } from "react";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 import { SnapTradeHoldingsAccount } from "snaptrade-typescript-sdk";
-import { useAuth } from "./AuthProvider";
+import { useSnaptradeAuth } from "./SnaptradeAuthProvider";
 
 type AccountContextType = {
   accounts: Record<string, SnapTradeHoldingsAccount>;
@@ -13,19 +13,19 @@ type AccountContextType = {
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
 
-export const AccountProvider = ({ children }: { children: React.ReactNode }) => {
+export const SnaptradeAccountProvider = ({ children }: { children: React.ReactNode }) => {
   const [accounts, setAccounts] = useLocalStorage<Record<string, SnapTradeHoldingsAccount>>("broker_accounts", {});
   const [selectedAccountId, setSelectedAccountId] = useLocalStorage<string | null>("selected_account_id", null);
 
-  const { userId, userSecret } = useAuth();
+  const { userId, userSecret } = useSnaptradeAuth();
 
   const selectedAccount = useMemo(() => {
     return selectedAccountId ? accounts[selectedAccountId] : null;
   }, [selectedAccountId, accounts]);
 
   useEffect(() => {
-    const fetchAccount = async () => {
-      const accounts: SnapTradeHoldingsAccount[] = await fetch("/api/accounts", {
+    const fetchAccounts = async () => {
+      const accounts: SnapTradeHoldingsAccount[] = await fetch("/api/snaptrade/accounts", {
         headers: {
           "user-id": userId as string,
           "user-secret": userSecret as string,
@@ -41,7 +41,7 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
         setSelectedAccountId(Object.keys(accountsMap)[0]);
       }
     };
-    fetchAccount();
+    fetchAccounts();
   }, []);
 
   const value = useMemo(
@@ -52,10 +52,10 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;
 };
 
-export const useAccount = () => {
+export const useSnaptradeAccount = () => {
   const ctx = useContext(AccountContext);
   if (!ctx) {
-    throw new Error("useAccount must be used within an AccountProvider");
+    throw new Error("useSnaptradeAccount must be used within an SnaptradeAccountProvider");
   }
   return ctx;
 };

@@ -2,16 +2,16 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useAccount } from "@/context/AccountProvider";
-import { useAuth } from "@/context/AuthProvider";
+import { useSnaptradeAccount } from "@/context/SnaptradeAccountProvider";
+import { useSnaptradeAuth } from "@/context/SnaptradeAuthProvider";
 import { useEffect, useState } from "react";
 import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";
 
 export default function OptionsPage() {
-    const { selectedAccount } = useAccount();
+    const { selectedAccount } = useSnaptradeAccount();
     const [holdings, setHoldings] = useState<AccountHoldingsAccount | null>(null);
     const [loading, setLoading] = useState(true);
-    const { userId, userSecret } = useAuth();
+    const { userId, userSecret } = useSnaptradeAuth();
 
     useEffect(() => {
         const fetchHoldings = async () => {

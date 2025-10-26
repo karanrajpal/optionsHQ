@@ -5,13 +5,13 @@ import { LuCheck, LuPlus, LuSettings } from 'react-icons/lu';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from './ui/navigation-menu';
 import { DarkModeToggle } from './dark-mode-toggle';
 import { Button } from './ui/button';
-import { useAuth } from '@/context/AuthProvider';
+import { useSnaptradeAuth } from '@/context/SnaptradeAuthProvider';
 import { MdOutlineAccountBalance, MdOutlineAccountBalanceWallet } from 'react-icons/md';
-import { useAccount } from '@/context/AccountProvider';
+import { useSnaptradeAccount } from '@/context/SnaptradeAccountProvider';
 
 export default function Header() {
-    const { currentBroker, setCurrentBroker, brokerAccounts } = useAuth();
-    const { selectedAccount, accounts, setSelectedAccountId } = useAccount();
+    const { currentBroker, setCurrentBroker, brokerAccounts } = useSnaptradeAuth();
+    const { selectedAccount, accounts, setSelectedAccountId } = useSnaptradeAccount();
     return (
         <header role="banner" className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -112,7 +112,7 @@ export default function Header() {
 }
 
 function AuthMenuButton() {
-    const { isLoggedIn, logout } = useAuth();
+    const { isLoggedIn, logout } = useSnaptradeAuth();
 
     return (
         <Button variant={null} className="w-full text-left no-underline" onClick={() => { if (isLoggedIn) logout(); else window.location.assign('/'); }}>

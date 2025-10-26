@@ -1,12 +1,12 @@
 "use client"
 
-import * as React from "react";
+import { ReactNode, useEffect } from "react";
 
 type PWAWrapperProps = {
-    children: React.ReactNode;
+    children: ReactNode;
 };
 export function PWAWrapper({ children }: PWAWrapperProps) {
-    React.useEffect(() => {
+    useEffect(() => {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js', {
                 scope: '/',

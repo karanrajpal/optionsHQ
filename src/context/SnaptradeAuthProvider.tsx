@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, ReactNode } from "react";
 import { Dispatch, SetStateAction } from "react";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 import { Broker } from "@/components/ConnectBroker";
@@ -26,7 +26,7 @@ type BrokerAccount = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const SnaptradeAuthProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useLocalStorage("user_id", "");
   const [userSecret, setUserSecret] = useLocalStorage("user_secret", "");
   const [isLoggedIn, setIsLoggedIn] = useLocalStorage("is_logged_in", false);
@@ -74,10 +74,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export const useSnaptradeAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useSnaptradeAuth must be used within an SnaptradeAuthProvider");
   }
   return ctx;
 };

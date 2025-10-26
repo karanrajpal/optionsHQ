@@ -4,7 +4,7 @@ import { SnapTradeReact } from 'snaptrade-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { LoginRedirectURI } from 'snaptrade-typescript-sdk';
-import { useAuth } from '@/context/AuthProvider';
+import { useSnaptradeAuth } from '@/context/SnaptradeAuthProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useLocalStorage } from '@/lib/useLocalStorage';
 
@@ -12,7 +12,7 @@ export type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA';
 const ConnectBroker = () => {
     const [open, setOpen] = useState(false);
     const [redirectLink, setRedirectLink] = useState('');
-    const { userId, userSecret, setCurrentBroker, setUserId, setUserSecret, setIsLoggedIn, addBrokerAccount } = useAuth();
+    const { userId, userSecret, setCurrentBroker, setUserId, setUserSecret, setIsLoggedIn, addBrokerAccount } = useSnaptradeAuth();
     const [broker, setBroker] = useLocalStorage<Broker>('broker', 'CHASE');
 
     const connectionProcess = async () => {
