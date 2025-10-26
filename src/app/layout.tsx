@@ -8,8 +8,9 @@ import { PWAWrapper } from "@/components/pwa-wrapper";
 import Script from "next/script";
 import Header from "@/components/header";
 import { SnaptradeAuthProvider } from "@/context/SnaptradeAuthProvider";
-import { SnaptradeAccountProvider } from "@/context/SnaptradeAccountProvider";
+import { SnaptradeAccountsProvider } from "@/context/SnaptradeAccountsProvider";
 import { ReactNode } from "react";
+import { UserDataAccountsProvider } from "@/context/UserDataAccountsProvider";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -40,10 +41,12 @@ export default function RootLayout({
                                 disableTransitionOnChange
                             >
                                 <SnaptradeAuthProvider>
-                                    <SnaptradeAccountProvider>
-                                        {stackClientApp.getUser().then(user => user && <Header />)}
-                                        {children}
-                                    </SnaptradeAccountProvider>
+                                    <SnaptradeAccountsProvider>
+                                        <UserDataAccountsProvider>
+                                            {stackClientApp.getUser().then(user => user && <Header />)}
+                                            {children}
+                                        </UserDataAccountsProvider>
+                                    </SnaptradeAccountsProvider>
                                 </SnaptradeAuthProvider>
                             </ThemeProvider>
                         </PWAWrapper>

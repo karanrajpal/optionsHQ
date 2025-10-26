@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo } from "react";
 import { Dispatch, SetStateAction } from "react";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 import { SnapTradeHoldingsAccount } from "snaptrade-typescript-sdk";
@@ -13,7 +13,7 @@ type AccountContextType = {
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
 
-export const SnaptradeAccountProvider = ({ children }: { children: React.ReactNode }) => {
+export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode }) => {
   const [accounts, setAccounts] = useLocalStorage<Record<string, SnapTradeHoldingsAccount>>("broker_accounts", {});
   const [selectedAccountId, setSelectedAccountId] = useLocalStorage<string | null>("selected_account_id", null);
 

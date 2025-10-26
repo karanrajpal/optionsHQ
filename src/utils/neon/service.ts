@@ -7,8 +7,8 @@ export class OptionsDatabase {
         this.sql = neon(process.env.NEXT_PUBLIC_NEON_URL as string);
     }
 
-    async getData() {
-        const data = await this.sql`select * from options_transactions`;
+    async getUserDataAccounts(userId: string) {
+        const data = await this.sql`select * from user_data_accounts where user_id = ${userId}`;
         return data;
     }
 }

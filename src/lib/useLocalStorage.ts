@@ -10,7 +10,7 @@ export function useLocalStorage<T = any>(key: string, defaultValue: T): [T, Disp
   const [value, setValueState] = useState<T>(() => {
     if (typeof window === 'undefined') return defaultValue;
     const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) as T : defaultValue;
+    return (stored && stored !== 'undefined') ? JSON.parse(stored) as T : defaultValue;
   });
 
   const setValue: Dispatch<SetStateAction<T>> = (newValue) => {

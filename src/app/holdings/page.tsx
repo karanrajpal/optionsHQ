@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useSnaptradeAccount } from "@/context/SnaptradeAccountProvider";
+import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useSnaptradeAuth } from "@/context/SnaptradeAuthProvider";
 import { useEffect, useState } from "react";
 import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";

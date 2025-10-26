@@ -7,7 +7,7 @@ import { DarkModeToggle } from './dark-mode-toggle';
 import { Button } from './ui/button';
 import { useSnaptradeAuth } from '@/context/SnaptradeAuthProvider';
 import { MdOutlineAccountBalance, MdOutlineAccountBalanceWallet } from 'react-icons/md';
-import { useSnaptradeAccount } from '@/context/SnaptradeAccountProvider';
+import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
 
 export default function Header() {
     const { currentBroker, setCurrentBroker, brokerAccounts } = useSnaptradeAuth();
