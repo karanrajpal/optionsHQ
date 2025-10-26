@@ -7,6 +7,7 @@ import { Button } from './ui/button';
 import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
 import { SiChase } from 'react-icons/si';
 import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
+import { useUser } from '@stackframe/stack';
 
 export default function Header() {
     const { selectedAccount, accounts, setSelectedAccountId } = useSnaptradeAccount();
@@ -86,11 +87,11 @@ export default function Header() {
 }
 
 function AuthMenuButton() {
-    const { isLoggedIn, logout } = useSnaptradeAuth();
+    const user = useUser();
 
     return (
-        <Button variant={null} className="w-full text-left no-underline" onClick={() => { if (isLoggedIn) logout(); else window.location.assign('/'); }}>
-            {isLoggedIn ? 'Logout' : 'Login'}
+        <Button variant={null} className="w-full text-left no-underline" onClick={() => { if (user) user.signOut(); else window.location.assign('/'); }}>
+            {user ? 'Logout' : 'Login'}
         </Button>
     );
 }
