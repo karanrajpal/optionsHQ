@@ -28,6 +28,23 @@ applyTo: '**'
 	- The file should contain a clear, up-to-date schema for each table, listing all columns and their types.
 	- This helps the coding agent and developers keep track of the current database structure.
 
+### User Table Definition
+Table: neon_auth.users_sync
+--------------------------------------------------------------------------
+| Column Name     | Data Type        | Description                       |
+|-----------------|------------------|-----------------------------------|
+| id              | UUID             | Primary key, unique user ID       |
+| name            | VARCHAR(255)     | User's full name                  |
+| email           | VARCHAR(255)     | User's email address              |
+| created_at      | TIMESTAMP        | Timestamp of user creation        |
+| updated_at      | TIMESTAMP        | Timestamp of last update          |
+| deleted_at      | TIMESTAMP        | Timestamp of deletion (nullable)  |
+--------------------------------------------------------------------------
+
+If any changes are made to this table, update the above definition accordingly.
+
+If any foreign keys are needed with the users table, ensure they reference `neon_auth.users_sync(id)`.
+
 ## Other Guidelines
 - Use Tailwind CSS utility classes for styling unless otherwise specified.
 - Use environment variables for secrets and configuration, never hardcode them.
