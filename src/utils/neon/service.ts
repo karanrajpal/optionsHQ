@@ -1,5 +1,11 @@
 import { neon } from "@neondatabase/serverless";
 
+export type SimpleWatchlistItem = {
+    id: number;
+    watchlist_id: number;
+    ticker_symbol: string;
+    added_at: string;
+};
 export class OptionsDatabase {
     private sql: any;
 
@@ -45,7 +51,7 @@ export class OptionsDatabase {
         await this.sql`delete from watchlists where id = ${watchlistId}`;
     }
 
-    async getWatchlistItems(watchlistId: number) {
+    async getWatchlistItems(watchlistId: number): Promise<SimpleWatchlistItem[]> {
         const data = await this.sql`select * from watchlist_items where watchlist_id = ${watchlistId} order by added_at desc`;
         return data;
     }

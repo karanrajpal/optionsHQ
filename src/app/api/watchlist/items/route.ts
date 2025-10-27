@@ -1,12 +1,13 @@
 import { OptionsDatabase } from "@/utils/neon/service";
 import { createAlpacaStocksService } from "@/lib/alpaca";
 import { NextRequest, NextResponse } from "next/server";
+import { AlpacaSnapshot } from "@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2";
 
 export async function GET(request: NextRequest) {
     try {
         const watchlistId = request.nextUrl.searchParams.get("watchlist_id");
-        const alpacaApiKey = request.headers.get("alpaca-api-key");
-        const alpacaApiSecret = request.headers.get("alpaca-api-secret");
+        const alpacaApiKey = request.headers.get("alpaca-api-key") || process.env.ALPACA_API_KEY;
+        const alpacaApiSecret = request.headers.get("alpaca-api-secret") || process.env.ALPACA_API_SECRET;
 
         if (!watchlistId) {
             return NextResponse.json({ error: "Watchlist ID is required" }, { status: 400 });
@@ -19,19 +20,19 @@ export async function GET(request: NextRequest) {
         if (alpacaApiKey && alpacaApiSecret && items.length > 0) {
             try {
                 const alpacaService = createAlpacaStocksService(alpacaApiKey, alpacaApiSecret);
-                const symbols = items.map((item: any) => item.ticker_symbol);
+                const symbols = items.map((item) => item.ticker_symbol);
                 const snapshots = await alpacaService.getSnapshots(symbols);
 
                 // Create a map of snapshots by symbol for quick lookup
-                const snapshotMap = new Map();
+                const snapshotMap = new Map<string, AlpacaSnapshot>();
                 if (Array.isArray(snapshots)) {
-                    snapshots.forEach((snapshot: any) => {
-                        snapshotMap.set(snapshot.Symbol, snapshot);
+                    snapshots.forEach((snapshot) => {
+                        snapshotMap.set((snapshot as any).symbol, snapshot);
                     });
                 }
 
                 // Enrich items with Alpaca data
-                const enrichedItems = items.map((item: any) => {
+                const enrichedItems = items.map((item) => {
                     const snapshot = snapshotMap.get(item.ticker_symbol);
                     return {
                         ...item,
@@ -39,12 +40,12 @@ export async function GET(request: NextRequest) {
                         latest_price: snapshot?.LatestTrade?.Price || null,
                         latest_quote_bid: snapshot?.LatestQuote?.BidPrice || null,
                         latest_quote_ask: snapshot?.LatestQuote?.AskPrice || null,
-                        prev_close: snapshot?.PrevDailyBar?.Close || null,
-                        change: snapshot?.DailyBar?.Close && snapshot?.PrevDailyBar?.Close
-                            ? snapshot.DailyBar.Close - snapshot.PrevDailyBar.Close
+                        prev_close: snapshot?.PrevDailyBar?.ClosePrice || null,
+                        change: snapshot?.DailyBar?.ClosePrice && snapshot?.PrevDailyBar?.ClosePrice
+                            ? snapshot.DailyBar.ClosePrice - snapshot.PrevDailyBar.ClosePrice
                             : null,
-                        change_percent: snapshot?.DailyBar?.Close && snapshot?.PrevDailyBar?.Close
-                            ? ((snapshot.DailyBar.Close - snapshot.PrevDailyBar.Close) / snapshot.PrevDailyBar.Close) * 100
+                        change_percent: snapshot?.DailyBar?.ClosePrice && snapshot?.PrevDailyBar?.ClosePrice
+                            ? ((snapshot.DailyBar.ClosePrice - snapshot.PrevDailyBar.ClosePrice) / snapshot.PrevDailyBar.ClosePrice) * 100
                             : null,
                     };
                 });
