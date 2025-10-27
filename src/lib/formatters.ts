@@ -9,7 +9,7 @@ export const formatCurrency = (value: number | null | undefined) => {
 
 export const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString).toLocaleDateString('en-US', { timeZone: 'UTC' });
 };
 
 export const getProfitLossColor = (profitLoss: number | null | undefined) => {

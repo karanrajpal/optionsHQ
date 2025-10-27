@@ -54,7 +54,7 @@ const optionsColumns: ColumnDef<OptionsPosition>[] = [
         accessorKey: 'currentPrice',
         header: 'Current Price',
         enableSorting: true,
-        cell: ({ row }) => formatCurrency(Number(row.original.price) * 100),
+        cell: ({ row }) => formatCurrency(Number(row.original.price)),
         sortingFn: (a, b) => Number(a.original.price) - Number(b.original.price),
     },
     {
