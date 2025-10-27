@@ -6,6 +6,7 @@ import { ColumnDef, useReactTable, getCoreRowModel, getSortedRowModel, SortingSt
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
+import { formatCurrency, formatDate, getProfitLossColor } from "@/lib/formatters";
 import { OptionsPosition } from "snaptrade-typescript-sdk";
 
 const optionsColumns: ColumnDef<OptionsPosition>[] = [
@@ -31,17 +32,17 @@ const optionsColumns: ColumnDef<OptionsPosition>[] = [
       return typeA.localeCompare(typeB);
     }
   },
-  {
-    accessorKey: 'expiry',
-    header: 'Expiry',
-    enableSorting: true,
-    cell: ({ row }) => row.original.symbol?.option_symbol?.expiration_date || '',
-    sortingFn: (a, b) => {
-      const dateA = new Date(a.original.symbol?.option_symbol?.expiration_date || '');
-      const dateB = new Date(b.original.symbol?.option_symbol?.expiration_date || '');
-      return dateA.getTime() - dateB.getTime();
-    }
-  },
+    {
+        accessorKey: 'expiry',
+        header: 'Expiry',
+        enableSorting: true,
+        cell: ({ row }) => formatDate(row.original.symbol?.option_symbol?.expiration_date),
+        sortingFn: (a, b) => {
+            const dateA = new Date(a.original.symbol?.option_symbol?.expiration_date || '');
+            const dateB = new Date(b.original.symbol?.option_symbol?.expiration_date || '');
+            return dateA.getTime() - dateB.getTime();
+        }
+    },
   {
     accessorKey: 'quantity',
     header: 'Quantity',
@@ -49,27 +50,34 @@ const optionsColumns: ColumnDef<OptionsPosition>[] = [
     cell: ({ row }) => row.original.units,
     sortingFn: (a, b) => (a.original.units ?? 0) - (b.original.units ?? 0),
   },
-  {
-    accessorKey: 'currentPrice',
-    header: 'Current Price',
-    enableSorting: true,
-    cell: ({ row }) => (Number(row.original.price) * 100).toFixed(2),
-    sortingFn: (a, b) => Number(a.original.price) - Number(b.original.price),
-  },
-  {
-    accessorKey: 'purchasePrice',
-    header: 'Purchase Price',
-    enableSorting: true,
-    cell: ({ row }) => row.original.average_purchase_price,
-    sortingFn: (a, b) => Number(a.original.average_purchase_price) - Number(b.original.average_purchase_price),
-  },
-  {
-    accessorKey: 'pl',
-    header: 'P/L',
-    enableSorting: true,
-    cell: ({ row }) => ((Number(row.original.price) * 100) - Number(row.original.average_purchase_price)).toFixed(2),
-    sortingFn: (a, b) => ((Number(a.original.price) * 100) - Number(a.original.average_purchase_price)) - ((Number(b.original.price) * 100) - Number(b.original.average_purchase_price)),
-  },
+    {
+        accessorKey: 'currentPrice',
+        header: 'Current Price',
+        enableSorting: true,
+        cell: ({ row }) => formatCurrency(Number(row.original.price) * 100),
+        sortingFn: (a, b) => Number(a.original.price) - Number(b.original.price),
+    },
+    {
+        accessorKey: 'purchasePrice',
+        header: 'Purchase Price',
+        enableSorting: true,
+        cell: ({ row }) => formatCurrency(row.original.average_purchase_price),
+        sortingFn: (a, b) => Number(a.original.average_purchase_price) - Number(b.original.average_purchase_price),
+    },
+    {
+        accessorKey: 'pl',
+        header: 'P/L',
+        enableSorting: true,
+        cell: ({ row }) => {
+            const pl = (Number(row.original.price) * 100) - Number(row.original.average_purchase_price);
+            return (
+                <span className={getProfitLossColor(pl)}>
+                    {formatCurrency(pl)}
+                </span>
+            );
+        },
+        sortingFn: (a, b) => ((Number(a.original.price) * 100) - Number(a.original.average_purchase_price)) - ((Number(b.original.price) * 100) - Number(b.original.average_purchase_price)),
+    },
 ];
 
 export default function OptionsPage() {

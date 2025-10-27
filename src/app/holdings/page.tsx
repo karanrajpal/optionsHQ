@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
+import { formatCurrency, getProfitLossColor } from "@/lib/formatters";
 import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";
 
 export default function HoldingsPage() {
@@ -64,9 +65,9 @@ export default function HoldingsPage() {
                                 <TableRow key={rowIdx}>
                                     <TableCell title={row.symbol?.symbol?.description ?? ''}>{row.symbol?.symbol?.symbol}</TableCell>
                                     <TableCell>{row.units}</TableCell>
-                                    <TableCell>{row.price}</TableCell>
-                                    <TableCell>{row.average_purchase_price}</TableCell>
-                                    <TableCell>{row.open_pnl}</TableCell>
+                                    <TableCell>{formatCurrency(row.price)}</TableCell>
+                                    <TableCell>{formatCurrency(row.average_purchase_price)}</TableCell>
+                                    <TableCell className={getProfitLossColor(row.open_pnl)}>{formatCurrency(row.open_pnl)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

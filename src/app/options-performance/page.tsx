@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
+import { formatCurrency, formatDate, getProfitLossColor } from "@/lib/formatters";
 import { PaginatedUniversalActivity, AccountUniversalActivity } from "snaptrade-typescript-sdk";
 
 export default function OptionsPerformancePage() {
@@ -45,18 +46,6 @@ export default function OptionsPerformancePage() {
         fetchActivities();
     }, [selectedAccount?.id, snaptradeUserId, snaptradeUserSecret]);
 
-    const formatCurrency = (value: number | null | undefined) => {
-        if (value === null || value === undefined) return "-";
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(value);
-    };
-
-    const formatDate = (dateString: string | null | undefined) => {
-        if (!dateString) return "-";
-        return new Date(dateString).toLocaleDateString();
-    };
 
     const getProfitLoss = (activity: AccountUniversalActivity) => {
         if (activity.amount !== null && activity.amount !== undefined) {
@@ -68,10 +57,7 @@ export default function OptionsPerformancePage() {
         return null;
     };
 
-    const getProfitLossColor = (profitLoss: number | null) => {
-        if (profitLoss === null) return "";
-        return profitLoss >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400";
-    };
+
 
     return (
         <div className="p-8 w-full">

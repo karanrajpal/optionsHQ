@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { LuCheck, LuSettings } from 'react-icons/lu';
+import { LuCheck, LuRocket, LuSettings } from 'react-icons/lu';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from './ui/navigation-menu';
 import { DarkModeToggle } from './dark-mode-toggle';
 import { Button } from './ui/button';
@@ -15,12 +15,13 @@ export default function Header() {
         <header role="banner" className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
                 <Link href="/" aria-label="OptionsHQ home" className="font-semibold text-gray-900 dark:text-white no-underline">
+                    <LuRocket className="inline-block mb-1 mr-1" size={20} />
                     OptionsHQ
                 </Link>
 
                 <nav aria-label="Primary navigation" className="flex items-center gap-4">
                     <Link href="/holdings" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
-                        Holdings
+                        Stocks
                     </Link>
                     <Link href="/options" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
                         Options
