@@ -5,7 +5,7 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import { DarkModeToggle } from './dark-mode-toggle';
 import { Button } from './ui/button';
 import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
-import { SiChase } from 'react-icons/si';
+import { SiChase, SiRobinhood } from 'react-icons/si';
 import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
 import { useUser } from '@stackframe/stack';
 
@@ -54,6 +54,7 @@ export default function Header() {
                                                 <div className="flex items-center gap-2">
                                                     {account.institution_name === 'Fidelity' ? <img src={'/fidelity.png'} alt="Fidelity Logo" className="w-4 h-4" /> : null}
                                                     {account.institution_name === 'Chase' ? <SiChase className="w-4 h-4" /> : null}
+                                                    {account.institution_name === 'Robinhood' ? <SiRobinhood className="w-4 h-4" /> : null}
                                                     {account.name}
                                                     {selectedAccount?.id === account.id && <LuCheck className="text-green-500" />}
                                                 </div>

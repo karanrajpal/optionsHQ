@@ -7,7 +7,7 @@ import { LoginRedirectURI } from 'snaptrade-typescript-sdk';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useUser } from '@stackframe/stack';
 
-export type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA';
+export type Broker = 'CHASE' | 'FIDELITY' | 'ALPACA' | 'ROBINHOOD';
 const ConnectBroker = () => {
     const [open, setOpen] = useState(false);
     const [redirectLink, setRedirectLink] = useState('');
@@ -65,6 +65,7 @@ const ConnectBroker = () => {
                         <SelectItem value="FIDELITY">Fidelity</SelectItem>
                         <SelectItem value="CHASE">Chase</SelectItem>
                         <SelectItem value="ALPACA">Alpaca</SelectItem>
+                        <SelectItem value="ROBINHOOD">Robinhood</SelectItem>
                     </SelectContent>
                 </Select>
                 {/* your Connect button */}
