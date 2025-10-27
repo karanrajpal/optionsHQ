@@ -24,6 +24,14 @@ export class SnaptradeService {
         });
     }
 
+    public async getOptionHoldings() {
+        return await this.snaptrade.options.listOptionHoldings({
+            accountId: this.accountId as string,
+            userId: this.userId,
+            userSecret: this.userSecret,
+        });
+    }
+
     public async listUserAccounts() {
         return await this.snaptrade.accountInformation.listUserAccounts({
             userId: this.userId,

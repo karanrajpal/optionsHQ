@@ -5,11 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
-import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";
+import { OptionsPosition } from "snaptrade-typescript-sdk";
 
 export default function OptionsPage() {
     const { selectedAccount } = useSnaptradeAccount();
-    const [holdings, setHoldings] = useState<AccountHoldingsAccount | null>(null);
+    const [optionHoldings, setOptionHoldings] = useState<OptionsPosition[] | null>(null);
     const [loading, setLoading] = useState(true);
     const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
 
@@ -17,14 +17,14 @@ export default function OptionsPage() {
         const fetchHoldings = async () => {
             setLoading(true);
             if (selectedAccount?.id) {
-                const response = await fetch(`/api/holdings?accountId=${selectedAccount.id}`, {
+                const response = await fetch(`/api/snaptrade/option_holdings?accountId=${selectedAccount.id}`, {
                     headers: {
                         "user-id": snaptradeUserId as string,
                         "user-secret": snaptradeUserSecret as string,
                     }
                 });
                 const data = await response.json();
-                setHoldings(data);
+                setOptionHoldings(data);
                 setLoading(false);
             }
         };
@@ -48,7 +48,7 @@ export default function OptionsPage() {
             ) : null}
 
             {
-                !loading && holdings?.option_positions && Object.keys(holdings?.option_positions).length > 0 ? (
+                !loading && optionHoldings && optionHoldings.length > 0 ? (
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -62,9 +62,9 @@ export default function OptionsPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {holdings?.option_positions?.map((row, rowIdx) => (
+                            {optionHoldings?.map((row, rowIdx) => (
                                 <TableRow key={rowIdx}>
-                                    <TableCell title={row.symbol?.option_symbol?.ticker ?? ''}>{row.symbol?.option_symbol?.ticker}</TableCell>
+                                    <TableCell title={row.symbol?.option_symbol?.underlying_symbol.symbol ?? ''}>{row.symbol?.option_symbol?.underlying_symbol.symbol}</TableCell>
                                     <TableCell>{row.symbol?.option_symbol?.option_type ?? ''}</TableCell>
                                     <TableCell>{row.symbol?.option_symbol?.expiration_date ?? ''}</TableCell>
                                     <TableCell>{row.units}</TableCell>
