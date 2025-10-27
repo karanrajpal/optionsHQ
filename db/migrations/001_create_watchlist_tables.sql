@@ -5,11 +5,11 @@
 -- Create watchlists table
 CREATE TABLE IF NOT EXISTS watchlists (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL,
+    user_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user_data_accounts(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES neon_auth.users_sync(id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_watchlists_user_id ON watchlists(user_id);

@@ -19,7 +19,7 @@ Stores watchlist metadata for users.
 | Column | Type | Description |
 |--------|------|-------------|
 | id | SERIAL | Primary key, auto-incrementing |
-| user_id | VARCHAR | Foreign key to user_data_accounts(user_id) |
+| user_id | UUID | Foreign key to neon_auth.users_sync(id) |
 | name | VARCHAR(255) | Watchlist name |
 | created_at | TIMESTAMP | Timestamp when the watchlist was created |
 | modified_at | TIMESTAMP | Timestamp when the watchlist was last modified |
@@ -40,11 +40,11 @@ Stores individual ticker symbols in watchlists.
 ```sql
 CREATE TABLE IF NOT EXISTS watchlists (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL,
+    user_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user_data_accounts(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES neon_auth.users_sync(id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_watchlists_user_id ON watchlists(user_id);
