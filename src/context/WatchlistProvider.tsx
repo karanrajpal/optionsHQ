@@ -30,6 +30,7 @@ type WatchlistContextType = {
   selectedWatchlist: Watchlist | null;
   watchlistItems: WatchlistItem[];
   isLoading: boolean;
+  isWatchListItemsLoading: boolean;
   setSelectedWatchlistId: (id: number | null) => void;
   createWatchlist: (name: string) => Promise<void>;
   updateWatchlist: (watchlistId: number, name: string) => Promise<void>;
@@ -50,6 +51,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
   const [selectedWatchlistId, setSelectedWatchlistId] = useState<number | null>(null);
   const [watchlistItems, setWatchlistItems] = useState<WatchlistItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isWatchListItemsLoading, setIsWatchListItemsLoading] = useState<boolean>(false);
 
   const selectedWatchlist = useMemo(() => {
     return watchlists.find(w => w.id === selectedWatchlistId) || null;
@@ -73,8 +75,10 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
   }, [user?.id, selectedWatchlistId]);
 
   const fetchWatchlistItems = useCallback(async () => {
+    setIsWatchListItemsLoading(true);
     if (!selectedWatchlistId) {
       setWatchlistItems([]);
+      setIsWatchListItemsLoading(false);
       return;
     }
 
@@ -93,6 +97,8 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       setWatchlistItems(data);
     } catch (error) {
       console.error("Error fetching watchlist items:", error);
+    } finally {
+      setIsWatchListItemsLoading(false);
     }
   }, [selectedWatchlistId, alpacaApiKey, alpacaApiSecret]);
 
@@ -211,6 +217,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       selectedWatchlist,
       watchlistItems,
       isLoading,
+      isWatchListItemsLoading,
       setSelectedWatchlistId,
       createWatchlist,
       updateWatchlist,
@@ -225,6 +232,7 @@ export const WatchlistProvider = ({ children }: { children: ReactNode }) => {
       selectedWatchlist,
       watchlistItems,
       isLoading,
+      isWatchListItemsLoading,
       fetchWatchlists,
       fetchWatchlistItems,
       createWatchlist,

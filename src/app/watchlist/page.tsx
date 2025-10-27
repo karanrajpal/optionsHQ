@@ -5,6 +5,8 @@ import { useWatchlist } from "@/context/WatchlistProvider";
 import { Button } from "@/components/ui/button";
 import { LuPlus, LuTrash2, LuTrendingUp, LuTrendingDown } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function WatchlistPage() {
     const {
@@ -12,6 +14,7 @@ export default function WatchlistPage() {
         selectedWatchlist,
         watchlistItems,
         isLoading,
+        isWatchListItemsLoading,
         setSelectedWatchlistId,
         createWatchlist,
         addWatchlistItem,
@@ -141,6 +144,12 @@ export default function WatchlistPage() {
                     </div>
                 )}
 
+                {isWatchListItemsLoading && (
+                    <div className="flex justify-center">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                    </div>
+                )}
+
                 {/* Watchlist items */}
                 {!selectedWatchlist ? (
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-12 text-center shadow-sm">
@@ -197,7 +206,14 @@ export default function WatchlistPage() {
                                                         className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-semibold text-gray-600 dark:text-gray-300"
                                                         title={item.ticker_symbol}
                                                     >
-                                                        {item.ticker_symbol.substring(0, 2)}
+                                                        {/* {item.ticker_symbol.substring(0, 2)} */}
+                                                        <Image
+                                                            src={`https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${item.ticker_symbol}.png`}
+                                                            alt={item.ticker_symbol}
+                                                            width={40}
+                                                            height={40}
+                                                            className="rounded-full"
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div>
