@@ -9,12 +9,13 @@ import {
     SortingState,
 } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatCurrency, getProfitLossColor } from '@/lib/formatters';
+import { formatCurrency, formatDateWithTimeAndZone, getProfitLossColor } from '@/lib/formatters';
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
 import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 export type HoldingsPosition = NonNullable<AccountHoldingsAccount['positions']>[number];
 
@@ -110,11 +111,13 @@ export default function HoldingsPage() {
     return (
         <div className="p-8 w-full">
             <h1 className="text-2xl font-bold">Account Holdings</h1>
-            {selectedAccount ? (
-                <pre>{selectedAccount.name}</pre>
-            ) : (!loading ? (
-                <p>No account selected</p>
-            ) : null)}
+            <div className='flex justify-between'>
+                {selectedAccount ? <pre>{selectedAccount.name}</pre> : !loading ? <p>No account selected</p> : null}
+                <div className='flex items-center'>
+                    {!loading && holdings?.cache_expired && <Badge variant='destructive'>Outdated</Badge>}
+                    <div className='ml-2 flex items-center'>Last updated: {loading ? <Skeleton className="inline-block h-4 w-32" /> : (holdings?.cache_timestamp ? formatDateWithTimeAndZone(holdings.cache_timestamp) : 'N/A')}</div>
+                </div>
+            </div>
             <div className="mt-4 w-full">
                 {loading ? (
                     <div className="mt-4 w-full grid gap-4">
