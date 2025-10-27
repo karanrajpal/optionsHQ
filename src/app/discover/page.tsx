@@ -4,17 +4,53 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OptionsDataTable } from '@/components/OptionsDataTable';
+import { OptionHorizons, OptionHorizonType } from '@/components/OptionHorizons';
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useUser } from '@stackframe/stack';
+import { useWatchlist } from '@/context/WatchlistProvider';
 
 export default function Discover() {
+  const user = useUser();
   const [ticker, setTicker] = useState('');
   const [optionType, setOptionType] = useState<'all' | 'call' | 'put'>('all');
+  const [optionHorizon, setOptionHorizon] = useState<OptionHorizonType>('make-premiums');
   const [data, setData] = useState<AlpacaOptionSnapshot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { watchlistItems } = useWatchlist();
+  const [triggerSearchForTicker, setTriggerSearchForTicker] = useState<string | null>(null);
 
-  const handleGetOptions = async () => {
+  useEffect(() => {
+    // Also default to Call options for LEAPS
+    if (optionType !== 'call') {
+      setOptionType('call');
+    }
+  }, [optionHorizon]);
+
+  // Calculate expiration date range based on option horizon
+  const getExpirationDateRange = useCallback(() => {
+    const today = new Date();
+    const startDate = new Date();
+    const endDate = new Date();
+
+    if (optionHorizon === 'make-premiums') {
+      // 5-6 weeks out
+      startDate.setDate(today.getDate() + 35); // 5 weeks
+      endDate.setDate(today.getDate() + 42); // 6 weeks
+    } else {
+      // LEAPS: 11-13 months out
+      startDate.setMonth(today.getMonth() + 10);
+      endDate.setMonth(today.getMonth() + 13);
+    }
+
+    return {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+    };
+  }, [optionHorizon]);
+
+  const handleGetOptions = useCallback(async () => {
     if (!ticker.trim()) {
       setError('Please enter a ticker symbol');
       return;
@@ -35,13 +71,10 @@ export default function Discover() {
         params.append('type', optionType);
       }
 
-      // Add date filter to get options expiring in the next 60 days
-      const today = new Date();
-      const futureDate = new Date();
-      futureDate.setDate(today.getDate() + 60);
-      
-      params.append('expiration_date_gte', today.toISOString().split('T')[0]);
-      params.append('expiration_date_lte', futureDate.toISOString().split('T')[0]);
+      // Add date filter based on option horizon
+      const { startDate, endDate } = getExpirationDateRange();
+      params.append('expiration_date_gte', startDate);
+      params.append('expiration_date_lte', endDate);
 
       const response = await fetch(`/api/alpaca/options?${params.toString()}`);
       
@@ -68,13 +101,26 @@ export default function Discover() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [ticker, optionType, getExpirationDateRange]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleGetOptions();
     }
   };
+
+  const handleWatchlistPillClick = (tickerSymbol: string) => {
+    setTicker(tickerSymbol);
+    setTriggerSearchForTicker(tickerSymbol);
+  };
+
+  // Auto-search when watchlist pill is clicked
+  useEffect(() => {
+    if (triggerSearchForTicker && ticker === triggerSearchForTicker) {
+      setTriggerSearchForTicker(null);
+      handleGetOptions();
+    }
+  }, [ticker, triggerSearchForTicker, handleGetOptions]);
 
   return (
     <main className="flex min-h-screen flex-col items-center p-8">
@@ -126,6 +172,32 @@ export default function Discover() {
             {isLoading ? 'Loading...' : 'Get Options'}
           </Button>
         </div>
+
+        {/* Option Horizons */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Option Horizon</label>
+          <OptionHorizons selected={optionHorizon} onSelect={setOptionHorizon} />
+        </div>
+
+        {/* Watchlist Quick Search Pills */}
+        {watchlistItems.length > 0 && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Quick Search from Watchlist</label>
+            <div className="flex gap-2 flex-wrap">
+              {watchlistItems.map((item) => (
+                <Button
+                  key={item.ticker_symbol}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleWatchlistPillClick(item.ticker_symbol)}
+                  className="rounded-full"
+                >
+                  {item.ticker_symbol}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && !isLoading && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-800">
