@@ -11,6 +11,7 @@ import { SnaptradeAccountsProvider } from "@/context/SnaptradeAccountsProvider";
 import { ReactNode, Suspense } from "react";
 import { UserDataAccountsProvider } from "@/context/UserDataAccountsProvider";
 import { WatchlistProvider } from "@/context/WatchlistProvider";
+import { LuRocket } from "react-icons/lu";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -40,7 +41,9 @@ export default function RootLayout({
                                 enableSystem
                                 disableTransitionOnChange
                             >
-                                <Suspense fallback={<div>Loading...</div>}>
+                                <Suspense fallback={<div className="flex items-center justify-center h-screen">
+                                    <LuRocket className="animate-bounce text-4xl" />
+                                </div>}>
                                     <UserDataAccountsProvider>
                                         <SnaptradeAccountsProvider>
                                             <WatchlistProvider>
