@@ -94,7 +94,7 @@ export default function Discover() {
             <Input
               id="ticker"
               type="text"
-              placeholder="e.g., AAPL, TSLA, SPY"
+              placeholder="e.g., ORCL, TSLA, SPY"
               value={ticker}
               onChange={(e) => setTicker(e.target.value)}
               onKeyPress={handleKeyPress}

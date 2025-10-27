@@ -33,7 +33,7 @@ Table: neon_auth.users_sync
 --------------------------------------------------------------------------
 | Column Name     | Data Type        | Description                       |
 |-----------------|------------------|-----------------------------------|
-| id              | UUID             | Primary key, unique user ID       |
+| id              | TEXT             | Primary key, unique user ID       |
 | name            | VARCHAR(255)     | User's full name                  |
 | email           | VARCHAR(255)     | User's email address              |
 | created_at      | TIMESTAMP        | Timestamp of user creation        |

@@ -2,6 +2,18 @@
 
 ## Tables
 
+### neon_auth.users_sync
+--------------------------------------------------------------------------
+| Column Name     | Data Type        | Description                       |
+|-----------------|------------------|-----------------------------------|
+| id              | TEXT             | Primary key, unique user ID       |
+| name            | VARCHAR(255)     | User's full name                  |
+| email           | VARCHAR(255)     | User's email address              |
+| created_at      | TIMESTAMP        | Timestamp of user creation        |
+| updated_at      | TIMESTAMP        | Timestamp of last update          |
+| deleted_at      | TIMESTAMP        | Timestamp of deletion (nullable)  |
+--------------------------------------------------------------------------
+
 ### user_data_accounts
 Stores user authentication and API credentials.
 
@@ -19,7 +31,7 @@ Stores watchlist metadata for users.
 | Column | Type | Description |
 |--------|------|-------------|
 | id | SERIAL | Primary key, auto-incrementing |
-| user_id | UUID | Foreign key to neon_auth.users_sync(id) |
+| user_id | TEXT | Foreign key to neon_auth.users_sync(id) |
 | name | VARCHAR(255) | Watchlist name |
 | created_at | TIMESTAMP | Timestamp when the watchlist was created |
 | modified_at | TIMESTAMP | Timestamp when the watchlist was last modified |
@@ -31,7 +43,7 @@ Stores individual ticker symbols in watchlists.
 |--------|------|-------------|
 | id | SERIAL | Primary key, auto-incrementing |
 | watchlist_id | INTEGER | Foreign key to watchlists(id) |
-| ticker_symbol | VARCHAR(10) | Stock ticker symbol (e.g., AAPL, TSLA) |
+| ticker_symbol | VARCHAR(10) | Stock ticker symbol (e.g., ORCL, TSLA) |
 | added_at | TIMESTAMP | Timestamp when the ticker was added |
 
 ## SQL Migrations
@@ -40,7 +52,7 @@ Stores individual ticker symbols in watchlists.
 ```sql
 CREATE TABLE IF NOT EXISTS watchlists (
     id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL,
+    user_id TEXT NOT NULL,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

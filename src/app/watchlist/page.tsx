@@ -127,7 +127,7 @@ export default function WatchlistPage() {
                     <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
                         <div className="flex gap-2">
                             <Input
-                                placeholder="Enter ticker symbol (e.g., AAPL)"
+                                placeholder="Enter ticker symbol (e.g., ORCL)"
                                 value={newTickerSymbol}
                                 onChange={(e) => setNewTickerSymbol(e.target.value)}
                                 onKeyPress={(e) => e.key === "Enter" && handleAddTicker()}

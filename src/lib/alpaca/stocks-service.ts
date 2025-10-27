@@ -20,7 +20,7 @@ export class AlpacaStocksService {
 
   /**
    * Get snapshot data for a single stock symbol
-   * @param symbol - Stock ticker symbol (e.g., "AAPL")
+   * @param symbol - Stock ticker symbol (e.g., "ORCL")
    * @returns Promise with snapshot data including latest trade, quote, and bars
    */
   async getSnapshot(symbol: string) {

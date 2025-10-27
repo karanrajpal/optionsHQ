@@ -54,7 +54,7 @@ Located at `/watchlist`, this page provides:
 
 1. Navigate to `/watchlist` from the header menu
 2. Create a new watchlist using the "New Watchlist" button
-3. Add stocks by entering ticker symbols (e.g., AAPL, TSLA, MSFT)
+3. Add stocks by entering ticker symbols (e.g., ORCL, TSLA, MSFT)
 4. View real-time prices and changes
 5. Switch between watchlists using the watchlist selector buttons
 6. Remove stocks using the trash icon
