@@ -66,4 +66,16 @@ export class OptionsDatabase {
         await this.sql`delete from watchlist_items where watchlist_id = ${watchlistId} and ticker_symbol = ${tickerSymbol.toUpperCase()}`;
         await this.sql`update watchlists set modified_at = CURRENT_TIMESTAMP where id = ${watchlistId}`;
     }
+
+    async getTopWatchlistItems(userId: string, limit: number = 5) {
+        const data = await this.sql`
+            select wi.ticker_symbol
+            from watchlist_items wi
+            join watchlists w on wi.watchlist_id = w.id
+            where w.user_id = ${userId}
+            order by wi.added_at desc
+            limit ${limit}
+        `;
+        return data;
+    }
 }

@@ -4,15 +4,61 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OptionsDataTable } from '@/components/OptionsDataTable';
+import { OptionHorizons, OptionHorizonType } from '@/components/OptionHorizons';
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUser } from '@stackframe/stack';
 
 export default function Discover() {
+  const user = useUser();
   const [ticker, setTicker] = useState('');
   const [optionType, setOptionType] = useState<'all' | 'call' | 'put'>('all');
+  const [optionHorizon, setOptionHorizon] = useState<OptionHorizonType>('make-premiums');
   const [data, setData] = useState<AlpacaOptionSnapshot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [topWatchlistItems, setTopWatchlistItems] = useState<Array<{ ticker_symbol: string }>>([]);
+
+  // Fetch top watchlist items
+  useEffect(() => {
+    const fetchTopItems = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const response = await fetch(`/api/watchlist/top-items?user_id=${user.id}&limit=5`);
+        if (response.ok) {
+          const data = await response.json();
+          setTopWatchlistItems(data);
+        }
+      } catch (err) {
+        console.error('Error fetching top watchlist items:', err);
+      }
+    };
+
+    fetchTopItems();
+  }, [user?.id]);
+
+  // Calculate expiration date range based on option horizon
+  const getExpirationDateRange = () => {
+    const today = new Date();
+    const startDate = new Date();
+    const endDate = new Date();
+
+    if (optionHorizon === 'make-premiums') {
+      // 5-6 weeks out
+      startDate.setDate(today.getDate() + 35); // 5 weeks
+      endDate.setDate(today.getDate() + 42); // 6 weeks
+    } else {
+      // LEAPS: 11-13 months out
+      startDate.setMonth(today.getMonth() + 11);
+      endDate.setMonth(today.getMonth() + 13);
+    }
+
+    return {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
+    };
+  };
 
   const handleGetOptions = async () => {
     if (!ticker.trim()) {
@@ -35,13 +81,10 @@ export default function Discover() {
         params.append('type', optionType);
       }
 
-      // Add date filter to get options expiring in the next 60 days
-      const today = new Date();
-      const futureDate = new Date();
-      futureDate.setDate(today.getDate() + 60);
-      
-      params.append('expiration_date_gte', today.toISOString().split('T')[0]);
-      params.append('expiration_date_lte', futureDate.toISOString().split('T')[0]);
+      // Add date filter based on option horizon
+      const { startDate, endDate } = getExpirationDateRange();
+      params.append('expiration_date_gte', startDate);
+      params.append('expiration_date_lte', endDate);
 
       const response = await fetch(`/api/alpaca/options?${params.toString()}`);
       
@@ -74,6 +117,15 @@ export default function Discover() {
     if (e.key === 'Enter') {
       handleGetOptions();
     }
+  };
+
+  const handleWatchlistPillClick = (tickerSymbol: string) => {
+    setTicker(tickerSymbol);
+    // Trigger search after a brief delay to allow state to update
+    setTimeout(() => {
+      const searchButton = document.querySelector('[data-search-button]') as HTMLButtonElement;
+      searchButton?.click();
+    }, 100);
   };
 
   return (
@@ -122,10 +174,37 @@ export default function Discover() {
             onClick={handleGetOptions} 
             disabled={isLoading}
             className="px-8"
+            data-search-button
           >
             {isLoading ? 'Loading...' : 'Get Options'}
           </Button>
         </div>
+
+        {/* Option Horizons */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Option Horizon</label>
+          <OptionHorizons selected={optionHorizon} onSelect={setOptionHorizon} />
+        </div>
+
+        {/* Watchlist Quick Search Pills */}
+        {topWatchlistItems.length > 0 && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Quick Search from Watchlist</label>
+            <div className="flex gap-2 flex-wrap">
+              {topWatchlistItems.map((item) => (
+                <Button
+                  key={item.ticker_symbol}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleWatchlistPillClick(item.ticker_symbol)}
+                  className="rounded-full"
+                >
+                  {item.ticker_symbol}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && !isLoading && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-800">
