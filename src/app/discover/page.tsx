@@ -51,7 +51,7 @@ export default function Discover() {
       endDate.setDate(today.getDate() + 42); // 6 weeks
     } else {
       // LEAPS: 11-13 months out
-      startDate.setMonth(today.getMonth() + 11);
+      startDate.setMonth(today.getMonth() + 10);
       endDate.setMonth(today.getMonth() + 13);
     }
 
