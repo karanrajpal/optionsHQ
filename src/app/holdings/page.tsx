@@ -1,12 +1,72 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+    getSortedRowModel,
+    SortingState,
+} from '@tanstack/react-table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatCurrency, getProfitLossColor } from '@/lib/formatters';
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
-import { formatCurrency, getProfitLossColor } from "@/lib/formatters";
 import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";
+import { Skeleton } from '@/components/ui/skeleton';
+
+export type HoldingsPosition = NonNullable<AccountHoldingsAccount['positions']>[number];
+
+const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
+    {
+        accessorKey: 'symbol',
+        header: 'Symbol',
+        cell: ({ row }) => (
+            <span title={row.original.symbol?.symbol?.description ?? ''}>
+                {row.original.symbol?.symbol?.symbol}
+            </span>
+        ),
+        enableSorting: true,
+        sortingFn: (a, b) => {
+            const sa = a.original.symbol?.symbol?.symbol || '';
+            const sb = b.original.symbol?.symbol?.symbol || '';
+            return sa.localeCompare(sb);
+        },
+    },
+    {
+        accessorKey: 'units',
+        header: 'Quantity',
+        cell: ({ row }) => row.original.units,
+        enableSorting: true,
+        sortingFn: (a, b) => (Number(a.original.units) || 0) - (Number(b.original.units) || 0),
+    },
+    {
+        accessorKey: 'price',
+        header: 'Current Price',
+        cell: ({ row }) => formatCurrency(row.original.price),
+        enableSorting: true,
+        sortingFn: (a, b) => (Number(a.original.price) || 0) - (Number(b.original.price) || 0),
+    },
+    {
+        accessorKey: 'average_purchase_price',
+        header: 'Purchase Price',
+        cell: ({ row }) => formatCurrency(row.original.average_purchase_price),
+        enableSorting: true,
+        sortingFn: (a, b) => (Number(a.original.average_purchase_price) || 0) - (Number(b.original.average_purchase_price) || 0),
+    },
+    {
+        accessorKey: 'open_pnl',
+        header: 'P/L',
+        cell: ({ row }) => (
+            <span className={getProfitLossColor(row.original.open_pnl)}>
+                {formatCurrency(row.original.open_pnl)}
+            </span>
+        ),
+        enableSorting: true,
+        sortingFn: (a, b) => (Number(a.original.open_pnl) || 0) - (Number(b.original.open_pnl) || 0),
+    },
+];
 
 export default function HoldingsPage() {
     const { selectedAccount } = useSnaptradeAccount();
@@ -27,11 +87,25 @@ export default function HoldingsPage() {
                 const data = await response.json();
                 setHoldings(data);
                 setLoading(false);
+            } else {
+                setHoldings(null);
+                setLoading(false);
             }
         };
-
         fetchHoldings();
     }, [selectedAccount?.id]);
+
+    // Inline HoldingsDataTable logic
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const data = holdings?.positions ?? [];
+    const table = useReactTable({
+        data,
+        columns: holdingsColumns,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        onSortingChange: setSorting,
+        state: { sorting },
+    });
 
     return (
         <div className="p-8 w-full">
@@ -41,41 +115,57 @@ export default function HoldingsPage() {
             ) : (!loading ? (
                 <p>No account selected</p>
             ) : null)}
-            {loading ? (
-                <div className="mt-4 w-full grid gap-4">
-                    <Skeleton className="h-14 rounded-xl" />
-                    <Skeleton className="h-64 rounded-xl" />
-                </div>
-            ) : null}
-
-            {
-                !loading && holdings?.positions && Object.keys(holdings?.positions).length > 0 ? (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Symbol</TableHead>
-                                <TableHead>Quantity</TableHead>
-                                <TableHead>Current Price</TableHead>
-                                <TableHead>Purchase Price</TableHead>
-                                <TableHead>P/L</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {holdings?.positions?.map((row, rowIdx) => (
-                                <TableRow key={rowIdx}>
-                                    <TableCell title={row.symbol?.symbol?.description ?? ''}>{row.symbol?.symbol?.symbol}</TableCell>
-                                    <TableCell>{row.units}</TableCell>
-                                    <TableCell>{formatCurrency(row.price)}</TableCell>
-                                    <TableCell>{formatCurrency(row.average_purchase_price)}</TableCell>
-                                    <TableCell className={getProfitLossColor(row.open_pnl)}>{formatCurrency(row.open_pnl)}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                ) : (!loading ? (
-                    <p>No holdings to display.</p>
-                ) : null)
-            }
-        </div >
+            <div className="mt-4 w-full">
+                {loading ? (
+                    <div className="mt-4 w-full grid gap-4">
+                        <Skeleton className="h-14 rounded-xl" />
+                        <Skeleton className="h-64 rounded-xl" />
+                    </div>
+                ) : (
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => {
+                                            const canSort = header.column.getCanSort();
+                                            const isSorted = header.column.getIsSorted();
+                                            return (
+                                                <TableHead
+                                                    key={header.id}
+                                                    onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                                                    className={canSort ? 'cursor-pointer select-none' : ''}
+                                                >
+                                                    {header.isPlaceholder ? null : <>{flexRender(header.column.columnDef.header, header.getContext())}{isSorted ? (isSorted === 'asc' ? ' ▲' : ' ▼') : ''}</>}
+                                                </TableHead>
+                                            );
+                                        })}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row) => (
+                                        <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={holdingsColumns.length} className="h-24 text-center">
+                                            No holdings to display.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }
