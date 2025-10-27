@@ -22,7 +22,7 @@ Later add feature to parse transactions and auto add to watchlist
 ## Dashboard features
 - Options Performance - Table of options (ticker, expiry date, type of option, premiums earned, current price (from Fidelity CSV), % of money made, APR) with filter for current
 - Watchlist - Add/Remove list of tickers
-- Options Finder - Given a list of tickers (like AMZN, AAPL) use Polygon API to find a good option to trade (Also show next earnings date + highlight if recommendation includes the earnings date)
+- Options Finder - Given a list of tickers (like AMZN, ORCL) use Polygon API to find a good option to trade (Also show next earnings date + highlight if recommendation includes the earnings date)
     - Next Earnings OR earnings calendar(low priority) for list of stocks
     - Requirements for a good option are -> 6 weeks out from today + expected rate of interest = 1.5%
 - (Low Priority) Stocks Finder - Given a list of tickers, organize by the biggest dips over different period of times

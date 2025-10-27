@@ -40,8 +40,10 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
           accountsMap[account.id || `Unknown ${index}`] = account;
         });
         setAccounts(accountsMap);
-        // Set the first account as selected
-        setSelectedAccountId(Object.keys(accountsMap)[0]);
+        if (!selectedAccountId) {
+          // Set the first account as selected
+          setSelectedAccountId(Object.keys(accountsMap)[0]);
+        }
       }
     };
     fetchAccounts();

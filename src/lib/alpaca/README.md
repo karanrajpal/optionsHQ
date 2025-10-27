@@ -35,7 +35,7 @@ const optionsService = createAlpacaOptionsService();
 
 // Fetch options chain
 const data = await optionsService.getOptionsChain({
-  underlying_symbols: 'AAPL',
+  underlying_symbols: 'ORCL',
   type: 'call',
   limit: 50
 });
@@ -104,7 +104,7 @@ Fetch options contracts from Alpaca.
 
 **Example:**
 ```
-/api/alpaca/options?underlying_symbols=AAPL&type=call&limit=50
+/api/alpaca/options?underlying_symbols=ORCL&type=call&limit=50
 ```
 
 ## Resources

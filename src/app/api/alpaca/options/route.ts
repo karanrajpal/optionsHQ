@@ -8,7 +8,7 @@ import { GetOptionChainParams } from '@alpacahq/alpaca-trade-api/dist/resources/
  * Fetch options contracts from Alpaca Options API
  * 
  * Query Parameters:
- * - root_symbol: Ticker symbol (e.g., "AAPL") - Required
+ * - root_symbol: Ticker symbol (e.g., "ORCL") - Required
  * - type: "call" or "put" - Optional
  * - status: "active" or "inactive" - Optional (default: "active")
  * - expiration_date_gte: Filter by expiration date >= this date (YYYY-MM-DD) - Optional
@@ -17,7 +17,7 @@ import { GetOptionChainParams } from '@alpacahq/alpaca-trade-api/dist/resources/
  * - strike_price_lte: Filter by strike price <= this value - Optional
  * - limit: Number of results to return (max 10000) - Optional
  *
- * Example: /api/alpaca/options?root_symbol=AAPL&type=call&limit=50
+ * Example: /api/alpaca/options?root_symbol=ORCL&type=call&limit=50
  */
 export async function GET(request: NextRequest) {
   try {
