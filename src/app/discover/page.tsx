@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { OptionsDataTable } from '@/components/OptionsDataTable';
 import { OptionHorizons, OptionHorizonType } from '@/components/OptionHorizons';
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@stackframe/stack';
 
 export default function Discover() {
@@ -18,7 +18,7 @@ export default function Discover() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [topWatchlistItems, setTopWatchlistItems] = useState<Array<{ ticker_symbol: string }>>([]);
-  const [shouldAutoSearch, setShouldAutoSearch] = useState(false);
+  const [triggerSearchForTicker, setTriggerSearchForTicker] = useState<string | null>(null);
 
   // Fetch top watchlist items
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function Discover() {
   }, [user?.id]);
 
   // Calculate expiration date range based on option horizon
-  const getExpirationDateRange = () => {
+  const getExpirationDateRange = useCallback(() => {
     const today = new Date();
     const startDate = new Date();
     const endDate = new Date();
@@ -59,9 +59,9 @@ export default function Discover() {
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
     };
-  };
+  }, [optionHorizon]);
 
-  const handleGetOptions = async () => {
+  const handleGetOptions = useCallback(async () => {
     if (!ticker.trim()) {
       setError('Please enter a ticker symbol');
       return;
@@ -112,7 +112,7 @@ export default function Discover() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [ticker, optionType, getExpirationDateRange]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -122,16 +122,16 @@ export default function Discover() {
 
   const handleWatchlistPillClick = (tickerSymbol: string) => {
     setTicker(tickerSymbol);
-    setShouldAutoSearch(true);
+    setTriggerSearchForTicker(tickerSymbol);
   };
 
-  // Trigger search when watchlist pill is clicked
+  // Auto-search when watchlist pill is clicked
   useEffect(() => {
-    if (shouldAutoSearch && ticker) {
-      setShouldAutoSearch(false);
+    if (triggerSearchForTicker && ticker === triggerSearchForTicker) {
+      setTriggerSearchForTicker(null);
       handleGetOptions();
     }
-  }, [shouldAutoSearch, ticker]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ticker, triggerSearchForTicker, handleGetOptions]);
 
   return (
     <main className="flex min-h-screen flex-col items-center p-8">
