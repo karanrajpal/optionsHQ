@@ -18,6 +18,7 @@ export default function Discover() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [topWatchlistItems, setTopWatchlistItems] = useState<Array<{ ticker_symbol: string }>>([]);
+  const [shouldAutoSearch, setShouldAutoSearch] = useState(false);
 
   // Fetch top watchlist items
   useEffect(() => {
@@ -121,12 +122,16 @@ export default function Discover() {
 
   const handleWatchlistPillClick = (tickerSymbol: string) => {
     setTicker(tickerSymbol);
-    // Trigger search after a brief delay to allow state to update
-    setTimeout(() => {
-      const searchButton = document.querySelector('[data-search-button]') as HTMLButtonElement;
-      searchButton?.click();
-    }, 100);
+    setShouldAutoSearch(true);
   };
+
+  // Trigger search when watchlist pill is clicked
+  useEffect(() => {
+    if (shouldAutoSearch && ticker) {
+      setShouldAutoSearch(false);
+      handleGetOptions();
+    }
+  }, [shouldAutoSearch, ticker]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <main className="flex min-h-screen flex-col items-center p-8">
@@ -174,7 +179,6 @@ export default function Discover() {
             onClick={handleGetOptions} 
             disabled={isLoading}
             className="px-8"
-            data-search-button
           >
             {isLoading ? 'Loading...' : 'Get Options'}
           </Button>
