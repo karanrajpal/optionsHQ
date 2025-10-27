@@ -8,7 +8,7 @@ import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
 import { OptionsPosition } from "snaptrade-typescript-sdk";
 
-export const optionsColumns: ColumnDef<OptionsPosition>[] = [
+const optionsColumns: ColumnDef<OptionsPosition>[] = [
   {
     accessorKey: 'symbol',
     header: 'Symbol',
