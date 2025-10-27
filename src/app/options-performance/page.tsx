@@ -83,34 +83,9 @@ export default function OptionsPerformancePage() {
             ) : null)}
             
             {loading ? (
-                <div className="mt-4 w-full">
-                    <div className="grid grid-cols-10 gap-4 mb-2">
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                        <Skeleton className="h-8 rounded" />
-                    </div>
-
-                    {Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="grid grid-cols-10 gap-4 py-2">
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                            <Skeleton className="h-16 rounded" />
-                        </div>
-                    ))}
+                <div className="mt-4 w-full grid gap-4">
+                    <Skeleton className="h-14 rounded-xl" />
+                    <Skeleton className="h-64 rounded-xl" />
                 </div>
             ) : null}
 
