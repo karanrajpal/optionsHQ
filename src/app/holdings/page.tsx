@@ -17,7 +17,7 @@ export default function HoldingsPage() {
         const fetchHoldings = async () => {
             setLoading(true);
             if (selectedAccount?.id) {
-                const response = await fetch(`/api/holdings?accountId=${selectedAccount.id}`, {
+                const response = await fetch(`/api/snaptrade/holdings?accountId=${selectedAccount.id}`, {
                     headers: {
                         "user-id": snaptradeUserId as string,
                         "user-secret": snaptradeUserSecret as string
