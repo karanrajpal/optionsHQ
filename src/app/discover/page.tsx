@@ -8,6 +8,7 @@ import { OptionHorizons, OptionHorizonType } from '@/components/OptionHorizons';
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@stackframe/stack';
+import { useWatchlist } from '@/context/WatchlistProvider';
 
 export default function Discover() {
   const user = useUser();
@@ -17,27 +18,15 @@ export default function Discover() {
   const [data, setData] = useState<AlpacaOptionSnapshot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [topWatchlistItems, setTopWatchlistItems] = useState<Array<{ ticker_symbol: string }>>([]);
+  const { watchlistItems } = useWatchlist();
   const [triggerSearchForTicker, setTriggerSearchForTicker] = useState<string | null>(null);
 
-  // Fetch top watchlist items
   useEffect(() => {
-    const fetchTopItems = async () => {
-      if (!user?.id) return;
-      
-      try {
-        const response = await fetch(`/api/watchlist/top-items?user_id=${user.id}&limit=5`);
-        if (response.ok) {
-          const data = await response.json();
-          setTopWatchlistItems(data);
-        }
-      } catch (err) {
-        console.error('Error fetching top watchlist items:', err);
-      }
-    };
-
-    fetchTopItems();
-  }, [user?.id]);
+    // Also default to Call options for LEAPS
+    if (optionType !== 'call') {
+      setOptionType('call');
+    }
+  }, [optionHorizon]);
 
   // Calculate expiration date range based on option horizon
   const getExpirationDateRange = useCallback(() => {
@@ -191,11 +180,11 @@ export default function Discover() {
         </div>
 
         {/* Watchlist Quick Search Pills */}
-        {topWatchlistItems.length > 0 && (
+        {watchlistItems.length > 0 && (
           <div className="space-y-2">
             <label className="text-sm font-medium">Quick Search from Watchlist</label>
             <div className="flex gap-2 flex-wrap">
-              {topWatchlistItems.map((item) => (
+              {watchlistItems.map((item) => (
                 <Button
                   key={item.ticker_symbol}
                   variant="outline"

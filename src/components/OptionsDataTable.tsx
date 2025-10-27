@@ -33,7 +33,16 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
   {
     accessorKey: 'symbol',
     header: 'Symbol',
-    cell: ({ row }) => <div className="font-mono text-xs">{row?.original?.Symbol}</div>,
+    cell: ({ row }) => {
+      const symbol = row?.original?.Symbol?.match(/^[A-Za-z]+/)?.[0];
+      return <div className="font-mono text-xs">{symbol}</div>;
+    },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const symbolA = a.original?.Symbol || '';
+      const symbolB = b.original?.Symbol || '';
+      return symbolA.localeCompare(symbolB);
+    },
   },
   {
     accessorKey: 'type',
@@ -47,6 +56,18 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
         </div>
       );
     },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const typeA = (() => {
+        const match = a.original?.Symbol?.match(/\d{6}(\w)/);
+        return match ? match[1] === 'C' ? 'call' : 'put' : '';
+      })();
+      const typeB = (() => {
+        const match = b.original?.Symbol?.match(/\d{6}(\w)/);
+        return match ? match[1] === 'C' ? 'call' : 'put' : '';
+      })();
+      return typeA.localeCompare(typeB);
+    },
   },
   {
     accessorKey: 'strike_price',
@@ -56,6 +77,18 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
       const strikePrice = strikePriceMatch ? parseFloat(strikePriceMatch[1]) / 1000 : 0;
       return <div>${strikePrice.toFixed(2)}</div>;
     },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const strikeA = (() => {
+        const match = a.original?.Symbol?.match(/\d{6}[CP](\d+)/);
+        return match ? parseFloat(match[1]) / 1000 : 0;
+      })();
+      const strikeB = (() => {
+        const match = b.original?.Symbol?.match(/\d{6}[CP](\d+)/);
+        return match ? parseFloat(match[1]) / 1000 : 0;
+      })();
+      return strikeA - strikeB;
+    },
   },
   {
     accessorKey: 'expiration_date',
@@ -64,14 +97,26 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
       const date = extractDateFromContractSymbol(row?.original?.Symbol);
       return <div>{date?.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })}</div>;
     },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const dateA = extractDateFromContractSymbol(a.original?.Symbol || '');
+      const dateB = extractDateFromContractSymbol(b.original?.Symbol || '');
+      return dateA.getTime() - dateB.getTime();
+    },
   },
   {
-    accessorKey: 'snapshot',
+    accessorKey: 'last_price',
     header: 'Last Price',
     cell: ({ row }) => {
       const snapshot = row.original;
       const lastPrice = snapshot?.LatestTrade?.Price || snapshot?.LatestQuote?.AskPrice || snapshot?.LatestQuote?.BidPrice || 0;
       return lastPrice ? <div>${lastPrice.toFixed(2)}</div> : <div className="text-gray-400">-</div>;
+    },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const lastPriceA = a.original?.LatestTrade?.Price || a.original?.LatestQuote?.AskPrice || a.original?.LatestQuote?.BidPrice || 0;
+      const lastPriceB = b.original?.LatestTrade?.Price || b.original?.LatestQuote?.AskPrice || b.original?.LatestQuote?.BidPrice || 0;
+      return lastPriceA - lastPriceB;
     },
   },
   {
@@ -81,6 +126,12 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
       const bid = row.original?.LatestQuote?.BidPrice;
       return bid ? <div>${bid.toFixed(2)}</div> : <div className="text-gray-400">-</div>;
     },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const bidA = a.original?.LatestQuote?.BidPrice || 0;
+      const bidB = b.original?.LatestQuote?.BidPrice || 0;
+      return bidA - bidB;
+    },
   },
   {
     accessorKey: 'snapshot.latestQuote.ap',
@@ -88,6 +139,12 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
     cell: ({ row }) => {
       const ask = row.original?.LatestQuote?.AskPrice;
       return ask ? <div>${ask.toFixed(2)}</div> : <div className="text-gray-400">-</div>;
+    },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const askA = a.original?.LatestQuote?.AskPrice || 0;
+      const askB = b.original?.LatestQuote?.AskPrice || 0;
+      return askA - askB;
     },
   },
   {
@@ -99,6 +156,15 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
       const daysToExpiration = date ? Math.ceil((date.getTime() - today.getTime()) / (1000 * 3600 * 24)) : null;
       return <div>{daysToExpiration || '-'}</div>;
     },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const dateA = extractDateFromContractSymbol(a.original?.Symbol || '');
+      const dateB = extractDateFromContractSymbol(b.original?.Symbol || '');
+      const today = new Date();
+      const daysA = dateA ? Math.ceil((dateA.getTime() - today.getTime()) / (1000 * 3600 * 24)) : Infinity;
+      const daysB = dateB ? Math.ceil((dateB.getTime() - today.getTime()) / (1000 * 3600 * 24)) : Infinity;
+      return daysA - daysB;
+    }
   },
   {
     accessorKey: 'snapshot.impliedVolatility',
@@ -106,6 +172,12 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
     cell: ({ row }) => {
       const iv = (row.original as any).ImpliedVolatility;
       return iv ? <div>{(iv * 100).toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
+    },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const ivA = (a.original as any).ImpliedVolatility || 0;
+      const ivB = (b.original as any).ImpliedVolatility || 0;
+      return ivA - ivB;
     },
   },
 ];
@@ -153,11 +225,22 @@ export function OptionsDataTable({ data, isLoading, error }: OptionsDataTablePro
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                const canSort = header.column.getCanSort();
+                const isSorted = header.column.getIsSorted();
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                    className={canSort ? 'cursor-pointer select-none' : ''}
+                  >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : (
+                        <>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {isSorted ? (isSorted === 'asc' ? ' ▲' : ' ▼') : ''}
+                        </>
+                      )}
                   </TableHead>
                 );
               })}
