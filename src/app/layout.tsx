@@ -10,6 +10,7 @@ import Header from "@/components/header";
 import { SnaptradeAccountsProvider } from "@/context/SnaptradeAccountsProvider";
 import { ReactNode, Suspense } from "react";
 import { UserDataAccountsProvider } from "@/context/UserDataAccountsProvider";
+import { WatchlistProvider } from "@/context/WatchlistProvider";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -42,8 +43,10 @@ export default function RootLayout({
                                 <Suspense fallback={<div>Loading...</div>}>
                                     <UserDataAccountsProvider>
                                         <SnaptradeAccountsProvider>
-                                            {stackClientApp.getUser().then(user => user && <Header />)}
-                                            {children}
+                                            <WatchlistProvider>
+                                                {stackClientApp.getUser().then(user => user && <Header />)}
+                                                {children}
+                                            </WatchlistProvider>
                                         </SnaptradeAccountsProvider>
                                     </UserDataAccountsProvider>
                                 </Suspense>
