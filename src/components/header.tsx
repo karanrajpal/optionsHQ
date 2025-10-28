@@ -1,17 +1,17 @@
 'use client';
 import Link from 'next/link';
-import { LuCheck, LuRocket, LuSettings } from 'react-icons/lu';
+import { LuCheck, LuRocket, LuMoon, LuSun } from 'react-icons/lu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from './ui/navigation-menu';
-import { DarkModeToggle } from './dark-mode-toggle';
 import { Button } from './ui/button';
 import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
 import { SiChase, SiRobinhood } from 'react-icons/si';
 import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
-import { useUser } from '@stackframe/stack';
+import { useTheme } from 'next-themes';
 
 export default function Header() {
     const { selectedAccount, accounts, setSelectedAccountId } = useSnaptradeAccount();
+    const { theme, setTheme } = useTheme();
 
     return (
         <header role="banner" className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -59,37 +59,21 @@ export default function Header() {
                                     )}
                                 </NavigationMenuContent>
                             </NavigationMenuItem>
-
-
-                            <NavigationMenuItem>
-                                <NavigationMenuTrigger className="text-gray-600 hover:text-gray-900 bg-inherit dark:text-gray-300 dark:hover:text-white">
-                                    <LuSettings size={18} />
-                                </NavigationMenuTrigger>
-                                <NavigationMenuContent className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm left-auto right-0 origin-top-right">
-                                    <NavigationMenuLink className="block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
-                                        <div className="flex items-center gap-2">
-                                            <DarkModeToggle />
-                                        </div>
-                                    </NavigationMenuLink>
-                                    <NavigationMenuLink className="block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
-                                        <AuthMenuButton />
-                                    </NavigationMenuLink>
-                                </NavigationMenuContent>
-                            </NavigationMenuItem>
                         </NavigationMenuList>
                     </NavigationMenu>
+
+                    <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                    >
+                        <LuSun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                        <LuMoon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                        <span className="sr-only">Toggle theme</span>
+                    </Button>
                 </nav>
             </div>
         </header>
-    );
-}
-
-function AuthMenuButton() {
-    const user = useUser();
-
-    return (
-        <Button variant={null} className="w-full text-left no-underline" onClick={() => { if (user) user.signOut(); else window.location.assign('/'); }}>
-            {user ? 'Logout' : 'Login'}
-        </Button>
     );
 }
