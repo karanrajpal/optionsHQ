@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@stackframe/stack";
-import { useModulePreferences } from "@/context/ModulePreferencesProvider";
+import { useModulePreferences, ModulePreferences } from "@/context/ModulePreferencesProvider";
 import { 
   Sidebar, 
   SidebarContent, 
@@ -12,7 +12,7 @@ import {
   SidebarMenuButton, 
   SidebarMenuItem 
 } from "@/components/ui/sidebar";
-import { LuUser, LuBarChart3, LuSearch, LuList, LuActivity } from "react-icons/lu";
+import { LuUser, LuChartBar, LuSearch, LuList, LuActivity } from "react-icons/lu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ export function AppSidebar() {
   const { preferences, isLoading, updatePreferences } = useModulePreferences();
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleToggle = async (key: keyof typeof preferences) => {
+  const handleToggle = async (key: keyof ModulePreferences) => {
     if (!preferences || isSaving) return;
     
     setIsSaving(true);
@@ -33,15 +33,6 @@ export function AppSidebar() {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
   };
 
   return (
@@ -65,11 +56,6 @@ export function AppSidebar() {
                   )}
                 </div>
               </div>
-              {user?.createdAt && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Member since {formatDate(user.createdAt.toISOString())}
-                </p>
-              )}
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -91,7 +77,7 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <div className="flex items-center justify-between w-full px-2 py-2">
                       <div className="flex items-center gap-2">
-                        <LuBarChart3 size={18} />
+                        <LuChartBar size={18} />
                         <span className="text-sm">Portfolio Tracking</span>
                       </div>
                       <Button
