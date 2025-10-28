@@ -15,7 +15,8 @@ import {
   SidebarMenu, 
   SidebarMenuButton, 
   SidebarMenuItem,
-  SidebarMenuSkeleton
+  SidebarMenuSkeleton,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { 
   Collapsible,
@@ -44,6 +45,8 @@ export function AppSidebar() {
   const pathname = usePathname();
   const [stocksOpen, setStocksOpen] = useState(true);
   const [optionsOpen, setOptionsOpen] = useState(true);
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
 
   // Only show sidebar if user is logged in
   if (!user) {
@@ -80,11 +83,11 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild size="lg" isActive={pathname === "/"}>
+              <SidebarMenuItem className="flex justify-center">
+                <SidebarMenuButton asChild size='lg' isActive={pathname === "/"}>
                   <Link href="/">
-                    <MdOutlineHome className="!w-5 !h-5" />
-                    <span className="text-base">Home</span>
+                    <MdOutlineHome className="!w-8 !h-8" />
+                    {!collapsed && <span className="text-base">Home</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -98,29 +101,28 @@ export function AppSidebar() {
             <SidebarGroup>
               <SidebarGroupLabel asChild>
                 <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-semibold">
-                  Stocks
-                  <LuChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  {!collapsed && <>Stocks<LuChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></>}
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
               <CollapsibleContent>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {preferences?.watchlist_enabled && (
-                      <SidebarMenuItem>
+                      <SidebarMenuItem className="flex justify-center">
                         <SidebarMenuButton asChild size="lg" isActive={pathname === "/watchlist"}>
                           <Link href="/watchlist">
-                            <LuList className="!w-5 !h-5" />
-                            <span className="text-base">Watchlist</span>
+                            <LuList className="!w-8 !h-8" />
+                            {!collapsed && <span className="text-base">Watchlist</span>}
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     )}
                     {preferences?.portfolio_tracking_enabled && (
-                      <SidebarMenuItem>
+                      <SidebarMenuItem className="flex justify-center">
                         <SidebarMenuButton asChild size="lg" isActive={pathname === "/holdings"}>
-                          <Link href="/holdings">
-                            <MdOutlineBarChart className="!w-5 !h-5" />
-                            <span className="text-base">Stocks</span>
+                          <Link href="/holdings" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
+                            <MdOutlineBarChart className="!w-8 !h-8" />
+                            {!collapsed && <span className="text-base">Stocks</span>}
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -138,8 +140,7 @@ export function AppSidebar() {
             <SidebarGroup>
               <SidebarGroupLabel asChild>
                 <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-semibold">
-                  Options
-                  <LuChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  {!collapsed && <>Options<LuChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></>}
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
               <CollapsibleContent>
@@ -147,30 +148,30 @@ export function AppSidebar() {
                   <SidebarMenu>
                     {preferences?.portfolio_tracking_enabled && (
                       <>
-                        <SidebarMenuItem>
+                        <SidebarMenuItem className="flex justify-center">
                           <SidebarMenuButton asChild size="lg" isActive={pathname === "/options"}>
-                            <Link href="/options">
-                              <LuTrendingUp className="!w-5 !h-5" />
-                              <span className="text-base">Options</span>
+                            <Link href="/options" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
+                              <LuTrendingUp className={collapsed ? "!w-8 !h-8" : "!w-7 !h-7"} />
+                              {!collapsed && <span className="text-base">Options</span>}
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
-                        <SidebarMenuItem>
+                        <SidebarMenuItem className="flex justify-center">
                           <SidebarMenuButton asChild size="lg" isActive={pathname === "/options-performance"}>
-                            <Link href="/options-performance">
-                              <MdOutlineStackedLineChart className="!w-5 !h-5" />
-                              <span className="text-base">Options Performance</span>
+                            <Link href="/options-performance" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
+                              <MdOutlineStackedLineChart className="!w-8 !h-8" />
+                              {!collapsed && <span className="text-base">Options Performance</span>}
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       </>
                     )}
                     {preferences?.options_discovery_enabled && (
-                      <SidebarMenuItem>
+                      <SidebarMenuItem className="flex justify-center">
                         <SidebarMenuButton asChild size="lg" isActive={pathname === "/discover"}>
-                          <Link href="/discover">
-                            <LuSearch className="!w-5 !h-5" />
-                            <span className="text-base">Discover</span>
+                          <Link href="/discover" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
+                            <LuSearch className="!w-8 !h-8" />
+                            {!collapsed && <span className="text-base">Discover</span>}
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -186,11 +187,11 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
+              <SidebarMenuItem className="flex justify-center">
                 <SidebarMenuButton asChild size="lg" isActive={pathname === "/setup"}>
-                  <Link href="/setup">
-                    <LuSettings className="!w-5 !h-5" />
-                    <span className="text-base">Setup</span>
+                  <Link href="/setup" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
+                    <LuSettings className="!w-8 !h-8" />
+                    {!collapsed && <span className="text-base">Setup</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -202,7 +203,7 @@ export function AppSidebar() {
       {/* User Profile Footer */}
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem className="flex justify-center items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" className="w-full">
@@ -210,14 +211,16 @@ export function AppSidebar() {
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground">
                       {user.displayName?.[0]?.toUpperCase() || (user.primaryEmail?.[0] ? user.primaryEmail[0].toUpperCase() : "U")}
                     </div>
-                    <div className="flex flex-col items-start flex-1 min-w-0">
-                      <span className="text-sm font-medium truncate w-full">
-                        {user.displayName || "User"}
-                      </span>
-                      <span className="text-xs text-muted-foreground truncate w-full">
-                        {user.primaryEmail}
-                      </span>
-                    </div>
+                    {!collapsed && (
+                      <div className="flex flex-col items-start flex-1 min-w-0">
+                        <span className="text-sm font-medium truncate w-full">
+                          {user.displayName || "User"}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate w-full">
+                          {user.primaryEmail}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
