@@ -208,7 +208,7 @@ export function AppSidebar() {
                 <SidebarMenuButton size="lg" className="w-full">
                   <div className="flex items-center gap-2 w-full">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground">
-                      {user.displayName?.[0]?.toUpperCase() || user.primaryEmail?.[0]?.toUpperCase() || "U"}
+                      {user.displayName?.[0]?.toUpperCase() || (user.primaryEmail?.[0] ? user.primaryEmail[0].toUpperCase() : "U")}
                     </div>
                     <div className="flex flex-col items-start flex-1 min-w-0">
                       <span className="text-sm font-medium truncate w-full">
