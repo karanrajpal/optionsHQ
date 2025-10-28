@@ -1,7 +1,8 @@
 "use client";
 
 import { useUser } from "@stackframe/stack";
-import { useModulePreferences, ModulePreferences } from "@/context/ModulePreferencesProvider";
+import { useModulePreferences } from "@/context/ModulePreferencesProvider";
+import Link from "next/link";
 import { 
   Sidebar, 
   SidebarContent, 
@@ -12,173 +13,109 @@ import {
   SidebarMenuButton, 
   SidebarMenuItem 
 } from "@/components/ui/sidebar";
-import { LuUser, LuChartBar, LuSearch, LuList, LuActivity } from "react-icons/lu";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { 
+  LuHome, 
+  LuBarChart2, 
+  LuTrendingUp, 
+  LuLineChart, 
+  LuList, 
+  LuSearch, 
+  LuSettings 
+} from "react-icons/lu";
 
 export function AppSidebar() {
   const user = useUser();
-  const { preferences, isLoading, updatePreferences } = useModulePreferences();
-  const [isSaving, setIsSaving] = useState(false);
+  const { preferences } = useModulePreferences();
 
-  const handleToggle = async (key: keyof ModulePreferences) => {
-    if (!preferences || isSaving) return;
-    
-    setIsSaving(true);
-    try {
-      await updatePreferences({ [key]: !preferences[key] });
-    } catch (error) {
-      console.error("Error updating preferences:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  // Only show sidebar if user is logged in
+  if (!user) {
+    return null;
+  }
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarContent>
-        {/* Account Section */}
+        {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
-            <div className="px-4 py-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <LuUser className="text-gray-600 dark:text-gray-400" size={18} />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    Welcome, {user?.displayName ?? 'Options Lover'}
-                  </p>
-                  {user?.primaryEmail && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {user.primaryEmail}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/">
+                    <LuHome />
+                    <span>Home</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {preferences?.portfolio_tracking_enabled && (
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/holdings">
+                        <LuBarChart2 />
+                        <span>Stocks</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/options">
+                        <LuTrendingUp />
+                        <span>Options</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/options-performance">
+                        <LuLineChart />
+                        <span>Options Performance</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
+              )}
+
+              {preferences?.watchlist_enabled && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link href="/watchlist">
+                      <LuList />
+                      <span>Watchlist</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+
+              {preferences?.options_discovery_enabled && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link href="/discover">
+                      <LuSearch />
+                      <span>Discover</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Module Preferences Section */}
+        {/* Settings */}
         <SidebarGroup>
-          <SidebarGroupLabel>Module Preferences</SidebarGroupLabel>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {isLoading ? (
-                <>
-                  <Skeleton className="h-10 w-full mb-2" />
-                  <Skeleton className="h-10 w-full mb-2" />
-                  <Skeleton className="h-10 w-full mb-2" />
-                  <Skeleton className="h-10 w-full" />
-                </>
-              ) : preferences ? (
-                <>
-                  <SidebarMenuItem>
-                    <div className="flex items-center justify-between w-full px-2 py-2">
-                      <div className="flex items-center gap-2">
-                        <LuChartBar size={18} />
-                        <span className="text-sm">Portfolio Tracking</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleToggle('portfolio_tracking_enabled')}
-                        disabled={isSaving}
-                        className={`h-6 w-12 rounded-full p-0 transition-colors ${
-                          preferences.portfolio_tracking_enabled
-                            ? 'bg-green-500 hover:bg-green-600'
-                            : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-                        }`}
-                      >
-                        <span
-                          className={`block h-4 w-4 rounded-full bg-white transition-transform ${
-                            preferences.portfolio_tracking_enabled ? 'translate-x-3' : 'translate-x-1'
-                          }`}
-                        />
-                      </Button>
-                    </div>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <div className="flex items-center justify-between w-full px-2 py-2">
-                      <div className="flex items-center gap-2">
-                        <LuSearch size={18} />
-                        <span className="text-sm">Options Discovery</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleToggle('options_discovery_enabled')}
-                        disabled={isSaving}
-                        className={`h-6 w-12 rounded-full p-0 transition-colors ${
-                          preferences.options_discovery_enabled
-                            ? 'bg-green-500 hover:bg-green-600'
-                            : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-                        }`}
-                      >
-                        <span
-                          className={`block h-4 w-4 rounded-full bg-white transition-transform ${
-                            preferences.options_discovery_enabled ? 'translate-x-3' : 'translate-x-1'
-                          }`}
-                        />
-                      </Button>
-                    </div>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <div className="flex items-center justify-between w-full px-2 py-2">
-                      <div className="flex items-center gap-2">
-                        <LuList size={18} />
-                        <span className="text-sm">Watchlist</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleToggle('watchlist_enabled')}
-                        disabled={isSaving}
-                        className={`h-6 w-12 rounded-full p-0 transition-colors ${
-                          preferences.watchlist_enabled
-                            ? 'bg-green-500 hover:bg-green-600'
-                            : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-                        }`}
-                      >
-                        <span
-                          className={`block h-4 w-4 rounded-full bg-white transition-transform ${
-                            preferences.watchlist_enabled ? 'translate-x-3' : 'translate-x-1'
-                          }`}
-                        />
-                      </Button>
-                    </div>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <div className="flex items-center justify-between w-full px-2 py-2">
-                      <div className="flex items-center gap-2">
-                        <LuActivity size={18} />
-                        <span className="text-sm">Kalshi Monitoring</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleToggle('kalshi_monitoring_enabled')}
-                        disabled={isSaving}
-                        className={`h-6 w-12 rounded-full p-0 transition-colors ${
-                          preferences.kalshi_monitoring_enabled
-                            ? 'bg-green-500 hover:bg-green-600'
-                            : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-                        }`}
-                      >
-                        <span
-                          className={`block h-4 w-4 rounded-full bg-white transition-transform ${
-                            preferences.kalshi_monitoring_enabled ? 'translate-x-3' : 'translate-x-1'
-                          }`}
-                        />
-                      </Button>
-                    </div>
-                  </SidebarMenuItem>
-                </>
-              ) : null}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/setup">
+                    <LuSettings />
+                    <span>Setup</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

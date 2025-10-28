@@ -13,7 +13,7 @@ import { UserDataAccountsProvider } from "@/context/UserDataAccountsProvider";
 import { WatchlistProvider } from "@/context/WatchlistProvider";
 import { ModulePreferencesProvider } from "@/context/ModulePreferencesProvider";
 import { LuRocket } from "react-icons/lu";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 
 // const inter = Inter({ subsets: ["latin"] });
@@ -52,14 +52,15 @@ export default function RootLayout({
                                             <SnaptradeAccountsProvider>
                                                 <WatchlistProvider>
                                                     <SidebarProvider>
-                                                        <AppSidebar />
-                                                        <main className="w-full">
-                                                            <div className="flex items-center gap-2 p-2 border-b">
-                                                                <SidebarTrigger />
-                                                            </div>
-                                                            {stackClientApp.getUser().then(user => user && <Header />)}
-                                                            {children}
-                                                        </main>
+                                                        <div className="flex h-screen w-full">
+                                                            <AppSidebar />
+                                                            <main className="flex-1 flex flex-col overflow-hidden">
+                                                                {stackClientApp.getUser().then(user => user && <Header />)}
+                                                                <div className="flex-1 overflow-auto">
+                                                                    {children}
+                                                                </div>
+                                                            </main>
+                                                        </div>
                                                     </SidebarProvider>
                                                 </WatchlistProvider>
                                             </SnaptradeAccountsProvider>
