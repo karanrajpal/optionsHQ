@@ -9,6 +9,7 @@ import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@stackframe/stack';
 import { useWatchlist } from '@/context/WatchlistProvider';
+import { useModulePreferences } from '@/context/ModulePreferencesProvider';
 
 export default function Discover() {
   const user = useUser();
@@ -19,6 +20,7 @@ export default function Discover() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { watchlistItems } = useWatchlist();
+  const { preferences } = useModulePreferences();
   const [triggerSearchForTicker, setTriggerSearchForTicker] = useState<string | null>(null);
 
   useEffect(() => {
@@ -180,7 +182,7 @@ export default function Discover() {
         </div>
 
         {/* Watchlist Quick Search Pills */}
-        {watchlistItems.length > 0 && (
+        {preferences?.watchlist_enabled && watchlistItems.length > 0 && (
           <div className="space-y-2">
             <label className="text-sm font-medium">Quick Search from Watchlist</label>
             <div className="flex gap-2 flex-wrap">

@@ -11,7 +11,10 @@ import { SnaptradeAccountsProvider } from "@/context/SnaptradeAccountsProvider";
 import { ReactNode, Suspense } from "react";
 import { UserDataAccountsProvider } from "@/context/UserDataAccountsProvider";
 import { WatchlistProvider } from "@/context/WatchlistProvider";
+import { ModulePreferencesProvider } from "@/context/ModulePreferencesProvider";
 import { LuRocket } from "react-icons/lu";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -45,12 +48,26 @@ export default function RootLayout({
                                     <LuRocket className="animate-bounce text-4xl" />
                                 </div>}>
                                     <UserDataAccountsProvider>
-                                        <SnaptradeAccountsProvider>
-                                            <WatchlistProvider>
-                                                {stackClientApp.getUser().then(user => user && <Header />)}
-                                                {children}
-                                            </WatchlistProvider>
-                                        </SnaptradeAccountsProvider>
+                                        <ModulePreferencesProvider>
+                                            <SnaptradeAccountsProvider>
+                                                <WatchlistProvider>
+                                                    <SidebarProvider>
+                                                        <div className="flex h-screen w-full">
+                                                            <AppSidebar />
+                                                            <main className="flex-1 flex flex-col overflow-hidden">
+                                                                <div className="border-b border-gray-200 dark:border-gray-700 p-2 flex items-center gap-2">
+                                                                    <SidebarTrigger />
+                                                                </div>
+                                                                {stackClientApp.getUser().then(user => user && <Header />)}
+                                                                <div className="flex-1 overflow-auto">
+                                                                    {children}
+                                                                </div>
+                                                            </main>
+                                                        </div>
+                                                    </SidebarProvider>
+                                                </WatchlistProvider>
+                                            </SnaptradeAccountsProvider>
+                                        </ModulePreferencesProvider>
                                     </UserDataAccountsProvider>
                                 </Suspense>
                             </ThemeProvider>

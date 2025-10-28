@@ -78,4 +78,77 @@ export class OptionsDatabase {
         `;
         return data;
     }
+
+    // Module preferences methods
+    async getModulePreferences(userId: string) {
+        const data = await this.sql`select * from user_module_preferences where user_id = ${userId}`;
+        return data[0];
+    }
+
+    async createModulePreferences(userId: string, preferences: {
+        portfolio_tracking_enabled?: boolean;
+        options_discovery_enabled?: boolean;
+        watchlist_enabled?: boolean;
+        kalshi_monitoring_enabled?: boolean;
+    }) {
+        const {
+            portfolio_tracking_enabled = true,
+            options_discovery_enabled = true,
+            watchlist_enabled = true,
+            kalshi_monitoring_enabled = false,
+        } = preferences;
+
+        const data = await this.sql`
+            insert into user_module_preferences (
+                user_id, 
+                portfolio_tracking_enabled, 
+                options_discovery_enabled, 
+                watchlist_enabled, 
+                kalshi_monitoring_enabled,
+                modified_at
+            ) values (
+                ${userId}, 
+                ${portfolio_tracking_enabled}, 
+                ${options_discovery_enabled}, 
+                ${watchlist_enabled}, 
+                ${kalshi_monitoring_enabled},
+                CURRENT_TIMESTAMP
+            ) 
+            on conflict (user_id) do update set
+                portfolio_tracking_enabled = excluded.portfolio_tracking_enabled,
+                options_discovery_enabled = excluded.options_discovery_enabled,
+                watchlist_enabled = excluded.watchlist_enabled,
+                kalshi_monitoring_enabled = excluded.kalshi_monitoring_enabled,
+                modified_at = CURRENT_TIMESTAMP
+            returning *
+        `;
+        return data[0];
+    }
+
+    async updateModulePreferences(userId: string, preferences: Partial<{
+        portfolio_tracking_enabled: boolean;
+        options_discovery_enabled: boolean;
+        watchlist_enabled: boolean;
+        kalshi_monitoring_enabled: boolean;
+    }>) {
+        const currentPrefs = await this.getModulePreferences(userId);
+        
+        if (!currentPrefs) {
+            return this.createModulePreferences(userId, preferences);
+        }
+
+        const updates = { ...currentPrefs, ...preferences };
+        
+        const data = await this.sql`
+            update user_module_preferences set
+                portfolio_tracking_enabled = ${updates.portfolio_tracking_enabled},
+                options_discovery_enabled = ${updates.options_discovery_enabled},
+                watchlist_enabled = ${updates.watchlist_enabled},
+                kalshi_monitoring_enabled = ${updates.kalshi_monitoring_enabled},
+                modified_at = CURRENT_TIMESTAMP
+            where user_id = ${userId}
+            returning *
+        `;
+        return data[0];
+    }
 }

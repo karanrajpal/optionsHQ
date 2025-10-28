@@ -46,6 +46,18 @@ Stores individual ticker symbols in watchlists.
 | ticker_symbol | VARCHAR(10) | Stock ticker symbol (e.g., ORCL, TSLA) |
 | added_at | TIMESTAMP | Timestamp when the ticker was added |
 
+### user_module_preferences
+Stores module enable/disable preferences for each user.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| user_id | TEXT | Primary key, foreign key to neon_auth.users_sync(id) |
+| portfolio_tracking_enabled | BOOLEAN | Enable/disable portfolio tracking module (stocks, options, performance) |
+| options_discovery_enabled | BOOLEAN | Enable/disable options discovery module |
+| watchlist_enabled | BOOLEAN | Enable/disable watchlist module |
+| kalshi_monitoring_enabled | BOOLEAN | Enable/disable Kalshi monitoring module |
+| modified_at | TIMESTAMP | Timestamp when preferences were last modified |
+
 ## SQL Migrations
 
 ### Create watchlists table
@@ -74,4 +86,32 @@ CREATE TABLE IF NOT EXISTS watchlist_items (
 );
 
 CREATE INDEX idx_watchlist_items_watchlist_id ON watchlist_items(watchlist_id);
+```
+
+### Create user_module_preferences table
+```sql
+CREATE TABLE IF NOT EXISTS user_module_preferences (
+    user_id TEXT PRIMARY KEY,
+    portfolio_tracking_enabled BOOLEAN DEFAULT TRUE,
+    options_discovery_enabled BOOLEAN DEFAULT TRUE,
+    watchlist_enabled BOOLEAN DEFAULT TRUE,
+    kalshi_monitoring_enabled BOOLEAN DEFAULT FALSE,
+    modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES neon_auth.users_sync(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_user_module_preferences_user_id ON user_module_preferences(user_id);
+
+CREATE OR REPLACE FUNCTION update_user_module_preferences_modified_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.modified_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_user_module_preferences_modified_at
+BEFORE UPDATE ON user_module_preferences
+FOR EACH ROW
+EXECUTE FUNCTION update_user_module_preferences_modified_at();
 ```

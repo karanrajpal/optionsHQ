@@ -11,6 +11,7 @@ import { useUser } from '@stackframe/stack';
 
 export default function Header() {
     const { selectedAccount, accounts, setSelectedAccountId } = useSnaptradeAccount();
+    
     return (
         <header role="banner" className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -20,21 +21,6 @@ export default function Header() {
                 </Link>
 
                 <nav aria-label="Primary navigation" className="flex items-center gap-4">
-                    <Link href="/holdings" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
-                        Stocks
-                    </Link>
-                    <Link href="/options" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
-                        Options
-                    </Link>
-                    <Link href="/options-performance" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
-                        Options Performance
-                    </Link>
-                    <Link href="/watchlist" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
-                        Watchlist
-                    </Link>
-                    <Link href="/discover" className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white no-underline">
-                        Discover
-                    </Link>
 
                     <NavigationMenu>
                         <NavigationMenuList>
