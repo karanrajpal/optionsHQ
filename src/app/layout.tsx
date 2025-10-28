@@ -13,7 +13,7 @@ import { UserDataAccountsProvider } from "@/context/UserDataAccountsProvider";
 import { WatchlistProvider } from "@/context/WatchlistProvider";
 import { ModulePreferencesProvider } from "@/context/ModulePreferencesProvider";
 import { LuRocket } from "react-icons/lu";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 
 // const inter = Inter({ subsets: ["latin"] });
@@ -55,6 +55,9 @@ export default function RootLayout({
                                                         <div className="flex h-screen w-full">
                                                             <AppSidebar />
                                                             <main className="flex-1 flex flex-col overflow-hidden">
+                                                                <div className="border-b border-gray-200 dark:border-gray-700 p-2 flex items-center gap-2">
+                                                                    <SidebarTrigger />
+                                                                </div>
                                                                 {stackClientApp.getUser().then(user => user && <Header />)}
                                                                 <div className="flex-1 overflow-auto">
                                                                     {children}
