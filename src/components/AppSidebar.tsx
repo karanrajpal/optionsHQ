@@ -14,14 +14,12 @@ import {
   SidebarMenuItem 
 } from "@/components/ui/sidebar";
 import { 
-  LuHome, 
-  LuBarChart2, 
   LuTrendingUp, 
-  LuLineChart, 
   LuList, 
   LuSearch, 
   LuSettings 
 } from "react-icons/lu";
+import { MdOutlineBarChart, MdOutlineHome, MdOutlineStackedLineChart } from "react-icons/md";
 
 export function AppSidebar() {
   const user = useUser();
@@ -43,7 +41,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/">
-                    <LuHome />
+                    <MdOutlineHome />
                     <span>Home</span>
                   </Link>
                 </SidebarMenuButton>
@@ -54,7 +52,7 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <Link href="/holdings">
-                        <LuBarChart2 />
+                        <MdOutlineBarChart />
                         <span>Stocks</span>
                       </Link>
                     </SidebarMenuButton>
@@ -70,7 +68,7 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <Link href="/options-performance">
-                        <LuLineChart />
+                        <MdOutlineStackedLineChart />
                         <span>Options Performance</span>
                       </Link>
                     </SidebarMenuButton>
