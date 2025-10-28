@@ -11,7 +11,10 @@ import { SnaptradeAccountsProvider } from "@/context/SnaptradeAccountsProvider";
 import { ReactNode, Suspense } from "react";
 import { UserDataAccountsProvider } from "@/context/UserDataAccountsProvider";
 import { WatchlistProvider } from "@/context/WatchlistProvider";
+import { ModulePreferencesProvider } from "@/context/ModulePreferencesProvider";
 import { LuRocket } from "react-icons/lu";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -45,12 +48,22 @@ export default function RootLayout({
                                     <LuRocket className="animate-bounce text-4xl" />
                                 </div>}>
                                     <UserDataAccountsProvider>
-                                        <SnaptradeAccountsProvider>
-                                            <WatchlistProvider>
-                                                {stackClientApp.getUser().then(user => user && <Header />)}
-                                                {children}
-                                            </WatchlistProvider>
-                                        </SnaptradeAccountsProvider>
+                                        <ModulePreferencesProvider>
+                                            <SnaptradeAccountsProvider>
+                                                <WatchlistProvider>
+                                                    <SidebarProvider>
+                                                        <AppSidebar />
+                                                        <main className="w-full">
+                                                            <div className="flex items-center gap-2 p-2 border-b">
+                                                                <SidebarTrigger />
+                                                            </div>
+                                                            {stackClientApp.getUser().then(user => user && <Header />)}
+                                                            {children}
+                                                        </main>
+                                                    </SidebarProvider>
+                                                </WatchlistProvider>
+                                            </SnaptradeAccountsProvider>
+                                        </ModulePreferencesProvider>
                                     </UserDataAccountsProvider>
                                 </Suspense>
                             </ThemeProvider>
