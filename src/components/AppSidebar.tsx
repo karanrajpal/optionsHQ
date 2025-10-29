@@ -198,7 +198,7 @@ export function AppSidebar() {
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="end" className="w-56">
+              <DropdownMenuContent side="top" align="end" className="w-56 z-[52]">
                 <DropdownMenuItem onClick={() => user.signOut()} className="cursor-pointer">
                   <LuLogOut className="mr-2 h-4 w-4" />
                   <span>Logout</span>

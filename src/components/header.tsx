@@ -1,16 +1,12 @@
 'use client';
 import Link from 'next/link';
-import { LuCheck, LuRocket, LuMoon, LuSun } from 'react-icons/lu';
+import { LuRocket, LuMoon, LuSun } from 'react-icons/lu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from './ui/navigation-menu';
 import { Button } from './ui/button';
-import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
-import { SiChase, SiRobinhood } from 'react-icons/si';
-import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
+
 import { useTheme } from 'next-themes';
 
 export default function Header() {
-    const { selectedAccount, accounts, setSelectedAccountId } = useSnaptradeAccount();
     const { theme, setTheme } = useTheme();
 
     return (
@@ -26,41 +22,7 @@ export default function Header() {
                 </div>
 
                 <nav aria-label="Primary navigation" className="flex items-center gap-4 pr-8">
-                    <NavigationMenu>
-                        <NavigationMenuList>
-                            <NavigationMenuItem>
-                                <NavigationMenuTrigger className="text-gray-600 hover:text-gray-900 bg-inherit dark:text-gray-300 dark:hover:text-white">
-                                    <MdOutlineAccountBalanceWallet size={18} />
-                                </NavigationMenuTrigger>
-                                <NavigationMenuContent className="w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm left-auto right-0 origin-top-right">
-                                    {accounts && Object.keys(accounts).length > 0 ? (
-                                        Object.values(accounts).map((account) => (
-                                            <NavigationMenuLink
-                                                onClick={() => account.id ? setSelectedAccountId(account.id) : null}
-                                                key={account.id}
-                                                title={`${account.institution_name} - ${account.name}`}
-                                                className="w-56 cursor-pointer block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    {account.institution_name === 'Fidelity' ? <img src={'/fidelity.png'} alt="Fidelity Logo" className="w-4 h-4" /> : null}
-                                                    {account.institution_name === 'Chase' ? <SiChase className="w-4 h-4" /> : null}
-                                                    {account.institution_name === 'Robinhood' ? <SiRobinhood className="w-4 h-4" /> : null}
-                                                    {account.name}
-                                                    {selectedAccount?.id === account.id && <LuCheck className="text-green-500" />}
-                                                </div>
-                                            </NavigationMenuLink>
-                                        ))
-                                    ) : (
-                                        <NavigationMenuLink className="w-48 block px-4 py-2 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors">
-                                            <div className="flex items-center gap-2">
-                                                No Accounts found
-                                            </div>
-                                        </NavigationMenuLink>
-                                    )}
-                                </NavigationMenuContent>
-                            </NavigationMenuItem>
-                        </NavigationMenuList>
-                    </NavigationMenu>
+                    {/* Account dropdown removed */}
 
                     <Button 
                         variant="ghost" 

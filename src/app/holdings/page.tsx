@@ -11,11 +11,13 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency, formatDateWithTimeAndZone, getProfitLossColor } from '@/lib/formatters';
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
 import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { SiChase, SiRobinhood } from 'react-icons/si';
 
 export type HoldingsPosition = NonNullable<AccountHoldingsAccount['positions']>[number];
 
@@ -70,7 +72,7 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
 ];
 
 export default function HoldingsPage() {
-    const { selectedAccount } = useSnaptradeAccount();
+    const { selectedAccount, accounts, setSelectedAccountId } = useSnaptradeAccount();
     const [holdings, setHoldings] = useState<AccountHoldingsAccount | null>(null);
     const [loading, setLoading] = useState(true);
     const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
@@ -112,7 +114,35 @@ export default function HoldingsPage() {
         <div className="p-8 w-full">
             <h1 className="text-2xl font-bold">Account Holdings</h1>
             <div className='flex justify-between'>
-                {selectedAccount ? <pre>{selectedAccount.name}</pre> : !loading ? <p>No account selected</p> : null}
+                <div>
+                    <Select
+                        value={selectedAccount?.id ?? undefined}
+                        onValueChange={(val) => setSelectedAccountId(val)}
+                        disabled={loading}
+                    >
+                        <SelectTrigger className="w-64">
+                            <SelectValue placeholder="Select account" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {Object.values(accounts).length > 0 ? (
+                                Object.values(accounts).map((account: import("snaptrade-typescript-sdk").SnapTradeHoldingsAccount) => (
+                                    account.id ? (
+                                        <SelectItem key={account.id} value={account.id}>
+                                            <span className="flex items-center gap-2">
+                                                {account.institution_name === 'Fidelity' && (<img src="/fidelity.png" alt="Fidelity Logo" className="w-4 h-4" />)}
+                                                {account.institution_name === 'Chase' && (<SiChase className="w-4 h-4" />)}
+                                                {account.institution_name === 'Robinhood' && (<SiRobinhood className="w-4 h-4" />)}
+                                                {account.institution_name ? `${account.institution_name} - ` : ''}{account.name}
+                                            </span>
+                                        </SelectItem>
+                                    ) : null
+                                ))
+                            ) : (
+                                <SelectItem value="no_accounts" disabled>No accounts found</SelectItem>
+                            )}
+                        </SelectContent>
+                    </Select>
+                </div>
                 <div className='flex items-center'>
                     {!loading && holdings?.cache_expired && <Badge variant='destructive'>Outdated</Badge>}
                     <div className='ml-2 flex items-center'>Last updated: {loading ? <Skeleton className="inline-block h-4 w-32" /> : (holdings?.cache_timestamp ? formatDateWithTimeAndZone(holdings.cache_timestamp) : 'N/A')}</div>
