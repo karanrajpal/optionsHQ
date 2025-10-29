@@ -4,37 +4,30 @@ import { useUser } from "@stackframe/stack";
 import { useModulePreferences } from "@/context/ModulePreferencesProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { 
-  Sidebar, 
-  SidebarContent, 
+import {
+  Sidebar,
+  SidebarContent,
   SidebarFooter,
-  SidebarGroup, 
-  SidebarGroupContent, 
-  SidebarGroupLabel, 
-  SidebarMenu, 
-  SidebarMenuButton, 
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSkeleton,
   useSidebar
 } from "@/components/ui/sidebar";
-import { 
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  LuTrendingUp, 
-  LuList, 
-  LuSearch, 
+import {
+  LuTrendingUp,
+  LuList,
+  LuSearch,
   LuSettings,
-  LuChevronDown,
   LuLogOut
 } from "react-icons/lu";
 import { MdOutlineBarChart, MdOutlineHome, MdOutlineStackedLineChart } from "react-icons/md";
@@ -43,8 +36,6 @@ export function AppSidebar() {
   const user = useUser();
   const { preferences, isLoading } = useModulePreferences();
   const pathname = usePathname();
-  const [stocksOpen, setStocksOpen] = useState(true);
-  const [optionsOpen, setOptionsOpen] = useState(true);
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
 
@@ -57,17 +48,14 @@ export function AppSidebar() {
   if (isLoading) {
     return (
       <Sidebar collapsible="icon">
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Loading...</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuSkeleton showIcon />
-                <SidebarMenuSkeleton showIcon />
-                <SidebarMenuSkeleton showIcon />
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+        <SidebarContent className="mt-10">
+          <SidebarMenu>
+            <SidebarMenuSkeleton showIcon />
+            <SidebarMenuSkeleton showIcon />
+            <SidebarMenuSkeleton showIcon />
+            <SidebarMenuSkeleton showIcon />
+            <SidebarMenuSkeleton showIcon />
+          </SidebarMenu>
         </SidebarContent>
       </Sidebar>
     );
@@ -76,14 +64,15 @@ export function AppSidebar() {
   const hasStocksGroup = preferences?.portfolio_tracking_enabled || preferences?.watchlist_enabled;
   const hasOptionsGroup = preferences?.portfolio_tracking_enabled || preferences?.options_discovery_enabled;
 
+
   return (
     <Sidebar collapsible="icon" className="z-[51]">
-      <SidebarContent>
+      <SidebarContent className="gap-0">
         {/* Home */}
-        <SidebarGroup>
+        <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem className="flex justify-center">
+              <SidebarMenuItem className={`flex justify-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
                 <SidebarMenuButton asChild size='lg' isActive={pathname === "/"} tooltip="Home">
                   <Link href="/">
                     <MdOutlineHome className="!w-8 !h-8" />
@@ -95,101 +84,86 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Stocks Group */}
+        {/* Stocks Section */}
         {hasStocksGroup && (
-          <Collapsible open={stocksOpen} onOpenChange={setStocksOpen} className="group/collapsible">
-            <SidebarGroup>
-              <SidebarGroupLabel asChild>
-                <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-semibold">
-                  {!collapsed && <>Stocks<LuChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></>}
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {preferences?.watchlist_enabled && (
-                      <SidebarMenuItem className="flex justify-center">
-                        <SidebarMenuButton asChild size="lg" isActive={pathname === "/watchlist"} tooltip="Watchlist">
-                          <Link href="/watchlist">
-                            <LuList className="!w-8 !h-8" />
-                            {!collapsed && <span className="text-base">Watchlist</span>}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    )}
-                    {preferences?.portfolio_tracking_enabled && (
-                      <SidebarMenuItem className="flex justify-center">
-                        <SidebarMenuButton asChild size="lg" isActive={pathname === "/holdings"} tooltip="Stocks">
-                          <Link href="/holdings" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
-                            <MdOutlineBarChart className="!w-8 !h-8" />
-                            {!collapsed && <span className="text-base">Stocks</span>}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    )}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </Collapsible>
+          <SidebarGroup>
+            <SidebarGroupLabel>Stocks</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {preferences?.watchlist_enabled && (
+                  <SidebarMenuItem className={`flex justify-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
+                    <SidebarMenuButton asChild size="lg" isActive={pathname === "/watchlist"} tooltip="Watchlist">
+                      <Link href="/watchlist">
+                        <LuList className="!w-8 !h-8" />
+                        {!collapsed && <span className="text-base">Watchlist</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+                {preferences?.portfolio_tracking_enabled && (
+                  <SidebarMenuItem className={`flex justify-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
+                    <SidebarMenuButton asChild size="lg" isActive={pathname === "/holdings"} tooltip="Stocks">
+                      <Link href="/holdings">
+                        <MdOutlineBarChart className="!w-8 !h-8" />
+                        {!collapsed && <span className="text-base">Stocks</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         )}
 
-        {/* Options Group */}
+        {/* Options Section */}
         {hasOptionsGroup && (
-          <Collapsible open={optionsOpen} onOpenChange={setOptionsOpen} className="group/collapsible">
-            <SidebarGroup>
-              <SidebarGroupLabel asChild>
-                <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-semibold">
-                  {!collapsed && <>Options<LuChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></>}
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {preferences?.portfolio_tracking_enabled && (
-                      <>
-                        <SidebarMenuItem className="flex justify-center">
-                          <SidebarMenuButton asChild size="lg" isActive={pathname === "/options"} tooltip="Options">
-                            <Link href="/options" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
-                              <LuTrendingUp className={collapsed ? "!w-8 !h-8" : "!w-7 !h-7"} />
-                              {!collapsed && <span className="text-base">Options</span>}
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem className="flex justify-center">
-                          <SidebarMenuButton asChild size="lg" isActive={pathname === "/options-performance"} tooltip="Options Performance">
-                            <Link href="/options-performance" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
-                              <MdOutlineStackedLineChart className="!w-8 !h-8" />
-                              {!collapsed && <span className="text-base">Options Performance</span>}
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      </>
-                    )}
-                    {preferences?.options_discovery_enabled && (
-                      <SidebarMenuItem className="flex justify-center">
-                        <SidebarMenuButton asChild size="lg" isActive={pathname === "/discover"} tooltip="Discover">
-                          <Link href="/discover" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
-                            <LuSearch className="!w-8 !h-8" />
-                            {!collapsed && <span className="text-base">Discover</span>}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    )}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </Collapsible>
+          <SidebarGroup>
+            <SidebarGroupLabel>Options</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {preferences?.portfolio_tracking_enabled && (
+                  <>
+                    <SidebarMenuItem className={`flex justify-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
+                      <SidebarMenuButton asChild size="lg" isActive={pathname === "/options"} tooltip="Options">
+                        <Link href="/options">
+                          <LuTrendingUp className={"!w-8 !h-8"} />
+                          {!collapsed && <span className="text-base">Options</span>}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem className={`flex justify-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
+                      <SidebarMenuButton asChild size="lg" isActive={pathname === "/options-performance"} tooltip="Options Performance">
+                        <Link href="/options-performance">
+                          <MdOutlineStackedLineChart className="!w-8 !h-8" />
+                          {!collapsed && <span className="text-base">Options Performance</span>}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </>
+                )}
+                {preferences?.options_discovery_enabled && (
+                  <SidebarMenuItem className={`flex justify-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
+                    <SidebarMenuButton asChild size="lg" isActive={pathname === "/discover"} tooltip="Discover">
+                      <Link href="/discover">
+                        <LuSearch className="!w-8 !h-8" />
+                        {!collapsed && <span className="text-base">Discover</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         )}
 
         {/* Settings */}
         <SidebarGroup>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem className="flex justify-center">
+              <SidebarMenuItem className={`flex justify-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
                 <SidebarMenuButton asChild size="lg" isActive={pathname === "/setup"} tooltip="Setup">
-                  <Link href="/setup" className={collapsed ? "flex w-full justify-center" : "flex items-center gap-3"}>
+                  <Link href="/setup">
                     <LuSettings className="!w-8 !h-8" />
                     {!collapsed && <span className="text-base">Setup</span>}
                   </Link>
@@ -203,7 +177,7 @@ export function AppSidebar() {
       {/* User Profile Footer */}
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem className="flex justify-center items-center">
+          <SidebarMenuItem className={`flex justify-center items-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" className="w-full">
