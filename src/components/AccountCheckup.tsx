@@ -2,7 +2,6 @@ import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { Button } from "./ui/button";
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import ConnectBroker from "./ConnectBroker";
 import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
 import { useUser } from "@stackframe/stack";
@@ -33,18 +32,17 @@ export const AccountCheckup = () => {
                             <AccordionItem value="snaptrade">
                                 <AccordionTrigger>Add Broker</AccordionTrigger>
                                 <AccordionContent>
-                                        <ConnectBroker />
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                        </div>
-                    ) : (
-                        <div>
-                            <Button>
-                                <Link href="/holdings">Go to your holdings</Link>
-                            </Button>
-                        </div>
-                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+                ) : (
+                    <div>
+                        <Button>
+                            <Link href="/holdings">Go to your holdings</Link>
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );

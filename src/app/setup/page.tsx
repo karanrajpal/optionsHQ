@@ -42,7 +42,7 @@ export default function SetupPage() {
   const ActiveComponent = moduleConfig[activeTab].component;
 
   return (
-    <main className="flex p-20 min-h-[calc(100vh-4rem)]">
+    <main className="flex p-4 md:p-20 min-h-[calc(100vh-4rem)]">
       {/* Sidebar with tabs */}
       <aside className="w-64 border-r border-gray-200 dark:border-gray-700 p-4">
         <h1 className="text-2xl font-bold mb-6 px-2">Module Settings</h1>
@@ -51,16 +51,15 @@ export default function SetupPage() {
             const config = moduleConfig[tab];
             const Icon = config.icon;
             const isActive = activeTab === tab;
-            
+
             return (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-3 px-3 pr-4 py-3 !mb-3 rounded-xl transition-colors ${
-                  isActive
+                className={`flex items-center gap-3 px-3 pr-4 py-3 !mb-3 rounded-xl transition-colors ${isActive
                     ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
+                  }`}
               >
                 <Icon size={20} />
                 <span className="text-sm font-medium">{config.title}</span>
@@ -71,7 +70,7 @@ export default function SetupPage() {
       </aside>
 
       {/* Content area */}
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-4 md:p-8">
         {isLoading ? (
           <div className="space-y-6">
             <Skeleton className="h-12 w-3/4" />

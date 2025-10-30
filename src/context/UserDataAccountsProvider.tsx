@@ -4,20 +4,20 @@ import { useLocalStorage } from "@/lib/useLocalStorage";
 import { useUser } from "@stackframe/stack";
 
 type UserDataAccountsContextType = {
-  alpacaApiKey: string | null;
-  alpacaApiSecret: string | null;
-  snaptradeUserId: string | null;
-  snaptradeUserSecret: string | null;
+  alpacaApiKey: string | undefined;
+  alpacaApiSecret: string | undefined;
+  snaptradeUserId: string | undefined;
+  snaptradeUserSecret: string | undefined;
   isLoading: boolean;
 };
 
 const UserDataAccountsContext = createContext<UserDataAccountsContextType | undefined>(undefined);
 
 export const UserDataAccountsProvider = ({ children }: { children: ReactNode }) => {
-  const [alpacaApiKey, setAlpacaApiKey] = useLocalStorage<string | null>("alpaca_api_key", null);
-  const [alpacaApiSecret, setAlpacaApiSecret] = useLocalStorage<string | null>("alpaca_api_secret", null);
-  const [snaptradeUserId, setSnaptradeUserId] = useLocalStorage<string | null>("snaptrade_user_id", null);
-  const [snaptradeUserSecret, setSnaptradeUserSecret] = useLocalStorage<string | null>("snaptrade_user_secret", null);
+  const [alpacaApiKey, setAlpacaApiKey] = useLocalStorage<string | undefined>("alpaca_api_key", undefined);
+  const [alpacaApiSecret, setAlpacaApiSecret] = useLocalStorage<string | undefined>("alpaca_api_secret", undefined);
+  const [snaptradeUserId, setSnaptradeUserId] = useLocalStorage<string | undefined>("snaptrade_user_id", undefined);
+  const [snaptradeUserSecret, setSnaptradeUserSecret] = useLocalStorage<string | undefined>("snaptrade_user_secret", undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const user = useUser();

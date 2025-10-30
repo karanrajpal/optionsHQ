@@ -17,10 +17,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useState } from 'react';
+import { AugmentedAlpacaOptionSnapshot } from '@/app/discover/page';
 
-const extractDateFromContractSymbol = (contract: string) => {
+export const extractDateFromContractSymbol = (contract: string) => {
   const dateMatch = contract.match(/\d+/);
   const dateString = dateMatch ? dateMatch[0] : '';
   const date = new Date(
@@ -29,7 +29,21 @@ const extractDateFromContractSymbol = (contract: string) => {
   return date;
 };
 
-export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
+export const getDaysToExpiration = (contract: string) => {
+  const expirationDate = extractDateFromContractSymbol(contract);
+  const today = new Date();
+  const timeDiff = expirationDate.getTime() - today.getTime();
+  const daysToExpiration = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  return daysToExpiration;
+}
+
+export const extractStrikePriceFromContractSymbol = (contract: string) => {
+  const strikeMatch = contract.match(/\d{6}[CP](\d+)/);
+  const strikePrice = strikeMatch ? parseFloat(strikeMatch[1]) / 1000 : 0;
+  return strikePrice;
+};
+
+export const columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
   {
     accessorKey: 'symbol',
     header: 'Symbol',
@@ -73,8 +87,7 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
     accessorKey: 'strike_price',
     header: 'Strike Price',
     cell: ({ row }) => {
-      const strikePriceMatch = row?.original?.Symbol?.match(/\d{6}[CP](\d+)/);
-      const strikePrice = strikePriceMatch ? parseFloat(strikePriceMatch[1]) / 1000 : 0;
+      const strikePrice = extractStrikePriceFromContractSymbol(row?.original?.Symbol);
       return <div>${strikePrice.toFixed(2)}</div>;
     },
     enableSorting: true,
@@ -151,9 +164,7 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
     accessorKey: 'days_to_expiration',
     header: 'Days to Expiration',
     cell: ({ row }) => {
-      const date = extractDateFromContractSymbol(row?.original?.Symbol);
-      const today = new Date();
-      const daysToExpiration = date ? Math.ceil((date.getTime() - today.getTime()) / (1000 * 3600 * 24)) : null;
+      const daysToExpiration = getDaysToExpiration(row?.original?.Symbol);
       return <div>{daysToExpiration || '-'}</div>;
     },
     enableSorting: true,
@@ -165,6 +176,62 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
       const daysB = dateB ? Math.ceil((dateB.getTime() - today.getTime()) / (1000 * 3600 * 24)) : Infinity;
       return daysA - daysB;
     }
+  },
+  {
+    accessorKey: 'expectedReturnPercentage',
+    header: 'Exp. Return %',
+    cell: ({ row }) => {
+      const expReturn = (row.original as any).expectedReturnPercentage;
+      return expReturn !== undefined ? <div>{expReturn.toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
+    },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const retA = (a.original as any).expectedReturnPercentage || 0;
+      const retB = (b.original as any).expectedReturnPercentage || 0;
+      return retA - retB;
+    },
+  },
+  {
+    accessorKey: 'expectedAnnualizedReturnPercentage',
+    header: 'Exp. Ann. Return %',
+    cell: ({ row }) => {
+      const expAnnReturn = row.original.expectedAnnualizedReturnPercentage;
+      return expAnnReturn !== undefined ? <div>{expAnnReturn.toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
+    },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const retA = a.original.expectedAnnualizedReturnPercentage || 0;
+      const retB = b.original.expectedAnnualizedReturnPercentage || 0;
+      return retA - retB;
+    },
+  },
+  {
+    accessorKey: 'snapshot.delta',
+    header: 'Delta',
+    cell: ({ row }) => {
+      const delta = (row.original.Greeks as any)?.delta;
+      return delta ? <div>{delta.toFixed(4)}</div> : <div className="text-gray-400">-</div>;
+    },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const deltaA = (a.original.Greeks as any)?.delta || 0;
+      const deltaB = (b.original.Greeks as any)?.delta || 0;
+      return deltaA - deltaB;
+    },
+  },
+  {
+    accessorKey: 'snapshot.theta',
+    header: 'Theta',
+    cell: ({ row }) => {
+      const theta = (row.original.Greeks as any)?.theta;
+      return theta ? <div>{theta.toFixed(4)}</div> : <div className="text-gray-400">-</div>;
+    },
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const thetaA = (a.original.Greeks as any)?.theta || 0;
+      const thetaB = (b.original.Greeks as any)?.theta || 0;
+      return thetaA - thetaB;
+    },
   },
   {
     accessorKey: 'snapshot.impliedVolatility',
@@ -183,7 +250,7 @@ export const columns: ColumnDef<AlpacaOptionSnapshot>[] = [
 ];
 
 interface OptionsDataTableProps {
-  data: AlpacaOptionSnapshot[];
+  data: AugmentedAlpacaOptionSnapshot[];
   isLoading?: boolean;
   error?: string | null;
 }

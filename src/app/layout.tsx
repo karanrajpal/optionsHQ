@@ -15,6 +15,7 @@ import { ModulePreferencesProvider } from "@/context/ModulePreferencesProvider";
 import { LuRocket } from "react-icons/lu";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { cookies } from "next/headers";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -26,11 +27,13 @@ export const metadata: Metadata = {
     description: "An app to view your options trading data",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: ReactNode;
 }>) {
+    const cookieStore = await cookies();
+    const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
     return (
         <html lang="en">
             <Script async src="https://analytics.karanrajpal.net/script.js" data-website-id="36e23ca2-95a7-49fe-986a-5fbce6bc4b76"></Script>
@@ -51,7 +54,7 @@ export default function RootLayout({
                                         <ModulePreferencesProvider>
                                             <SnaptradeAccountsProvider>
                                                 <WatchlistProvider>
-                                                    <SidebarProvider>
+                                                    <SidebarProvider defaultOpen={defaultOpen}>
                                                         <div className="flex h-screen w-full">
                                                             <AppSidebar />
                                                             <main className="flex-1 flex flex-col overflow-hidden">

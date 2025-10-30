@@ -3,20 +3,49 @@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { OptionsDataTable } from '@/components/OptionsDataTable';
+import { extractStrikePriceFromContractSymbol, getDaysToExpiration, OptionsDataTable } from '@/components/OptionsDataTable';
 import { OptionHorizons, OptionHorizonType } from '@/components/OptionHorizons';
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@stackframe/stack';
 import { useWatchlist } from '@/context/WatchlistProvider';
 import { useModulePreferences } from '@/context/ModulePreferencesProvider';
+import { Item, ItemTitle } from '@/components/ui/item';
+import { Ticker, TickerPrice, TickerPriceChange, TickerSymbol } from '@/components/ui/shadcn-io/ticker';
+import { Skeleton } from '@/components/ui/skeleton';
+
+export type AugmentedAlpacaOptionSnapshot = AlpacaOptionSnapshot & {
+  expectedReturnPercentage: number;
+  expectedAnnualizedReturnPercentage?: number;
+};
+
+const augmentOptionsData = (options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] => {
+  return options.map(option => {
+    const strikePrice = extractStrikePriceFromContractSymbol(option.Symbol);
+    const expectedReturnPercentage = (option.LatestQuote.BidPrice / strikePrice) * 100;
+    const daysToExpiration = getDaysToExpiration(option.Symbol);
+    const expectedAnnualizedReturnPercentage = expectedReturnPercentage * 365 / (daysToExpiration);
+    return {
+      ...option,
+      expectedReturnPercentage,
+      expectedAnnualizedReturnPercentage,
+    };
+  });
+};
+
+const chooseGoodOptions = (options: AugmentedAlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] => {
+  return options
+    .filter(option => option.expectedReturnPercentage >= 0.6 && option.expectedReturnPercentage <= 1.5)
+    .sort((a, b) => b.expectedReturnPercentage - a.expectedReturnPercentage);
+};
+
 
 export default function Discover() {
   const user = useUser();
   const [ticker, setTicker] = useState('');
   const [optionType, setOptionType] = useState<'all' | 'call' | 'put'>('all');
   const [optionHorizon, setOptionHorizon] = useState<OptionHorizonType>('make-premiums');
-  const [data, setData] = useState<AlpacaOptionSnapshot[]>([]);
+  const [data, setData] = useState<AugmentedAlpacaOptionSnapshot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { watchlistItems } = useWatchlist();
@@ -79,22 +108,25 @@ export default function Discover() {
       params.append('expiration_date_lte', endDate);
 
       const response = await fetch(`/api/alpaca/options?${params.toString()}`);
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch options data');
       }
 
       const result = await response.json();
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch options data');
       }
 
-      setData(result.options || []);
-      
-      if (result.options.length === 0) {
-        setError('No options found for this ticker symbol');
+      const augmentedOptionsData: AugmentedAlpacaOptionSnapshot[] = augmentOptionsData(result.options);
+      const goodOptions = chooseGoodOptions(augmentedOptionsData);
+
+      setData(goodOptions);
+
+      if (goodOptions.length === 0) {
+        setError('No good options found for this ticker symbol');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
@@ -134,6 +166,12 @@ export default function Discover() {
           </p>
         </div>
 
+        {/* Option Horizons */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Option Horizon</label>
+          <OptionHorizons selected={optionHorizon} onSelect={setOptionHorizon} />
+        </div>
+
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
             <label htmlFor="ticker" className="text-sm font-medium">
@@ -166,8 +204,8 @@ export default function Discover() {
             </Select>
           </div>
 
-          <Button 
-            onClick={handleGetOptions} 
+          <Button
+            onClick={handleGetOptions}
             disabled={isLoading}
             className="px-8"
           >
@@ -175,16 +213,9 @@ export default function Discover() {
           </Button>
         </div>
 
-        {/* Option Horizons */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Option Horizon</label>
-          <OptionHorizons selected={optionHorizon} onSelect={setOptionHorizon} />
-        </div>
-
         {/* Watchlist Quick Search Pills */}
         {preferences?.watchlist_enabled && watchlistItems.length > 0 && (
           <div className="space-y-2">
-            <label className="text-sm font-medium">Quick Search from Watchlist</label>
             <div className="flex gap-2 flex-wrap">
               {watchlistItems.map((item) => (
                 <Button
@@ -207,8 +238,23 @@ export default function Discover() {
           </div>
         )}
 
+        {isLoading && (
+          <div>
+            <Skeleton className="h-60 w-full mb-4" />
+          </div>
+        )}
+
         {data.length > 0 && (
           <div className="space-y-2">
+            <Item variant="outline" className="w-fit">
+              <ItemTitle>
+                <Ticker>
+                  <TickerSymbol symbol={ticker.toUpperCase()}></TickerSymbol>
+                  <TickerPrice price={watchlistItems.find(item => item.ticker_symbol === ticker)?.latest_price ?? 0} />
+                  <TickerPriceChange change={watchlistItems.find(item => item.ticker_symbol === ticker)?.change_percent ?? 0} />
+                </Ticker>
+              </ItemTitle>
+            </Item>
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">
                 Options for {ticker.toUpperCase()}

@@ -9,6 +9,7 @@ type SnaptradeAccountContextType = {
   accounts: Record<string, SnapTradeHoldingsAccount>;
   selectedAccount: SnapTradeHoldingsAccount | null;
   setSelectedAccountId: Dispatch<SetStateAction<string | null>>;
+  removeAccount: (accountId: string) => void;
 };
 
 const SnapTradeAccountsContext = createContext<SnaptradeAccountContextType | undefined>(undefined);
@@ -25,6 +26,14 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
     return selectedAccountId ? accounts[selectedAccountId] : null;
   }, [selectedAccountId, accounts]);
 
+  const removeAccount = (accountId: string) => {
+    const updatedAccounts = { ...accounts };
+    delete updatedAccounts[accountId];
+    setAccounts(updatedAccounts);
+    if (selectedAccountId === accountId) {
+      setSelectedAccountId(null);
+    }
+  };
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -50,8 +59,8 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
   }, []);
 
   const value = useMemo(
-    () => ({ accounts, selectedAccount, setSelectedAccountId }),
-    [accounts, selectedAccount, setSelectedAccountId]
+    () => ({ accounts, selectedAccount, setSelectedAccountId, removeAccount }),
+    [accounts, selectedAccount, setSelectedAccountId, removeAccount]
   );
 
   return <SnapTradeAccountsContext.Provider value={value}>{children}</SnapTradeAccountsContext.Provider>;
