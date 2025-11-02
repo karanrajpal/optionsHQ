@@ -42,9 +42,9 @@ export default function SetupPage() {
   const ActiveComponent = moduleConfig[activeTab].component;
 
   return (
-    <main className="flex p-4 md:p-20 min-h-[calc(100vh-4rem)]">
+    <main className="flex p-1 md:p-20 min-h-[calc(100vh-4rem)]">
       {/* Sidebar with tabs */}
-      <aside className="w-64 border-r border-gray-200 dark:border-gray-700 p-4">
+      <aside className="w-36 md:w-64 border-r border-gray-200 dark:border-gray-700 p-4">
         <h1 className="text-2xl font-bold mb-6 px-2">Module Settings</h1>
         <nav className="space-y-1">
           {(Object.keys(moduleConfig) as ModuleTab[]).map((tab) => {

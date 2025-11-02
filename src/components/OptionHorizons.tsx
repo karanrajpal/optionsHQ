@@ -1,12 +1,11 @@
 'use client';
 
+import { StrategyType } from '@/app/discover/page';
 import { Button } from '@/components/ui/button';
 
-export type OptionHorizonType = 'make-premiums' | 'leaps';
-
 interface OptionHorizonsProps {
-  selected: OptionHorizonType;
-  onSelect: (horizon: OptionHorizonType) => void;
+  selected: StrategyType;
+  onSelect: (horizon: StrategyType) => void;
 }
 
 export function OptionHorizons({ selected, onSelect }: OptionHorizonsProps) {

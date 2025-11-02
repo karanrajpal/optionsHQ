@@ -1,5 +1,5 @@
 "use client";
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Dispatch, SetStateAction } from "react";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 import { SnapTradeHoldingsAccount } from "snaptrade-typescript-sdk";
@@ -26,14 +26,15 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
     return selectedAccountId ? accounts[selectedAccountId] : null;
   }, [selectedAccountId, accounts]);
 
-  const removeAccount = (accountId: string) => {
+  // TODO: Remove this functionality if not needed
+  const removeAccount = useCallback((accountId: string) => {
     const updatedAccounts = { ...accounts };
     delete updatedAccounts[accountId];
     setAccounts(updatedAccounts);
     if (selectedAccountId === accountId) {
       setSelectedAccountId(null);
     }
-  };
+  }, [accounts, selectedAccountId]);
 
   useEffect(() => {
     const fetchAccounts = async () => {

@@ -4,10 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { extractStrikePriceFromContractSymbol, getDaysToExpiration, OptionsDataTable } from '@/components/OptionsDataTable';
-import { OptionHorizons, OptionHorizonType } from '@/components/OptionHorizons';
+import { OptionHorizons } from '@/components/OptionHorizons';
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useState, useEffect, useCallback } from 'react';
-import { useUser } from '@stackframe/stack';
 import { useWatchlist } from '@/context/WatchlistProvider';
 import { useModulePreferences } from '@/context/ModulePreferencesProvider';
 import { Item, ItemTitle } from '@/components/ui/item';
@@ -15,36 +14,41 @@ import { Ticker, TickerPrice, TickerPriceChange, TickerSymbol } from '@/componen
 import { Skeleton } from '@/components/ui/skeleton';
 
 export type AugmentedAlpacaOptionSnapshot = AlpacaOptionSnapshot & {
-  expectedReturnPercentage: number;
+  expectedReturnPercentage?: number;
   expectedAnnualizedReturnPercentage?: number;
 };
 
-const augmentOptionsData = (options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] => {
-  return options.map(option => {
-    const strikePrice = extractStrikePriceFromContractSymbol(option.Symbol);
-    const expectedReturnPercentage = (option.LatestQuote.BidPrice / strikePrice) * 100;
-    const daysToExpiration = getDaysToExpiration(option.Symbol);
-    const expectedAnnualizedReturnPercentage = expectedReturnPercentage * 365 / (daysToExpiration);
-    return {
-      ...option,
-      expectedReturnPercentage,
-      expectedAnnualizedReturnPercentage,
-    };
-  });
+export type StrategyType = 'make-premiums' | 'leaps';
+export interface OptionsStrategy {
+  augmentOptionsData(options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[];
+  chooseGoodOptions(options: AugmentedAlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[];
 };
+class MakePremiumsOptionsStrategy implements OptionsStrategy {
+  public augmentOptionsData(options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] {
+    return options.map(option => {
+      const strikePrice = extractStrikePriceFromContractSymbol(option.Symbol);
+      const expectedReturnPercentage = (option.LatestQuote.BidPrice / strikePrice) * 100;
+      const daysToExpiration = getDaysToExpiration(option.Symbol);
+      const expectedAnnualizedReturnPercentage = expectedReturnPercentage * 365 / (daysToExpiration);
+      return {
+        ...option,
+        expectedReturnPercentage,
+        expectedAnnualizedReturnPercentage,
+      };
+    });
+  }
 
-const chooseGoodOptions = (options: AugmentedAlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] => {
-  return options
-    .filter(option => option.expectedReturnPercentage >= 0.6 && option.expectedReturnPercentage <= 1.5)
-    .sort((a, b) => b.expectedReturnPercentage - a.expectedReturnPercentage);
-};
-
+  public chooseGoodOptions(options: AugmentedAlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] {
+    return options
+      .filter(option => option.expectedReturnPercentage && option.expectedReturnPercentage >= 0.6 && option.expectedReturnPercentage <= 1.5)
+      .sort((a, b) => (b.expectedReturnPercentage || 0) - (a.expectedReturnPercentage || 0));
+  }
+}
 
 export default function Discover() {
-  const user = useUser();
   const [ticker, setTicker] = useState('');
   const [optionType, setOptionType] = useState<'all' | 'call' | 'put'>('all');
-  const [optionHorizon, setOptionHorizon] = useState<OptionHorizonType>('make-premiums');
+  const [strategyType, setStrategyType] = useState<StrategyType>('make-premiums');
   const [data, setData] = useState<AugmentedAlpacaOptionSnapshot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +61,7 @@ export default function Discover() {
     if (optionType !== 'call') {
       setOptionType('call');
     }
-  }, [optionHorizon]);
+  }, [strategyType]);
 
   // Calculate expiration date range based on option horizon
   const getExpirationDateRange = useCallback(() => {
@@ -65,7 +69,7 @@ export default function Discover() {
     const startDate = new Date();
     const endDate = new Date();
 
-    if (optionHorizon === 'make-premiums') {
+    if (strategyType === 'make-premiums') {
       // 5-6 weeks out
       startDate.setDate(today.getDate() + 35); // 5 weeks
       endDate.setDate(today.getDate() + 42); // 6 weeks
@@ -79,7 +83,7 @@ export default function Discover() {
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
     };
-  }, [optionHorizon]);
+  }, [strategyType]);
 
   const handleGetOptions = useCallback(async () => {
     if (!ticker.trim()) {
@@ -120,13 +124,18 @@ export default function Discover() {
         throw new Error(result.error || 'Failed to fetch options data');
       }
 
-      const augmentedOptionsData: AugmentedAlpacaOptionSnapshot[] = augmentOptionsData(result.options);
-      const goodOptions = chooseGoodOptions(augmentedOptionsData);
-
-      setData(goodOptions);
-
-      if (goodOptions.length === 0) {
-        setError('No good options found for this ticker symbol');
+      if (strategyType === 'make-premiums') {
+        const strategy = new MakePremiumsOptionsStrategy();
+        const augmentedData = strategy.augmentOptionsData(result.options);
+        const goodOptions = strategy.chooseGoodOptions(augmentedData);
+        setData(goodOptions);
+        if (goodOptions.length === 0) {
+          setError('No good options found for this ticker symbol');
+        }
+        return;
+      } else {
+        // For LEAPS, we will define the strategy later
+        setData(result.options);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
@@ -169,7 +178,7 @@ export default function Discover() {
         {/* Option Horizons */}
         <div className="space-y-2">
           <label className="text-sm font-medium">Option Horizon</label>
-          <OptionHorizons selected={optionHorizon} onSelect={setOptionHorizon} />
+          <OptionHorizons selected={strategyType} onSelect={setStrategyType} />
         </div>
 
         <div className="flex gap-4 items-end">
@@ -263,7 +272,12 @@ export default function Discover() {
                 {data.length} contract{data.length !== 1 ? 's' : ''} found
               </span>
             </div>
-            <OptionsDataTable data={data} isLoading={isLoading} error={error} />
+            <OptionsDataTable
+              data={data}
+              isLoading={isLoading}
+              error={error}
+              strategyType={strategyType}
+            />
           </div>
         )}
 

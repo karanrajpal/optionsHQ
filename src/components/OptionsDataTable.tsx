@@ -17,8 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useState } from 'react';
-import { AugmentedAlpacaOptionSnapshot } from '@/app/discover/page';
+import { useMemo, useState } from 'react';
+import { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
+import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 
 export const extractDateFromContractSymbol = (contract: string) => {
   const dateMatch = contract.match(/\d+/);
@@ -43,7 +44,7 @@ export const extractStrikePriceFromContractSymbol = (contract: string) => {
   return strikePrice;
 };
 
-export const columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
+export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
   {
     accessorKey: 'symbol',
     header: 'Symbol',
@@ -178,34 +179,6 @@ export const columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
     }
   },
   {
-    accessorKey: 'expectedReturnPercentage',
-    header: 'Exp. Return %',
-    cell: ({ row }) => {
-      const expReturn = (row.original as any).expectedReturnPercentage;
-      return expReturn !== undefined ? <div>{expReturn.toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
-    },
-    enableSorting: true,
-    sortingFn: (a, b) => {
-      const retA = (a.original as any).expectedReturnPercentage || 0;
-      const retB = (b.original as any).expectedReturnPercentage || 0;
-      return retA - retB;
-    },
-  },
-  {
-    accessorKey: 'expectedAnnualizedReturnPercentage',
-    header: 'Exp. Ann. Return %',
-    cell: ({ row }) => {
-      const expAnnReturn = row.original.expectedAnnualizedReturnPercentage;
-      return expAnnReturn !== undefined ? <div>{expAnnReturn.toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
-    },
-    enableSorting: true,
-    sortingFn: (a, b) => {
-      const retA = a.original.expectedAnnualizedReturnPercentage || 0;
-      const retB = b.original.expectedAnnualizedReturnPercentage || 0;
-      return retA - retB;
-    },
-  },
-  {
     accessorKey: 'snapshot.delta',
     header: 'Delta',
     cell: ({ row }) => {
@@ -253,10 +226,52 @@ interface OptionsDataTableProps {
   data: AugmentedAlpacaOptionSnapshot[];
   isLoading?: boolean;
   error?: string | null;
+  strategyType: StrategyType;
+};
+
+function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[], strategyType: StrategyType): ColumnDef<AugmentedAlpacaOptionSnapshot>[] {
+  const augmentedColumns = [...columns];
+  if (strategyType === 'make-premiums') {
+    augmentedColumns.push(
+      {
+        accessorKey: 'expectedReturnPercentage',
+        header: 'Exp. Return %',
+        cell: ({ row }) => {
+          const expReturn = (row.original as any).expectedReturnPercentage;
+          return expReturn !== undefined ? <div>{expReturn.toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
+        },
+        enableSorting: true,
+        sortingFn: (a, b) => {
+          const retA = (a.original as any).expectedReturnPercentage || 0;
+          const retB = (b.original as any).expectedReturnPercentage || 0;
+          return retA - retB;
+        },
+      },
+      {
+        accessorKey: 'expectedAnnualizedReturnPercentage',
+        header: 'Exp. Ann. Return %',
+        cell: ({ row }) => {
+          const expAnnReturn = row.original.expectedAnnualizedReturnPercentage;
+          return expAnnReturn !== undefined ? <div>{expAnnReturn.toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
+        },
+        enableSorting: true,
+        sortingFn: (a, b) => {
+          const retA = a.original.expectedAnnualizedReturnPercentage || 0;
+          const retB = b.original.expectedAnnualizedReturnPercentage || 0;
+          return retA - retB;
+        },
+      });
+  } else if (strategyType === 'leaps') {
+  }
+  return augmentedColumns;
 }
 
-export function OptionsDataTable({ data, isLoading, error }: OptionsDataTableProps) {
+
+export function OptionsDataTable({ data, isLoading, error, strategyType }: OptionsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  console.log('Re-rendering OptionsDataTable with strategyType:', strategyType, baseColumns);
+  const columns = useMemo(() => addColumnDefsForStrategyType(baseColumns, strategyType), [baseColumns, strategyType]);
 
   const table = useReactTable({
     data,

@@ -111,13 +111,6 @@ export function PortfolioTrackingTab() {
               </Accordion>
             </div>
           </div>
-
-          {/* Placeholder for future settings */}
-          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Additional settings for portfolio tracking will be available here in the future.
-            </p>
-          </div>
         </div>
       </div>
     </motion.div>
