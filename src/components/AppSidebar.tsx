@@ -72,7 +72,6 @@ export function AppSidebar() {
   const hasStocksGroup = preferences?.portfolio_tracking_enabled || preferences?.watchlist_enabled;
   const hasOptionsGroup = preferences?.portfolio_tracking_enabled || preferences?.options_discovery_enabled;
 
-
   return (
     <Sidebar collapsible="icon" className="z-[51]">
       <SidebarContent className="gap-0">

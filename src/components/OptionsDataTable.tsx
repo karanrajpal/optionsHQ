@@ -19,29 +19,7 @@ import {
 } from '@/components/ui/table';
 import { useMemo, useState } from 'react';
 import { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
-
-export const extractDateFromContractSymbol = (contract: string) => {
-  const dateMatch = contract.match(/\d+/);
-  const dateString = dateMatch ? dateMatch[0] : '';
-  const date = new Date(
-    `20${dateString.substring(0, 2)}-${dateString.substring(2, 4)}-${dateString.substring(4, 6)}`
-  );
-  return date;
-};
-
-export const getDaysToExpiration = (contract: string) => {
-  const expirationDate = extractDateFromContractSymbol(contract);
-  const today = new Date();
-  const timeDiff = expirationDate.getTime() - today.getTime();
-  const daysToExpiration = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  return daysToExpiration;
-}
-
-export const extractStrikePriceFromContractSymbol = (contract: string) => {
-  const strikeMatch = contract.match(/\d{6}[CP](\d+)/);
-  const strikePrice = strikeMatch ? parseFloat(strikeMatch[1]) / 1000 : 0;
-  return strikePrice;
-};
+import { extractDateFromContractSymbol, extractStrikePriceFromContractSymbol, getDaysToExpiration } from '@/lib/formatters';
 
 export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
   {

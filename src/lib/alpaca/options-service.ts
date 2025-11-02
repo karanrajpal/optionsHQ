@@ -8,7 +8,6 @@
 import Alpaca from '@alpacahq/alpaca-trade-api';
 import { GetOptionChainParams } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/rest_v2';
 
-
 export class AlpacaOptionsService {
   private alpaca: Alpaca;
 

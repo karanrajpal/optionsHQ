@@ -1,7 +1,7 @@
 'use client';
 
 import { OptionsSearchBar } from '@/components/OptionsSearchBar';
-import { extractStrikePriceFromContractSymbol, getDaysToExpiration, OptionsDataTable } from '@/components/OptionsDataTable';
+import { OptionsDataTable } from '@/components/OptionsDataTable';
 import { OptionHorizons } from '@/components/OptionHorizons';
 import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useState, useEffect, useCallback } from 'react';
@@ -9,6 +9,7 @@ import { useWatchlist } from '@/context/WatchlistProvider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TickerPriceItem } from '@/components/TickerPriceItem';
 import { PageHeader } from '@/components/PageHeader';
+import { MakePremiumsOptionsStrategy } from '@/lib/option-strategies/CoveredCallsOptionsStrategy';
 
 export type AugmentedAlpacaOptionSnapshot = AlpacaOptionSnapshot & {
   expectedReturnPercentage?: number;
@@ -16,31 +17,6 @@ export type AugmentedAlpacaOptionSnapshot = AlpacaOptionSnapshot & {
 };
 
 export type StrategyType = 'make-premiums' | 'leaps';
-export interface OptionsStrategy {
-  augmentOptionsData(options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[];
-  chooseGoodOptions(options: AugmentedAlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[];
-};
-class MakePremiumsOptionsStrategy implements OptionsStrategy {
-  public augmentOptionsData(options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] {
-    return options.map(option => {
-      const strikePrice = extractStrikePriceFromContractSymbol(option.Symbol);
-      const expectedReturnPercentage = (option.LatestQuote.BidPrice / strikePrice) * 100;
-      const daysToExpiration = getDaysToExpiration(option.Symbol);
-      const expectedAnnualizedReturnPercentage = expectedReturnPercentage * 365 / (daysToExpiration);
-      return {
-        ...option,
-        expectedReturnPercentage,
-        expectedAnnualizedReturnPercentage,
-      };
-    });
-  }
-
-  public chooseGoodOptions(options: AugmentedAlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] {
-    return options
-      .filter(option => option.expectedReturnPercentage && option.expectedReturnPercentage >= 0.6 && option.expectedReturnPercentage <= 1.5)
-      .sort((a, b) => (b.expectedReturnPercentage || 0) - (a.expectedReturnPercentage || 0));
-  }
-}
 
 export default function Discover() {
   const [ticker, setTicker] = useState('');
@@ -144,7 +120,7 @@ export default function Discover() {
   
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-8">
+    <main className="flex min-h-screen flex-col items-center p-7">
       <div className="w-full max-w-7xl space-y-2">
         <PageHeader
           header="Options Discovery"
