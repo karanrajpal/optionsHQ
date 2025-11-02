@@ -58,11 +58,11 @@ export function AppSidebar() {
       <Sidebar collapsible="icon">
         <SidebarContent className="mt-10">
           <SidebarMenu>
-            <SidebarMenuSkeleton showIcon />
-            <SidebarMenuSkeleton showIcon />
-            <SidebarMenuSkeleton showIcon />
-            <SidebarMenuSkeleton showIcon />
-            <SidebarMenuSkeleton showIcon />
+            <SidebarMenuSkeleton />
+            <SidebarMenuSkeleton />
+            <SidebarMenuSkeleton />
+            <SidebarMenuSkeleton />
+            <SidebarMenuSkeleton />
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>

@@ -8,6 +8,7 @@ import { useUserDataAccounts } from "./UserDataAccountsProvider";
 type SnaptradeAccountContextType = {
   accounts: Record<string, SnapTradeHoldingsAccount>;
   selectedAccount: SnapTradeHoldingsAccount | null;
+  accountsLoading: boolean;
   setSelectedAccountId: Dispatch<SetStateAction<string | null>>;
   removeAccount: (accountId: string) => void;
 };
@@ -18,6 +19,7 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
   const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
 
   const [accounts, setAccounts] = useState<Record<string, SnapTradeHoldingsAccount>>({});
+  const [accountsLoading, setAccountsLoading] = useState(true);
 
   // Storing some of the user preferences for defaults in local storage
   const [selectedAccountId, setSelectedAccountId] = useLocalStorage<string | null>("selected_account_id", null);
@@ -38,6 +40,7 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
 
   useEffect(() => {
     const fetchAccounts = async () => {
+      setAccountsLoading(true);
       const accounts: SnapTradeHoldingsAccount[] = await fetch("/api/snaptrade/accounts", {
         headers: {
           "user-id": snaptradeUserId as string,
@@ -54,14 +57,15 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
           // Set the first account as selected
           setSelectedAccountId(Object.keys(accountsMap)[0]);
         }
+        setAccountsLoading(false);
       }
     };
     fetchAccounts();
   }, []);
 
   const value = useMemo(
-    () => ({ accounts, selectedAccount, setSelectedAccountId, removeAccount }),
-    [accounts, selectedAccount, setSelectedAccountId, removeAccount]
+    () => ({ accounts, selectedAccount, setSelectedAccountId, removeAccount, accountsLoading }),
+    [accounts, selectedAccount, setSelectedAccountId, removeAccount, accountsLoading]
   );
 
   return <SnapTradeAccountsContext.Provider value={value}>{children}</SnapTradeAccountsContext.Provider>;

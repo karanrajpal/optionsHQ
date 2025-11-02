@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/table';
 import { useMemo, useState } from 'react';
 import { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
-import { AlpacaOptionSnapshot } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 
 export const extractDateFromContractSymbol = (contract: string) => {
   const dateMatch = contract.match(/\d+/);
@@ -227,6 +226,7 @@ interface OptionsDataTableProps {
   isLoading?: boolean;
   error?: string | null;
   strategyType: StrategyType;
+  ticker: string;
 };
 
 function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[], strategyType: StrategyType): ColumnDef<AugmentedAlpacaOptionSnapshot>[] {
@@ -267,10 +267,9 @@ function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSn
 }
 
 
-export function OptionsDataTable({ data, isLoading, error, strategyType }: OptionsDataTableProps) {
+export function OptionsDataTable({ data, isLoading, error, strategyType, ticker }: OptionsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  console.log('Re-rendering OptionsDataTable with strategyType:', strategyType, baseColumns);
   const columns = useMemo(() => addColumnDefsForStrategyType(baseColumns, strategyType), [baseColumns, strategyType]);
 
   const table = useReactTable({
@@ -301,54 +300,64 @@ export function OptionsDataTable({ data, isLoading, error, strategyType }: Optio
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                const canSort = header.column.getCanSort();
-                const isSorted = header.column.getIsSorted();
-                return (
-                  <TableHead
-                    key={header.id}
-                    onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
-                    className={canSort ? 'cursor-pointer select-none' : ''}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : (
-                        <>
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {isSorted ? (isSorted === 'asc' ? ' ▲' : ' ▼') : ''}
-                        </>
-                      )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">
+          Options for {ticker.toUpperCase()}
+        </h2>
+        <span className="text-sm text-gray-600">
+          {data.length} contract{data.length !== 1 ? 's' : ''} found
+        </span>
+      </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const canSort = header.column.getCanSort();
+                  const isSorted = header.column.getIsSorted();
+                  return (
+                    <TableHead
+                      key={header.id}
+                      onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                      className={canSort ? 'cursor-pointer select-none px-2' : 'px-2'}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : (
+                          <>
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {isSorted ? (isSorted === 'asc' ? ' ▲' : ' ▼') : ''}
+                          </>
+                        )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No options data available. Enter a ticker symbol and click &quot;Get Options&quot;.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className='px-2'>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No options data available. Enter a ticker symbol and click &quot;Get Options&quot;.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

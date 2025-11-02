@@ -4,12 +4,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ColumnDef, useReactTable, getCoreRowModel, getSortedRowModel, SortingState, flexRender } from '@tanstack/react-table';
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
 import { formatCurrency, formatDate, getProfitLossColor } from "@/lib/formatters";
-import { OptionsPosition } from "snaptrade-typescript-sdk";
-import { SiChase, SiRobinhood } from "react-icons/si";
+import { OptionsPosition, SnapTradeHoldingsAccount } from "snaptrade-typescript-sdk";
+import { AccountPicker } from "@/components/AccountPicker";
+import { PageHeader } from "@/components/PageHeader";
 
 const optionsColumns: ColumnDef<OptionsPosition>[] = [
     {
@@ -83,7 +83,7 @@ const optionsColumns: ColumnDef<OptionsPosition>[] = [
 ];
 
 export default function OptionsPage() {
-    const { selectedAccount, accounts, setSelectedAccountId } = useSnaptradeAccount();
+    const { selectedAccount } = useSnaptradeAccount();
     const [optionHoldings, setOptionHoldings] = useState<OptionsPosition[] | null>(null);
     const [loading, setLoading] = useState(true);
     const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
@@ -120,37 +120,12 @@ export default function OptionsPage() {
     });
 
     return (
-        <div className="p-8 w-full">
-            <h1 className="text-2xl font-bold">Options</h1>
-            <div className="mb-4">
-                <Select
-                    value={selectedAccount?.id ?? undefined}
-                    onValueChange={(val) => setSelectedAccountId(val)}
-                    disabled={loading}
-                >
-                    <SelectTrigger className="w-64">
-                        <SelectValue placeholder="Select account" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {Object.values(accounts).length > 0 ? (
-                            Object.values(accounts).map((account: import("snaptrade-typescript-sdk").SnapTradeHoldingsAccount) => (
-                                account.id ? (
-                                    <SelectItem key={account.id} value={account.id}>
-                                        <span className="flex items-center gap-2">
-                                            {account.institution_name === 'Fidelity' && (<img src="/fidelity.png" alt="Fidelity Logo" className="w-4 h-4" />)}
-                                            {account.institution_name === 'Chase' && (<SiChase className="w-4 h-4" />)}
-                                            {account.institution_name === 'Robinhood' && (<SiRobinhood className="w-4 h-4" />)}
-                                            {account.institution_name ? `${account.institution_name} - ` : ''}{account.name}
-                                        </span>
-                                    </SelectItem>
-                                ) : null
-                            ))
-                        ) : (
-                            <SelectItem value="no_accounts" disabled>No accounts found</SelectItem>
-                        )}
-                    </SelectContent>
-                </Select>
-            </div>
+        <div className="p-6 w-full space-y-1">
+            <PageHeader
+                header="Options"
+                rightElement={<AccountPicker />}
+            />
+
             {loading ? (
                 <div className="mt-4 w-full grid gap-4">
                     <Skeleton className="h-14 rounded-xl" />

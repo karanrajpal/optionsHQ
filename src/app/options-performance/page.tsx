@@ -7,6 +7,8 @@ import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
 import { formatCurrency, formatDate, getProfitLossColor } from "@/lib/formatters";
 import { PaginatedUniversalActivity, AccountUniversalActivity } from "snaptrade-typescript-sdk";
+import { AccountPicker } from "@/components/AccountPicker";
+import { PageHeader } from "@/components/PageHeader";
 
 export default function OptionsPerformancePage() {
     const { selectedAccount } = useSnaptradeAccount();
@@ -60,14 +62,9 @@ export default function OptionsPerformancePage() {
 
 
     return (
-        <div className="p-8 w-full">
-            <h1 className="text-2xl font-bold mb-4">Options Performance</h1>
-            {selectedAccount ? (
-                <p className="mb-4 text-gray-600 dark:text-gray-400">Account: {selectedAccount.name}</p>
-            ) : (!loading ? (
-                <p>No account selected</p>
-            ) : null)}
-            
+        <div className="p-8 w-full space-y-1">
+            <PageHeader header="Options Performance" rightElement={<AccountPicker />} />
+
             {loading ? (
                 <div className="mt-4 w-full grid gap-4">
                     <Skeleton className="h-14 rounded-xl" />

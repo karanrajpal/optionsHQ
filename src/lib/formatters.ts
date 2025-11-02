@@ -15,14 +15,13 @@ export const formatDate = (dateString: string | null | undefined) => {
 export const formatDateWithTimeAndZone = (dateString: string | null | undefined) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleString('en-US', {
-        timeZone: 'UTC',
-        year: 'numeric',
-        month: '2-digit',
+        // timeZone: 'UTC',
+        // year: 'numeric',
+        month: 'short',
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
-        timeZoneName: 'short'
+        // timeZoneName: 'short'
     });
 }
 

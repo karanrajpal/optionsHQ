@@ -11,7 +11,7 @@ export default function Header() {
 
     return (
         <header role="banner" className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-            <div className="mx-auto py-2 flex items-center justify-between">
+            <div className="mx-auto py-1 flex items-center justify-between">
                 <div className="flex items-center gap-2 px-2">
                     <SidebarTrigger />
                     <div className="h-6 w-px bg-gray-300 dark:bg-gray-700" />
