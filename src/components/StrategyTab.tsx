@@ -1,9 +1,7 @@
 import { useState, useCallback } from 'react';
 import { OptionsSearchBar } from '@/components/OptionsSearchBar';
 import { OptionsDataTable } from '@/components/OptionsDataTable';
-import { TickerPriceItem } from '@/components/TickerPriceItem';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useWatchlist } from '@/context/WatchlistProvider';
 import type { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
 
 interface StrategyTabProps {
@@ -16,7 +14,6 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
   const [data, setData] = useState<AugmentedAlpacaOptionSnapshot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { watchlistItems } = useWatchlist();
 
   // For LEAPS, always use call options
   const effectiveOptionType = strategyType === 'leaps' ? 'call' : optionType;
@@ -101,11 +98,6 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
       {isLoading && <Skeleton className="h-60 w-full mb-4" />}
       {data.length > 0 && (
         <div className="space-y-2">
-          <TickerPriceItem
-            ticker={ticker}
-            latestPrice={watchlistItems.find(item => item.ticker_symbol === ticker)?.latest_price ?? 0}
-            changePercent={watchlistItems.find(item => item.ticker_symbol === ticker)?.change_percent ?? 0}
-          />
           <OptionsDataTable
             ticker={ticker}
             data={data}

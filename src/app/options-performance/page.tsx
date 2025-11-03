@@ -62,7 +62,7 @@ export default function OptionsPerformancePage() {
 
 
     return (
-        <div className="p-8 w-full space-y-1">
+        <div className="p-4 w-full space-y-1">
             <PageHeader header="Options Performance" rightElement={<AccountPicker />} />
 
             {loading ? (

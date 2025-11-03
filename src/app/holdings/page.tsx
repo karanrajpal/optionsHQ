@@ -111,7 +111,7 @@ export default function HoldingsPage() {
     });
 
     return (
-        <div className="p-6 w-full space-y-1">
+        <div className="p-4 w-full space-y-1">
             <PageHeader
                 header="Account Holdings"
                 rightElement={<AccountPicker />}

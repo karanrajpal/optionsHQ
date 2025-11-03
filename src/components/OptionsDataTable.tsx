@@ -20,6 +20,8 @@ import {
 import { useMemo, useState } from 'react';
 import { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
 import { extractDateFromContractSymbol, extractStrikePriceFromContractSymbol, getDaysToExpiration } from '@/lib/formatters';
+import { TickerPriceItem } from './TickerPriceItem';
+import { useWatchlist } from '@/context/WatchlistProvider';
 
 export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
   {
@@ -247,6 +249,7 @@ function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSn
 
 export function OptionsDataTable({ data, isLoading, error, strategyType, ticker }: OptionsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const { watchlistItems } = useWatchlist(); // TODO: Get live prices instead of watchlist prices
 
   const columns = useMemo(() => addColumnDefsForStrategyType(baseColumns, strategyType), [baseColumns, strategyType]);
 
@@ -280,9 +283,11 @@ export function OptionsDataTable({ data, isLoading, error, strategyType, ticker 
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">
-          Options for {ticker.toUpperCase()}
-        </h2>
+        <TickerPriceItem
+            ticker={ticker}
+            latestPrice={watchlistItems.find(item => item.ticker_symbol === ticker)?.latest_price ?? 0}
+            changePercent={watchlistItems.find(item => item.ticker_symbol === ticker)?.change_percent ?? 0}
+          />
         <span className="text-sm text-gray-600">
           {data.length} contract{data.length !== 1 ? 's' : ''} found
         </span>
