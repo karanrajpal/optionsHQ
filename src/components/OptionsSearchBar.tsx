@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useModulePreferences } from '@/context/ModulePreferencesProvider';
 import { useWatchlist } from '@/context/WatchlistProvider';
+import { Skeleton } from './ui/skeleton';
 
 export interface WatchlistItem {
     ticker_symbol: string;
@@ -20,6 +21,7 @@ interface OptionsSearchBarProps {
     onOptionTypeChange: (type: OptionType) => void;
     onSearch: () => void;
     isLoading?: boolean;
+    disableOptionType?: boolean;
 }
 
 export function OptionsSearchBar({
@@ -29,12 +31,13 @@ export function OptionsSearchBar({
     onOptionTypeChange,
     onSearch,
     isLoading = false,
+    disableOptionType = false,
 }: OptionsSearchBarProps) {
     // For quick picker pill click
     const [triggerSearchForTicker, setTriggerSearchForTicker] = useState<string | null>(null);
 
     const { preferences } = useModulePreferences();
-    const { watchlistItems } = useWatchlist();
+    const { watchlistItems, isWatchListItemsLoading } = useWatchlist();
 
     // Handle Enter key
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -43,64 +46,56 @@ export function OptionsSearchBar({
         }
     };
 
-    // When a watchlist pill is clicked
-    const handleWatchlistPillClick = (tickerSymbol: string) => {
-        onTickerChange(tickerSymbol);
-        setTriggerSearchForTicker(tickerSymbol);
+    // Watchlist quick search pill click
+    const handleWatchlistPillClick = (symbol: string) => {
+        onTickerChange(symbol);
+        setTriggerSearchForTicker(symbol);
     };
 
-    // Auto-search when watchlist pill is clicked and ticker matches
+    // If a pill was clicked, trigger search
     useEffect(() => {
-        if (triggerSearchForTicker && ticker === triggerSearchForTicker) {
-            setTriggerSearchForTicker(null);
+        if (triggerSearchForTicker) {
             onSearch();
+            setTriggerSearchForTicker(null);
         }
-    }, [ticker, triggerSearchForTicker, onSearch]);
+    }, [triggerSearchForTicker, onSearch]);
 
     return (
-        <div className='flex flex-col gap-2'>
-            <div className="flex gap-4 items-end">
-                <div className="flex-1 space-y-2">
-                    <label htmlFor="ticker" className="text-sm font-medium">
-                        Ticker Symbol
-                    </label>
+        <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-col md:flex-row md:items-end gap-2 w-full">
+                <div className="flex-1">
                     <Input
                         id="ticker"
                         type="text"
                         placeholder="e.g., ORCL, TSLA, SPY"
                         value={ticker}
-                        onChange={(e) => onTickerChange(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        className="uppercase"
+                        onChange={e => onTickerChange(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                        className="w-full"
+                        disabled={isLoading}
                     />
                 </div>
-
-                <div className="w-48 space-y-2">
-                    <label htmlFor="optionType" className="text-sm font-medium">
-                        Option Type
-                    </label>
-                    <Select value={optionType} onValueChange={(value: OptionType) => onOptionTypeChange(value)}>
-                        <SelectTrigger id="optionType">
-                            <SelectValue placeholder="Select type" />
+                <div className="w-32">
+                    <Select value={optionType} onValueChange={onOptionTypeChange} disabled={isLoading || disableOptionType}>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Type" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All</SelectItem>
-                            <SelectItem value="call">Calls</SelectItem>
-                            <SelectItem value="put">Puts</SelectItem>
+                            <SelectItem value="call">Call</SelectItem>
+                            <SelectItem value="put">Put</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
-
-                <Button
-                    onClick={onSearch}
-                    disabled={isLoading}
-                    className="px-8"
-                >
-                    {isLoading ? 'Loading...' : 'Get Options'}
+                <Button onClick={onSearch} disabled={isLoading} className="w-32">
+                    {isLoading ? 'Loading...' : 'Search'}
                 </Button>
             </div>
-
+            
             {/* Watchlist Quick Search Pills */}
+            {preferences?.watchlist_enabled && isWatchListItemsLoading && (
+                <Skeleton className="h-8 w-56" />
+            )}
             {preferences?.watchlist_enabled && watchlistItems.length > 0 && (
                 <div className="flex gap-2 flex-wrap">
                     {watchlistItems.map((item) => (

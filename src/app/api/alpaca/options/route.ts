@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAlpacaOptionsService } from '@/lib/alpaca';
 import { GetOptionChainParams } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/rest_v2';
+import { MakePremiumsOptionsStrategy } from '@/lib/option-strategies/CoveredCallsOptionsStrategy';
 
 /**
  * GET /api/alpaca/options
@@ -36,7 +37,6 @@ export async function GET(request: NextRequest) {
     // Build request parameters
     const requestParams: GetOptionChainParams = {
       root_symbol,
-      // status: (searchParams.get('status') as 'active' | 'inactive') || 'active',
     };
 
     // Add optional parameters if provided
@@ -70,14 +70,26 @@ export async function GET(request: NextRequest) {
       requestParams.totalLimit = parseInt(limit, 10);
     }
 
+    // Get strategyType from query
+    const strategyType = searchParams.get('strategyType') || 'make-premiums';
+
     // Create service and fetch data
     const optionsService = createAlpacaOptionsService();
     const data = await optionsService.getOptionsChain(requestParams);
 
+    // Augment data based on strategy
+    let options = data;
+    if (strategyType === 'make-premiums') {
+      const strategy = new MakePremiumsOptionsStrategy();
+      const augmentedData = strategy.augmentOptionsData(data);
+      options = strategy.chooseGoodOptions(augmentedData);
+    }
+    // For 'leaps', just return the data as is (or add logic later)
+
     return NextResponse.json({
       success: true,
-      count: data.length,
-      options: data,
+      count: options.length,
+      options,
     });
   } catch (error) {
     console.error('Error in /api/alpaca/options:', error);
