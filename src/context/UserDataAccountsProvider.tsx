@@ -18,7 +18,7 @@ export const UserDataAccountsProvider = ({ children }: { children: ReactNode }) 
   const [alpacaApiSecret, setAlpacaApiSecret] = useLocalStorage<string | undefined>("alpaca_api_secret", undefined);
   const [snaptradeUserId, setSnaptradeUserId] = useLocalStorage<string | undefined>("snaptrade_user_id", undefined);
   const [snaptradeUserSecret, setSnaptradeUserSecret] = useLocalStorage<string | undefined>("snaptrade_user_secret", undefined);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isUserAccountDetailsLoading, setIsUserAccountDetailsLoading] = useState<boolean>(true);
 
   const user = useUser();
 
@@ -32,7 +32,7 @@ export const UserDataAccountsProvider = ({ children }: { children: ReactNode }) 
         setSnaptradeUserId(data.snaptrade_user_id);
         setSnaptradeUserSecret(data.snaptrade_user_secret);
       }
-      setIsLoading(false);
+      setIsUserAccountDetailsLoading(false);
     };
     if (user?.id) {
       fetchUserDataAccounts();
@@ -40,8 +40,8 @@ export const UserDataAccountsProvider = ({ children }: { children: ReactNode }) 
   }, [user?.id]);
 
   const value = useMemo(
-    () => ({ alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, isLoading }),
-    [alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, isLoading]
+    () => ({ alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, isUserAccountDetailsLoading }),
+    [alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, isUserAccountDetailsLoading]
   );
 
   return <UserDataAccountsContext.Provider value={value}>{children}</UserDataAccountsContext.Provider>;
