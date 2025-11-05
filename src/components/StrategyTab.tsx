@@ -6,6 +6,7 @@ import type { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover
 import { useUserDataAccounts } from '@/context/UserDataAccountsProvider';
 import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
 import { OptionsWithStockData } from '@/app/api/alpaca/options/bulk/route';
+import { StockCard } from './StockCard';
 
 
 interface StrategyTabProps {
@@ -183,20 +184,17 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
           })
           .map(([symbol, optionsWithStockData]) => (
             <div key={symbol} className="mb-8">
-              <div className="p-4 border rounded-lg shadow-sm">
-          <h3 className="text-lg font-bold">{symbol}</h3>
-          <div className="mt-2 space-y-1">
-            <p><span className="font-semibold">Units:</span> {optionsWithStockData.stockData?.units}</p>
-            <p><span className="font-semibold">Average Purchase Price:</span> ${optionsWithStockData.stockData?.average_purchase_price?.toFixed(2)}</p>
-            <p><span className="font-semibold">Current Price:</span> ${optionsWithStockData.stockData?.price?.toFixed(2)}</p>
-          </div>
-              </div>
+              <StockCard
+                ticker={symbol}
+                latestPrice={optionsWithStockData.stockData?.price || 0}
+                changePercent={optionsWithStockData.stockData?.change_percent || 0}
+                quantity={optionsWithStockData.stockData?.units || 0}
+              />
               <OptionsDataTable
-          ticker={symbol}
-          data={optionsWithStockData.options}
-          isLoading={false}
-          error={null}
-          strategyType={strategyType}
+                data={optionsWithStockData.options}
+                isLoading={false}
+                error={null}
+                strategyType={strategyType}
               />
             </div>
           ))}

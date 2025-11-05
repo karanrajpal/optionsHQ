@@ -20,8 +20,6 @@ import {
 import { useMemo, useState } from 'react';
 import { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
 import { extractDateFromContractSymbol, extractStrikePriceFromContractSymbol, getDaysToExpiration } from '@/lib/formatters';
-import { TickerPriceItem } from './TickerPriceItem';
-import { useWatchlist } from '@/context/WatchlistProvider';
 
 export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
   {
@@ -206,7 +204,6 @@ interface OptionsDataTableProps {
   isLoading?: boolean;
   error?: string | null;
   strategyType: StrategyType;
-  ticker: string;
 };
 
 function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[], strategyType: StrategyType): ColumnDef<AugmentedAlpacaOptionSnapshot>[] {
@@ -247,9 +244,8 @@ function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSn
 }
 
 
-export function OptionsDataTable({ data, isLoading, error, strategyType, ticker }: OptionsDataTableProps) {
+export function OptionsDataTable({ data, isLoading, error, strategyType }: OptionsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const { watchlistItems } = useWatchlist(); // TODO: Get live prices instead of watchlist prices
 
   const columns = useMemo(() => addColumnDefsForStrategyType(baseColumns, strategyType), [baseColumns, strategyType]);
 
@@ -281,18 +277,13 @@ export function OptionsDataTable({ data, isLoading, error, strategyType, ticker 
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <TickerPriceItem
-            ticker={ticker}
-            latestPrice={watchlistItems.find(item => item.ticker_symbol === ticker)?.latest_price ?? 0}
-            changePercent={watchlistItems.find(item => item.ticker_symbol === ticker)?.change_percent ?? 0}
-          />
-        <span className="text-sm text-gray-600">
-          {data.length} contract{data.length !== 1 ? 's' : ''} found
-        </span>
-      </div>
-      <div className="rounded-md border">
+    <div className="rounded-md border space-y-2">
+      {data.length === 0 && (
+        <div className="p-4 text-center text-gray-500">
+          No options data available.
+        </div>
+      )}
+      {data.length > 0 && (
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -334,13 +325,13 @@ export function OptionsDataTable({ data, isLoading, error, strategyType, ticker 
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No options data available. Enter a ticker symbol and click &quot;Get Options&quot;.
+                  No options data available.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-      </div>
+      )}
     </div>
   );
 }
