@@ -46,7 +46,7 @@ export class MakePremiumsOptionsStrategy implements OptionsStrategy {
         return {
             expiration_date_gte: startDate.toISOString().split('T')[0],
             expiration_date_lte: endDate.toISOString().split('T')[0],
-            type: 'call' as 'call' | 'put',
+            type: 'call',
         };
     }
 
