@@ -32,7 +32,11 @@ export class MakePremiumsOptionsStrategy implements OptionsStrategy {
             .sort((a, b) => (b.expectedReturnPercentage || 0) - (a.expectedReturnPercentage || 0));
     }
 
-    private getDefaultParams() {
+    private getDefaultParams(): {
+        expiration_date_gte?: string;
+        expiration_date_lte?: string;
+        type?: 'call' | 'put';
+    } {
         const today = new Date();
         const startDate = new Date();
         const endDate = new Date();
@@ -42,7 +46,7 @@ export class MakePremiumsOptionsStrategy implements OptionsStrategy {
         return {
             expiration_date_gte: startDate.toISOString().split('T')[0],
             expiration_date_lte: endDate.toISOString().split('T')[0],
-            type: 'call',
+            type: 'call' as 'call' | 'put',
         };
     }
 
