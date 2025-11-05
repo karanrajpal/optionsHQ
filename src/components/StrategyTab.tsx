@@ -1,12 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { OptionsSearchBar } from '@/components/OptionsSearchBar';
 import { OptionsDataTable } from '@/components/OptionsDataTable';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
+import { useUserDataAccounts } from '@/context/UserDataAccountsProvider';
+import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
+import { OptionsWithStockData } from '@/app/api/alpaca/options/bulk/route';
+
 
 interface StrategyTabProps {
   strategyType: StrategyType;
-}
+};
 
 export function StrategyTab({ strategyType }: StrategyTabProps) {
   const [ticker, setTicker] = useState('');
@@ -14,6 +18,54 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
   const [data, setData] = useState<AugmentedAlpacaOptionSnapshot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { snaptradeUserId, snaptradeUserSecret, isUserAccountDetailsLoading } = useUserDataAccounts();
+  const { selectedAccount, accountsLoading } = useSnaptradeAccount();
+
+  // Recommended options state
+  const [recommended, setRecommended] = useState<Record<string, OptionsWithStockData>>({});
+  const [recommendedLoading, setRecommendedLoading] = useState(false);
+  const [recommendedError, setRecommendedError] = useState<string | null>(null);
+  // Fetch recommended options on mount or when strategyType changes
+  useEffect(() => {
+    let ignore = false;
+    async function fetchRecommended() {
+      setRecommendedLoading(true);
+      setRecommendedError(null);
+      setRecommended({});
+      try {
+        if (isUserAccountDetailsLoading || accountsLoading) return;
+        if (!snaptradeUserId || !snaptradeUserSecret || !selectedAccount?.id) {
+          throw new Error('Missing user credentials');
+        }
+        const params = new URLSearchParams({
+          strategy: strategyType,
+          accountId: selectedAccount.id,
+        });
+        const response = await fetch(`/api/alpaca/options/bulk?${params.toString()}`, {
+          headers: {
+            'user-id': snaptradeUserId,
+            'user-secret': snaptradeUserSecret,
+          },
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch recommended options');
+        }
+        const result = await response.json();
+        if (!result || typeof result !== 'object') {
+          throw new Error('Failed to fetch recommended options');
+        }
+        if (!ignore) setRecommended(result);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+        if (!ignore) setRecommendedError(errorMessage);
+      } finally {
+        if (!ignore) setRecommendedLoading(false);
+      }
+    }
+    fetchRecommended();
+    return () => { ignore = true; };
+  }, [strategyType, snaptradeUserId, snaptradeUserSecret, selectedAccount?.id]);
 
   // For LEAPS, always use call options
   const effectiveOptionType = strategyType === 'leaps' ? 'call' : optionType;
@@ -112,6 +164,43 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
           <p className="text-gray-500">Enter a ticker symbol above to get started</p>
         </div>
       )}
+
+      {/* Recommended Options Section */}
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold mb-2">Recommended Options</h2>
+        {(recommendedLoading || accountsLoading || isUserAccountDetailsLoading) && <Skeleton className="h-40 w-full mb-4" />}
+        {recommendedError && !recommendedLoading && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-800">{recommendedError}</div>
+        )}
+        {!recommendedLoading && !recommendedError && Object.keys(recommended).length === 0 && (
+          <div className="text-gray-500 p-4">No recommended options found.</div>
+        )}
+        {!recommendedLoading && !recommendedError && Object.entries(recommended)
+          .sort(([, a], [, b]) => {
+            const portfolioValueA = (a.stockData?.units || 0) * (a.stockData?.price || 0);
+            const portfolioValueB = (b.stockData?.units || 0) * (b.stockData?.price || 0);
+            return portfolioValueB - portfolioValueA;
+          })
+          .map(([symbol, optionsWithStockData]) => (
+            <div key={symbol} className="mb-8">
+              <div className="p-4 border rounded-lg shadow-sm">
+          <h3 className="text-lg font-bold">{symbol}</h3>
+          <div className="mt-2 space-y-1">
+            <p><span className="font-semibold">Units:</span> {optionsWithStockData.stockData?.units}</p>
+            <p><span className="font-semibold">Average Purchase Price:</span> ${optionsWithStockData.stockData?.average_purchase_price?.toFixed(2)}</p>
+            <p><span className="font-semibold">Current Price:</span> ${optionsWithStockData.stockData?.price?.toFixed(2)}</p>
+          </div>
+              </div>
+              <OptionsDataTable
+          ticker={symbol}
+          data={optionsWithStockData.options}
+          isLoading={false}
+          error={null}
+          strategyType={strategyType}
+              />
+            </div>
+          ))}
+      </div>
     </div>
   );
 }

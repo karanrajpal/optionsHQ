@@ -14,7 +14,7 @@ import { useUser } from "@stackframe/stack";
  * Uses the connected user_data_accounts type from the API
  */
 export const AccountCheckup = () => {
-    const { snaptradeUserId, snaptradeUserSecret, alpacaApiKey, alpacaApiSecret, isLoading } = useUserDataAccounts();
+    const { snaptradeUserId, snaptradeUserSecret, alpacaApiKey, alpacaApiSecret, isUserAccountDetailsLoading } = useUserDataAccounts();
     const isSnaptradeConnected = snaptradeUserId && snaptradeUserSecret;
     const isAlpacaConnected = alpacaApiKey && alpacaApiSecret;
     const { accounts } = useSnaptradeAccount();
@@ -24,7 +24,7 @@ export const AccountCheckup = () => {
         <div>
             <h2 className="font-bold text-3xl mb-6">Welcome, {user?.displayName ?? 'Options Lover'}</h2>
             <div className="flex justify-center">
-                {isLoading ? (
+                {isUserAccountDetailsLoading ? (
                     <Skeleton className="w-40 h-10 rounded" />
                 ) : !isSnaptradeConnected ? (
                     <div>

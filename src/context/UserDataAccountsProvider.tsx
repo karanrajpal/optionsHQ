@@ -8,7 +8,7 @@ type UserDataAccountsContextType = {
   alpacaApiSecret: string | undefined;
   snaptradeUserId: string | undefined;
   snaptradeUserSecret: string | undefined;
-  isLoading: boolean;
+  isUserAccountDetailsLoading: boolean;
 };
 
 const UserDataAccountsContext = createContext<UserDataAccountsContextType | undefined>(undefined);

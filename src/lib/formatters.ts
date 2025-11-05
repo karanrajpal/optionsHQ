@@ -1,3 +1,8 @@
+// Format a number with commas (e.g., 200,000)
+export const formatNumberWithCommas = (value: number | string | null | undefined) => {
+    if (value === null || value === undefined) return "-";
+    return value.toLocaleString();
+};
 // Utility functions for formatting currency, date, and profit/loss color
 export const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) return "-";

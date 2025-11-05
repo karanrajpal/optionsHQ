@@ -9,7 +9,7 @@ import {
     SortingState,
 } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatCurrency, formatDateWithTimeAndZone, getProfitLossColor } from '@/lib/formatters';
+import { formatCurrency, formatDateWithTimeAndZone, getProfitLossColor, formatNumberWithCommas } from '@/lib/formatters';
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
@@ -40,7 +40,7 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
     {
         accessorKey: 'units',
         header: 'Quantity',
-        cell: ({ row }) => row.original.units,
+    cell: ({ row }) => formatNumberWithCommas(row.original.units),
         enableSorting: true,
         sortingFn: (a, b) => (Number(a.original.units) || 0) - (Number(b.original.units) || 0),
     },
@@ -72,7 +72,7 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
 ];
 
 export default function HoldingsPage() {
-    const { selectedAccount, accounts, setSelectedAccountId } = useSnaptradeAccount();
+    const { selectedAccount } = useSnaptradeAccount();
     const [holdings, setHoldings] = useState<AccountHoldingsAccount | null>(null);
     const [loading, setLoading] = useState(true);
     const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
