@@ -140,7 +140,7 @@ export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
   },
   {
     accessorKey: 'days_to_expiration',
-    header: 'Days to Expiration',
+    header: 'Days to \nExpiration',
     cell: ({ row }) => {
       const daysToExpiration = getDaysToExpiration(row?.original?.Symbol);
       return <div>{daysToExpiration || '-'}</div>;
@@ -280,7 +280,7 @@ export function OptionsDataTable({ data, isLoading, error, strategyType }: Optio
     <div className="rounded-md border space-y-2">
       {data.length === 0 && (
         <div className="p-4 text-center text-gray-500">
-          No options data available.
+          No options found.
         </div>
       )}
       {data.length > 0 && (
@@ -325,7 +325,7 @@ export function OptionsDataTable({ data, isLoading, error, strategyType }: Optio
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No options data available.
+                  No options found.
                 </TableCell>
               </TableRow>
             )}

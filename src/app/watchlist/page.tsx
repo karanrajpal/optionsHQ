@@ -206,7 +206,6 @@ export default function WatchlistPage() {
                                                         className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-semibold text-gray-600 dark:text-gray-300"
                                                         title={item.ticker_symbol}
                                                     >
-                                                        {/* {item.ticker_symbol.substring(0, 2)} */}
                                                         <Image
                                                             src={`https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${item.ticker_symbol}.png`}
                                                             alt={item.ticker_symbol}

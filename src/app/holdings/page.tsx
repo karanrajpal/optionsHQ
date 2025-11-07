@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { AccountPicker } from '@/components/AccountPicker';
 import { PageHeader } from '@/components/PageHeader';
+import Image from 'next/image';
 
 export type HoldingsPosition = NonNullable<AccountHoldingsAccount['positions']>[number];
 
@@ -26,7 +27,14 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
         accessorKey: 'symbol',
         header: 'Symbol',
         cell: ({ row }) => (
-            <span title={row.original.symbol?.symbol?.description ?? ''}>
+            <span title={row.original.symbol?.symbol?.description ?? ''} className='flex items-center gap-1'>
+                <Image
+                    src={row.original.symbol?.symbol?.logo_url || `https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${row.original.symbol?.symbol?.symbol}.png`}
+                    alt={row.original.symbol?.symbol?.symbol || ''}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                />
                 {row.original.symbol?.symbol?.symbol}
             </span>
         ),
@@ -40,7 +48,7 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
     {
         accessorKey: 'units',
         header: 'Quantity',
-    cell: ({ row }) => formatNumberWithCommas(row.original.units),
+        cell: ({ row }) => formatNumberWithCommas(row.original.units),
         enableSorting: true,
         sortingFn: (a, b) => (Number(a.original.units) || 0) - (Number(b.original.units) || 0),
     },
