@@ -27,7 +27,14 @@ export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
     header: 'Symbol',
     cell: ({ row }) => {
       const symbol = row?.original?.Symbol?.match(/^[A-Za-z]+/)?.[0];
-      return <div className="font-mono text-xs">{symbol}</div>;
+      return symbol ? (
+        <a
+          href={`/stock/${symbol}`}
+          className="font-mono text-xs text-blue-600 hover:underline"
+        >
+          {symbol}
+        </a>
+      ) : null;
     },
     enableSorting: true,
     sortingFn: (a, b) => {

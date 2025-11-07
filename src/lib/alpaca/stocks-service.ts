@@ -5,6 +5,7 @@
  */
 
 import Alpaca from '@alpacahq/alpaca-trade-api';
+import { ManualAlpacaAsset } from './types';
 
 export class AlpacaStocksService {
   private alpaca: Alpaca;
@@ -51,7 +52,7 @@ export class AlpacaStocksService {
    * @param symbol - Stock ticker symbol
    * @returns Promise with asset information
    */
-  async getAsset(symbol: string) {
+  async getAsset(symbol: string): Promise<ManualAlpacaAsset> {
     try {
       return await this.alpaca.getAsset(symbol);
     } catch (error) {
@@ -65,11 +66,53 @@ export class AlpacaStocksService {
    * @param options - Search options
    * @returns Promise with array of matching assets
    */
-  async searchAssets(options?: { status?: string; asset_class?: string }) {
+  async searchAssets(options?: { status?: string; asset_class?: string }): Promise<ManualAlpacaAsset[]> {
     try {
       return await this.alpaca.getAssets(options);
     } catch (error) {
       console.error(`Error searching assets:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get historical bars for a symbol
+   * @param symbol - Stock ticker symbol
+   * @param timeframe - Timeframe for bars (e.g., "1Min", "5Min", "1Day")
+   * @param start - ISO string for start time
+   * @param end - ISO string for end time
+   * @returns Promise with array of bar data
+   */
+  async getBars(symbol: string, timeframe: string, start?: string, end?: string) {
+    try {
+      const bars = this.alpaca.getBarsV2(symbol, {
+        timeframe,
+        start,
+        end,
+        feed: 'iex',
+      });
+      const barArray = [];
+      for await (const bar of bars) {
+        barArray.push(bar);
+      }
+      return barArray;
+    } catch (error) {
+      console.error(`Error fetching bars for ${symbol}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get news articles for multiple symbols
+   * @param symbols - Array of stock ticker symbols
+   * @param options - Additional options like start and end dates
+   * @returns Promise with news articles
+   */
+  async getNews(symbols: string[], options?: { start?: string; end?: string; limit?: number }) {
+    try {
+      return await this.alpaca.getNews({ symbols, ...options });
+    } catch (error) {
+      console.error(`Error fetching news for symbols:`, error);
       throw error;
     }
   }

@@ -60,10 +60,6 @@ export default function WatchlistPage() {
         }
     };
 
-    const getTickerLogoUrl = (symbol: string) => {
-        return `https://logo.clearbit.com/${symbol.toLowerCase()}.com`;
-    };
-
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
@@ -217,7 +213,9 @@ export default function WatchlistPage() {
                                                 </div>
                                                 <div>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {item.ticker_symbol}
+                                                        <a href={`/stock/${item.ticker_symbol}`} className="text-blue-600 hover:underline">
+                                                            {item.ticker_symbol}
+                                                        </a>
                                                     </div>
                                                     {item.name && (
                                                         <div className="text-sm text-gray-500 dark:text-gray-400">
