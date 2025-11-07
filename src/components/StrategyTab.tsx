@@ -152,7 +152,6 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
       {data.length > 0 && (
         <div className="space-y-2">
           <OptionsDataTable
-            ticker={ticker}
             data={data}
             isLoading={isLoading}
             error={error}

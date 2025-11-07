@@ -32,7 +32,11 @@ export class MakePremiumsOptionsStrategy implements OptionsStrategy {
             .sort((a, b) => (b.expectedReturnPercentage || 0) - (a.expectedReturnPercentage || 0));
     }
 
-    private getDefaultParams() {
+    private getDefaultParams(): {
+        expiration_date_gte?: string;
+        expiration_date_lte?: string;
+        type?: 'call' | 'put';
+    } {
         const today = new Date();
         const startDate = new Date();
         const endDate = new Date();
