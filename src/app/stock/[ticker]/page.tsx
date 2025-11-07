@@ -121,8 +121,8 @@ export default function StockPage({ params }: StockPageProps) {
             <div>
                 <TickerPriceItem
                     ticker={ticker}
-                    latestPrice={snapshot.LatestQuote?.AskPrice}
-                    changePercent={0}
+                    latestPrice={snapshot.DailyBar?.ClosePrice}
+                    changePercent={snapshot.PrevDailyBar ? ((snapshot.DailyBar!.ClosePrice - snapshot.PrevDailyBar.ClosePrice) / snapshot.PrevDailyBar.ClosePrice) * 100 : 0}
                 />
             </div>
             <div className="mt-8 text-xl text-center">
