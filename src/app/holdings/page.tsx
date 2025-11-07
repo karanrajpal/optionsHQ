@@ -27,12 +27,12 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
         accessorKey: 'symbol',
         header: 'Symbol',
         cell: ({ row }) => (
-            <span title={row.original.symbol?.symbol?.description ?? ''} className='flex items-center gap-1'>
+            <span title={row.original.symbol?.symbol?.description ?? ''} className='flex items-center gap-2'>
                 <Image
                     src={row.original.symbol?.symbol?.logo_url || `https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${row.original.symbol?.symbol?.symbol}.png`}
                     alt={row.original.symbol?.symbol?.symbol || ''}
-                    width={40}
-                    height={40}
+                    width={32}
+                    height={32}
                     className="rounded-full"
                 />
                 {row.original.symbol?.symbol?.symbol}
@@ -77,6 +77,13 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
         enableSorting: true,
         sortingFn: (a, b) => (Number(a.original.open_pnl) || 0) - (Number(b.original.open_pnl) || 0),
     },
+    {
+        accessorKey: 'Value',
+        header: 'Value',
+        cell: ({ row }) => formatCurrency(row.original.units && row.original.price ? row.original.units * row.original.price : 0),
+        enableSorting: true,
+        sortingFn: (a, b) => (Number(a.original.units || 0) * Number(a.original.price || 0) || 0) - (Number(b.original.units || 0) * Number(b.original.price || 0) || 0),
+    }
 ];
 
 export default function HoldingsPage() {
@@ -130,7 +137,7 @@ export default function HoldingsPage() {
                     {!loading && holdings?.cache_expired && <Badge variant='destructive'>Outdated</Badge>}
                     <div className='ml-2 flex items-center text-gray-600 dark:text-gray-400'>
                         Updated at {loading
-                            ? <Skeleton className="inline-block h-4 w-32" />
+                            ? <Skeleton className="inline-block h-4 w-32 ml-1" />
                             : (holdings?.cache_timestamp ? formatDateWithTimeAndZone(holdings.cache_timestamp) : 'N/A')}
                     </div>
                 </div>

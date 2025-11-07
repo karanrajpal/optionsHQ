@@ -3,7 +3,7 @@ export const formatNumberWithCommas = (value: number | string | null | undefined
     if (value === null || value === undefined) return "-";
     const numberValue = typeof value === "string" ? parseFloat(value) : value;
     if (isNaN(numberValue)) return "-";
-    return numberValue.toFixed(2).toLocaleString();
+    return numberValue % 1 === 0 ? numberValue.toLocaleString() : numberValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 // Utility functions for formatting currency, date, and profit/loss color
 export const formatCurrency = (value: number | null | undefined) => {

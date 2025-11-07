@@ -209,8 +209,8 @@ export default function WatchlistPage() {
                                                         <Image
                                                             src={`https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${item.ticker_symbol}.png`}
                                                             alt={item.ticker_symbol}
-                                                            width={40}
-                                                            height={40}
+                                                            width={32}
+                                                            height={32}
                                                             className="rounded-full"
                                                         />
                                                     </div>
