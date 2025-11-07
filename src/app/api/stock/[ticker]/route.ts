@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAlpacaStocksService } from '@/lib/alpaca';
 import type { StockInfo } from '@/lib/alpaca/types';
 
-export async function GET(req: NextRequest, { params }: { params: { ticker: string } }) {
-    const { ticker } = params;
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/stock/[ticker]'>) {
+    const { ticker } = await ctx.params;
     if (!ticker) {
         return NextResponse.json({ error: 'Ticker is required' }, { status: 400 });
     }
