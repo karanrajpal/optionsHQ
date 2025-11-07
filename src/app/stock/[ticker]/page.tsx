@@ -1,26 +1,18 @@
 "use client";
 
-
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { StockInfo } from '@/lib/alpaca/types';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { TickerPriceItem } from '@/components/StockCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlpacaNews } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
+import { useParams } from 'next/navigation';
 
 const StockPriceChart = dynamic(() => import('@/components/StockPriceChart'), { ssr: false });
 
-interface StockPageProps {
-    params: { ticker: string };
-}
-
-export default function StockPage({ params }: StockPageProps) {
-    // Next.js: params may be a Promise in future, so unwrap with React.use()
-    // For now, support both direct and future usage
-    // @ts-ignore
-    const unwrappedParams = typeof params.then === 'function' ? React.use(params) : params;
-    const { ticker } = unwrappedParams as { ticker: string };
+export default function StockPage() {
+    const { ticker } = useParams<{ ticker: string }>();
     const [stockInfo, setStockInfo] = useState<StockInfo | null>(null);
     const [loading, setLoading] = useState(true);
     const [stockInfoError, setStockInfoError] = useState('');
