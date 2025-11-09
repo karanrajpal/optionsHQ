@@ -8,6 +8,7 @@ import { TickerPriceItem } from '@/components/StockCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlpacaNews } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useParams } from 'next/navigation';
+import { decodeHtmlEntities } from '@/lib/formatters';
 
 const StockPriceChart = dynamic(() => import('@/components/StockPriceChart'), { ssr: false });
 
@@ -107,13 +108,13 @@ export default function StockPage() {
                 <Image src={logoUrl} alt={companyName} width={64} height={64} className="rounded-full bg-white" />
                 <div className="flex flex-col items-start">
                     <h1 className="text-3xl font-bold">{companyName}</h1>
-                    <span className="text-gray-500 text-lg mt-1">{ticker.toUpperCase()}</span>
+                    <div className="text-muted-foreground text-sm">{asset.symbol} | {asset.exchange}</div>
                 </div>
             </div>
             <div>
                 <TickerPriceItem
-                    ticker={ticker}
                     latestPrice={snapshot.DailyBar?.ClosePrice}
+                    changePrice={snapshot.PrevDailyBar ? snapshot.DailyBar!.ClosePrice - snapshot.PrevDailyBar.ClosePrice : 0}
                     changePercent={snapshot.PrevDailyBar ? ((snapshot.DailyBar!.ClosePrice - snapshot.PrevDailyBar.ClosePrice) / snapshot.PrevDailyBar.ClosePrice) * 100 : 0}
                 />
             </div>
@@ -127,7 +128,7 @@ export default function StockPage() {
                     <StockPriceChart data={mockChartData} />
                 </div>
             )}
-            <div className="w-full mt-8">
+            <div className="w-full mt-8 p-1">
                 <h2 className="text-2xl font-bold mb-4">Latest News</h2>
                 {newsError ? (
                     <div className="text-red-500">{newsError}</div>
@@ -142,7 +143,7 @@ export default function StockPage() {
                                 <a href={article.URL} target="_blank" rel="noopener noreferrer" className="text-lg font-semibold text-blue-600 hover:underline">
                                     {article.Headline}
                                 </a>
-                                <p className="text-gray-600 mt-1">{article.Summary}</p>
+                                <p className="text-gray-600 mt-1">{decodeHtmlEntities(article.Summary)}</p>
                                 <span className="text-sm text-gray-400">{new Date(article.UpdatedAt).toLocaleDateString()}</span>
                             </li>
                         ))}

@@ -14,6 +14,12 @@ export const formatCurrency = (value: number | null | undefined) => {
     }).format(value);
 };
 
+export const decodeHtmlEntities = (text: string) => {
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
+};
+
 export const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString('en-US', { timeZone: 'UTC' });

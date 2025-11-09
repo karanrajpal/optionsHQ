@@ -32,7 +32,6 @@ export class AlpacaOptionsService {
     if (!request.root_symbol) {
       throw new Error('root_symbol is required');
     }
-    console.log('Fetching options chain for:', request.root_symbol, request);
     return this.alpaca.getOptionChain(request.root_symbol, request);
   }
 

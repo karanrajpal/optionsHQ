@@ -7,6 +7,7 @@ import { useUserDataAccounts } from '@/context/UserDataAccountsProvider';
 import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
 import { OptionsWithStockData } from '@/app/api/alpaca/options/bulk/route';
 import { StockCard } from './StockCard';
+import { TextShimmer } from './ui/text-shimmer';
 
 
 interface StrategyTabProps {
@@ -168,7 +169,12 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
       {/* Recommended Options Section */}
       <div className="mt-8">
         <h2 className="text-lg font-semibold mb-2">Recommended Options</h2>
-        {(recommendedLoading || accountsLoading || isUserAccountDetailsLoading) && <Skeleton className="h-40 w-full mb-4" />}
+        {(recommendedLoading || accountsLoading || isUserAccountDetailsLoading) && (
+          <>
+            <TextShimmer className='mb-2'>Looking at your portfolio...</TextShimmer>
+            <Skeleton className="h-40 w-full mb-4" />
+          </>
+        )}
         {recommendedError && !recommendedLoading && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-800">{recommendedError}</div>
         )}
