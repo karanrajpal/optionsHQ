@@ -14,7 +14,7 @@ export class OptionCandidatesService {
         this.accountId = accountId;
     }
 
-    async getMakePremiumsCandidates(): Promise<Position[]> {
+    async getCoveredCallsCandidates(): Promise<Position[]> {
         const snaptradeService = new SnaptradeService(
             this.userId,
             this.userSecret,

@@ -215,7 +215,7 @@ interface OptionsDataTableProps {
 
 function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[], strategyType: StrategyType): ColumnDef<AugmentedAlpacaOptionSnapshot>[] {
   const augmentedColumns = [...columns];
-  if (strategyType === 'make-premiums') {
+  if (strategyType === 'covered-calls') {
     augmentedColumns.push(
       {
         accessorKey: 'expectedReturnPercentage',

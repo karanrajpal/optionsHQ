@@ -11,7 +11,7 @@ export interface OptionsStrategy {
         type?: 'call' | 'put';
     };
 };
-export class MakePremiumsOptionsStrategy implements OptionsStrategy {
+export class CoveredCallsOptionsStrategy implements OptionsStrategy {
     public augmentOptionsData(options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] {
         return options.map(option => {
             const strikePrice = extractStrikePriceFromContractSymbol(option.Symbol);

@@ -77,7 +77,7 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
     const startDate = new Date();
     const endDate = new Date();
 
-    if (strategyType === 'make-premiums') {
+  if (strategyType === 'covered-calls') {
       startDate.setDate(today.getDate() + 35);
       endDate.setDate(today.getDate() + 42);
     } else {

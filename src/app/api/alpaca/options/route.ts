@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAlpacaOptionsService } from '@/lib/alpaca';
 import { GetOptionChainParams } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/rest_v2';
-import { MakePremiumsOptionsStrategy } from '@/lib/option-strategies/CoveredCallsOptionsStrategy';
+import { CoveredCallsOptionsStrategy } from '@/lib/option-strategies/CoveredCallsOptionsStrategy';
 
 /**
  * GET /api/alpaca/options
@@ -79,8 +79,8 @@ export async function GET(request: NextRequest) {
 
     // Augment data based on strategy
     let options = data;
-    if (strategyType === 'make-premiums') {
-      const strategy = new MakePremiumsOptionsStrategy();
+    if (strategyType === 'covered-calls') {
+      const strategy = new CoveredCallsOptionsStrategy();
       const augmentedData = strategy.augmentOptionsData(data);
       options = strategy.chooseGoodOptions(augmentedData);
     }

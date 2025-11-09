@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
         }
         const service = new OptionCandidatesService(userId, userSecret, accountId);
         let candidates = [];
-        if (strategy === "make-premiums") {
-            candidates = await service.getMakePremiumsCandidates();
+        if (strategy === "covered-calls") {
+            candidates = await service.getCoveredCallsCandidates();
         } else {
             return NextResponse.json({ error: "Unknown strategy" }, { status: 400 });
         }

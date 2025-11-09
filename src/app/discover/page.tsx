@@ -9,23 +9,23 @@ export type AugmentedAlpacaOptionSnapshot = import('@alpacahq/alpaca-trade-api/d
   expectedAnnualizedReturnPercentage?: number;
 };
 
-export type StrategyType = 'make-premiums' | 'leaps';
+export type StrategyType = 'covered-calls' | 'leaps';
 export default function Discover() {
   return (
     <main className="flex min-h-screen flex-col items-center p-7">
       <div className="w-full max-w-7xl space-y-2">
         <PageHeader header="Options Discovery" />
         <div className="space-y-2">
-          <Tabs defaultValue="make-premiums" className="w-full">
+          <Tabs defaultValue="covered-calls" className="w-full">
             <TabsList>
-              <TabsTrigger value="make-premiums">Make Premiums</TabsTrigger>
+              <TabsTrigger value="covered-calls">Covered Calls</TabsTrigger>
               <TabsTrigger value="leaps">LEAPS</TabsTrigger>
             </TabsList>
-            <TabsContent value="make-premiums">
-              <StrategyTab strategyType="make-premiums" />
+            <TabsContent value="covered-calls">
+              <StrategyTab strategyType={"covered-calls"} />
             </TabsContent>
             <TabsContent value="leaps">
-              <StrategyTab strategyType="leaps" />
+              <StrategyTab strategyType={"leaps"} />
             </TabsContent>
           </Tabs>
         </div>

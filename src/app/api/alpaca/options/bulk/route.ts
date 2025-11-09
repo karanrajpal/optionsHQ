@@ -4,7 +4,6 @@ import { OptionsDiscoveryService } from "@/lib/options-discovery-service";
 import { GetOptionChainParams } from "@alpacahq/alpaca-trade-api/dist/resources/datav2/rest_v2";
 import { AugmentedAlpacaOptionSnapshot } from "@/app/discover/page";
 import { Position } from "snaptrade-typescript-sdk";
-import { MakePremiumsOptionsStrategy } from "@/lib/option-strategies/CoveredCallsOptionsStrategy";
 
 /**
  * GET /api/alpaca/options/bulk
@@ -30,7 +29,7 @@ export type OptionsWithStockData = {
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
-        const strategy = searchParams.get("strategyType") || "make-premiums";
+        const strategy = searchParams.get("strategyType") || "covered-calls";
         const accountId = searchParams.get("accountId");
         const userId = request.headers.get("user-id");
         const userSecret = request.headers.get("user-secret");
@@ -76,8 +75,8 @@ export async function GET(request: NextRequest) {
         // Get all symbols for the strategy
         const candidatesService = new OptionCandidatesService(userId, userSecret, accountId);
         let candidates = [];
-        if (strategy === "make-premiums") {
-            candidates = await candidatesService.getMakePremiumsCandidates();
+        if (strategy === "covered-calls") {
+            candidates = await candidatesService.getCoveredCallsCandidates();
         } else {
             return NextResponse.json({ error: "Unknown strategy" }, { status: 400 });
         }
