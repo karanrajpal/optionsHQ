@@ -9,7 +9,7 @@ import { Position } from "snaptrade-typescript-sdk";
  * GET /api/alpaca/options/bulk
  *
  * Query Parameters:
- * - strategy: Strategy type (e.g., "make-premiums") - Required
+ * - strategy: Strategy type (e.g., "covered-calls") - Required
  * - accountId: Account ID - Required
  * - expiration_date_gte: Filter by expiration date >= this date (YYYY-MM-DD) - Optional
  * - expiration_date_lte: Filter by expiration date <= this date (YYYY-MM-DD) - Optional
