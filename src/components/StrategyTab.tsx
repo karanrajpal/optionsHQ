@@ -8,16 +8,23 @@ import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
 import { OptionsWithStockData } from '@/app/api/alpaca/options/bulk/route';
 import { StockCard } from './StockCard';
 import { TextShimmer } from './ui/text-shimmer';
+import { getChangePercentFromAlpacaSnapshot, getChangeValueFromAlpacaSnapshot } from '@/lib/formatters';
 
 
 interface StrategyTabProps {
   strategyType: StrategyType;
 };
 
+const STRATEGY_TYPE_TO_OPTION_TYPES: Record<StrategyType, ('all' | 'call' | 'put')> = {
+  'covered-calls': 'call',
+  'leaps': 'call',
+  'cash-secured-puts': 'put',
+};
+
 export function StrategyTab({ strategyType }: StrategyTabProps) {
   const [ticker, setTicker] = useState('');
-  const [optionType, setOptionType] = useState<'all' | 'call' | 'put'>('all');
-  const [data, setData] = useState<AugmentedAlpacaOptionSnapshot[]>([]);
+  const [optionType, setOptionType] = useState<'all' | 'call' | 'put'>(STRATEGY_TYPE_TO_OPTION_TYPES[strategyType]);
+  const [optionSearchDataWithStockInfo, setOptionSearchDataWithStockInfo] = useState<OptionsWithStockData>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { snaptradeUserId, snaptradeUserSecret, isUserAccountDetailsLoading } = useUserDataAccounts();
@@ -78,7 +85,7 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
     const startDate = new Date();
     const endDate = new Date();
 
-  if (strategyType === 'covered-calls') {
+    if (strategyType === 'covered-calls') {
       startDate.setDate(today.getDate() + 35);
       endDate.setDate(today.getDate() + 42);
     } else {
@@ -99,7 +106,7 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
     }
     setIsLoading(true);
     setError(null);
-    setData([]);
+    setOptionSearchDataWithStockInfo(undefined);
     try {
       const params = new URLSearchParams({
         root_symbol: ticker.toUpperCase(),
@@ -115,14 +122,15 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
       const response = await fetch(`/api/alpaca/options?${params.toString()}`);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch options data');
+        throw new Error(errorData.error || 'Failed to fetch options optionSearchDataWithStockInfo');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch options data');
+        throw new Error(result.error || 'Failed to fetch options optionSearchDataWithStockInfo');
       }
-      setData(result.options);
-      if (result.options.length === 0) {
+      const data: OptionsWithStockData = result.result;
+      setOptionSearchDataWithStockInfo(data);
+      if (data.options.length === 0) {
         setError('No good options found for this ticker symbol');
       }
     } catch (err) {
@@ -143,24 +151,30 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
         onOptionTypeChange={setOptionType}
         onSearch={handleGetOptions}
         isLoading={isLoading}
-        // For LEAPS, disable option type selection
-        disableOptionType={strategyType === 'leaps'}
+        // Disable option type based on strategy
+        disableOptionType={strategyType === 'leaps' || strategyType === 'covered-calls' || strategyType === 'cash-secured-puts'}
       />
       {error && !isLoading && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-800">{error}</div>
       )}
       {isLoading && <Skeleton className="h-60 w-full mb-4" />}
-      {data.length > 0 && (
+      {optionSearchDataWithStockInfo?.options && (
         <div className="space-y-2">
+          <StockCard
+            ticker={(optionSearchDataWithStockInfo.stockData?.snapshot as any).symbol || ''}
+            latestPrice={optionSearchDataWithStockInfo.stockData?.snapshot.LatestQuote.AskPrice || 0}
+            changePrice={getChangeValueFromAlpacaSnapshot(optionSearchDataWithStockInfo.stockData?.snapshot)}
+            changePercent={getChangePercentFromAlpacaSnapshot(optionSearchDataWithStockInfo.stockData?.snapshot)}
+          />
           <OptionsDataTable
-            data={data}
+            data={optionSearchDataWithStockInfo.options}
             isLoading={isLoading}
             error={error}
             strategyType={strategyType}
           />
         </div>
       )}
-      {!isLoading && !error && data.length === 0 && (
+      {!isLoading && !error && optionSearchDataWithStockInfo?.options?.length === 0 && (
         <div className="text-center p-12 border-2 border-dashed border-gray-300 rounded-lg">
           <p className="text-gray-500">Enter a ticker symbol above to get started</p>
         </div>
@@ -183,17 +197,17 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
         )}
         {!recommendedLoading && !recommendedError && Object.entries(recommended)
           .sort(([, a], [, b]) => {
-            const portfolioValueA = (a.stockData?.units || 0) * (a.stockData?.price || 0);
-            const portfolioValueB = (b.stockData?.units || 0) * (b.stockData?.price || 0);
+            const portfolioValueA = (a.stockPositionData?.units || 0) * (a.stockPositionData?.price || 0);
+            const portfolioValueB = (b.stockPositionData?.units || 0) * (b.stockPositionData?.price || 0);
             return portfolioValueB - portfolioValueA;
           })
           .map(([symbol, optionsWithStockData]) => (
             <div key={symbol} className="mb-8">
               <StockCard
                 ticker={symbol}
-                latestPrice={optionsWithStockData.stockData?.price || 0}
-                changePercent={optionsWithStockData.stockData?.change_percent || 0}
-                quantity={optionsWithStockData.stockData?.units || 0}
+                latestPrice={optionsWithStockData.stockPositionData?.price || 0}
+                changePercent={optionsWithStockData.stockPositionData?.change_percent || 0}
+                quantity={optionsWithStockData.stockPositionData?.units || 0}
               />
               <OptionsDataTable
                 data={optionsWithStockData.options}

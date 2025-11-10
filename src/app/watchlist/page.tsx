@@ -77,7 +77,7 @@ export default function WatchlistPage() {
             <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Watchlist</h1>
-                    <p className="text-gray-600 dark:text-gray-400">Track your favorite stocks</p>
+                    <p className="text-gray-600 dark:text-gray-400">This also powers Dip Finder and Options Recommender</p>
                 </div>
 
                 {/* Watchlist selector */}

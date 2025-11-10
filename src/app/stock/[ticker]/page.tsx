@@ -8,7 +8,7 @@ import { TickerPriceItem } from '@/components/StockCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlpacaNews } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
 import { useParams } from 'next/navigation';
-import { decodeHtmlEntities } from '@/lib/formatters';
+import { decodeHtmlEntities, getChangePercentFromAlpacaSnapshot, getChangeValueFromAlpacaSnapshot } from '@/lib/formatters';
 
 const StockPriceChart = dynamic(() => import('@/components/StockPriceChart'), { ssr: false });
 
@@ -114,8 +114,8 @@ export default function StockPage() {
             <div>
                 <TickerPriceItem
                     latestPrice={snapshot.DailyBar?.ClosePrice}
-                    changePrice={snapshot.PrevDailyBar ? snapshot.DailyBar!.ClosePrice - snapshot.PrevDailyBar.ClosePrice : 0}
-                    changePercent={snapshot.PrevDailyBar ? ((snapshot.DailyBar!.ClosePrice - snapshot.PrevDailyBar.ClosePrice) / snapshot.PrevDailyBar.ClosePrice) * 100 : 0}
+                    changePrice={getChangeValueFromAlpacaSnapshot(snapshot)}
+                    changePercent={getChangePercentFromAlpacaSnapshot(snapshot)}
                 />
             </div>
             <div className="mt-8 text-xl text-center">

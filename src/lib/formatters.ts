@@ -1,3 +1,5 @@
+import { AlpacaSnapshot } from "@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2";
+
 // Format a number with commas (e.g., 200,000)
 export const formatNumberWithCommas = (value: number | string | null | undefined) => {
     if (value === null || value === undefined) return "-";
@@ -64,4 +66,18 @@ export const extractStrikePriceFromContractSymbol = (contract: string) => {
     const strikeMatch = contract.match(/\d{6}[CP](\d+)/);
     const strikePrice = strikeMatch ? parseFloat(strikeMatch[1]) / 1000 : 0;
     return strikePrice;
+};
+
+export const getChangeValueFromAlpacaSnapshot = (snapshot: AlpacaSnapshot | undefined) => {
+    const prevClosePrice = snapshot?.PrevDailyBar ? snapshot.PrevDailyBar.ClosePrice : 0;
+    const closePrice = snapshot?.DailyBar ? snapshot.DailyBar.ClosePrice : 0;
+    return closePrice - prevClosePrice;
+};
+
+export const getChangePercentFromAlpacaSnapshot = (snapshot: AlpacaSnapshot | undefined) => {
+    if (!snapshot) return 0;
+    const prevClosePrice = snapshot.PrevDailyBar ? snapshot.PrevDailyBar.ClosePrice : 0;
+    const closePrice = snapshot.DailyBar ? snapshot.DailyBar.ClosePrice : 0;
+    if (prevClosePrice === 0) return 0;
+    return ((closePrice - prevClosePrice) / prevClosePrice) * 100;
 };

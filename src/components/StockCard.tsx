@@ -34,17 +34,19 @@ type StockCardProps = {
     ticker: string;
     latestPrice: number;
     changePercent: number;
+    changePrice?: number;
     quantity?: number;
 };
 
-export const StockCard = ({ ticker, latestPrice, changePercent, quantity }: StockCardProps) => {
+export const StockCard = ({ ticker, latestPrice, changePercent, changePrice, quantity }: StockCardProps) => {
     return (
         <div className="border rounded-lg shadow-sm bg-slate-100 dark:bg-gray-900">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mr-2">
                 <Link href={`/stock/${ticker}`} className="block w-fit">
                     <TickerPriceItem
                         ticker={ticker}
                         latestPrice={latestPrice}
+                        changePrice={changePrice}
                         changePercent={changePercent}
                     />
                 </Link>

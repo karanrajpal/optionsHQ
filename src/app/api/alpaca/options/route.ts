@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAlpacaOptionsService } from '@/lib/alpaca';
 import { GetOptionChainParams } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/rest_v2';
 import { CoveredCallsOptionsStrategy } from '@/lib/option-strategies/CoveredCallsOptionsStrategy';
+import { OptionsWithStockData } from './bulk/route';
+import { AlpacaCompositeService } from '@/lib/alpaca/composite-service';
 
 /**
  * GET /api/alpaca/options
@@ -19,11 +21,13 @@ import { CoveredCallsOptionsStrategy } from '@/lib/option-strategies/CoveredCall
  * - limit: Number of results to return (max 10000) - Optional
  *
  * Example: /api/alpaca/options?root_symbol=ORCL&type=call&limit=50
+ * 
+ * This endpoint returns options data and stock info of type OptionsWithStockData
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    
+
     // Extract and validate required parameters
     const root_symbol = searchParams.get('root_symbol');
 
@@ -86,20 +90,25 @@ export async function GET(request: NextRequest) {
     }
     // For 'leaps', just return the data as is (or add logic later)
 
-    return NextResponse.json({
-      success: true,
-      count: options.length,
+    const alpacaCompositeService = new AlpacaCompositeService();
+    const stockInfo = await alpacaCompositeService.getStockInfo(root_symbol);
+
+    const result: OptionsWithStockData = {
+      symbol: root_symbol,
       options,
-    });
+      stockData: stockInfo
+    };
+
+    return NextResponse.json({result, success: true});
   } catch (error) {
     console.error('Error in /api/alpaca/options:', error);
-    
+
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    
+
     return NextResponse.json(
-      { 
+      {
         success: false,
-        error: errorMessage 
+        error: errorMessage
       },
       { status: 500 }
     );

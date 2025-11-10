@@ -4,6 +4,7 @@ import { OptionsDiscoveryService } from "@/lib/options-discovery-service";
 import { GetOptionChainParams } from "@alpacahq/alpaca-trade-api/dist/resources/datav2/rest_v2";
 import { AugmentedAlpacaOptionSnapshot } from "@/app/discover/page";
 import { Position } from "snaptrade-typescript-sdk";
+import { StockInfo } from "@/lib/alpaca/types";
 
 /**
  * GET /api/alpaca/options/bulk
@@ -24,7 +25,8 @@ import { Position } from "snaptrade-typescript-sdk";
 export type OptionsWithStockData = {
     symbol: string;
     options: AugmentedAlpacaOptionSnapshot[];
-    stockData: Position;
+    stockPositionData?: Position;
+    stockData?: StockInfo;
 };
 export async function GET(request: NextRequest) {
     try {
@@ -91,7 +93,7 @@ export async function GET(request: NextRequest) {
                 result[symbol] = {
                     symbol,
                     options,
-                    stockData: candidate
+                    stockPositionData: candidate
                 };
             })
         );
