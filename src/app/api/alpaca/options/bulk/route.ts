@@ -32,7 +32,7 @@ export type OptionsWithStockData = {
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
-        const strategy = searchParams.get("strategyType") || "covered-calls";
+        const strategy = searchParams.get("strategy") || "covered-calls";
         const accountId = searchParams.get("accountId");
         const userId = request.headers.get("user-id");
         const userSecret = request.headers.get("user-secret");
