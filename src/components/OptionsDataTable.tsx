@@ -285,12 +285,12 @@ export function OptionsDataTable({ data, isLoading, error, strategyType }: Optio
 
   return (
     <div className="rounded-md border space-y-2">
-      {data.length === 0 && (
+      {data?.length === 0 && (
         <div className="p-4 text-center text-gray-500">
           No options found.
         </div>
       )}
-      {data.length > 0 && (
+      {data?.length > 0 && (
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

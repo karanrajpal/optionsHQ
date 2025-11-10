@@ -103,6 +103,33 @@ export class AlpacaStocksService {
   }
 
   /**
+   * Get bars for multiple symbols
+   * @param symbols - Array of stock ticker symbols
+   * @param timeframe - Timeframe for bars
+   * @param start - ISO string for start time
+   * @param end - ISO string for end time
+   * @returns Promise with map of symbol to array of bar data
+   * 
+   * Uses the getMultiBarsV2 method to fetch bars for multiple symbols in a single call.
+   */
+  async getMultiBars(symbols: string[], timeframe: string, start?: string, end?: string) {
+    try {
+      const barsMap = await this.alpaca.getMultiBarsV2(symbols, {
+        timeframe,
+        start,
+        end,
+        feed: 'iex',
+      });
+      // Converting barsMap from Map to a regular object for easier consumption
+      return Object.fromEntries(barsMap);
+    } catch (error) {
+      console.error(`Error fetching multi bars for symbols:`, error);
+      throw error;
+    }
+  }
+
+
+  /**
    * Get news articles for multiple symbols
    * @param symbols - Array of stock ticker symbols
    * @param options - Additional options like start and end dates

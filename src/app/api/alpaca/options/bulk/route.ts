@@ -5,6 +5,7 @@ import { GetOptionChainParams } from "@alpacahq/alpaca-trade-api/dist/resources/
 import { AugmentedAlpacaOptionSnapshot } from "@/app/discover/page";
 import { Position } from "snaptrade-typescript-sdk";
 import { StockInfo } from "@/lib/alpaca/types";
+import { AlpacaCompositeService } from "@/lib/alpaca/composite-service";
 
 /**
  * GET /api/alpaca/options/bulk
@@ -84,6 +85,10 @@ export async function GET(request: NextRequest) {
         }
         // For each symbol, get options chain
         const result: Record<string, OptionsWithStockData> = {};
+        // Adding stock data for each symbol
+        const alpacaCompositeService = new AlpacaCompositeService();
+        const symbols = candidates.map((candidate) => candidate.symbol?.symbol?.symbol || "");
+        const stockInfos = await alpacaCompositeService.getStockInfos(symbols);
         const discoveryService = new OptionsDiscoveryService();
         await Promise.all(
             candidates.map(async (candidate) => {
@@ -93,10 +98,12 @@ export async function GET(request: NextRequest) {
                 result[symbol] = {
                     symbol,
                     options,
-                    stockPositionData: candidate
+                    stockPositionData: candidate,
+                    stockData: stockInfos[symbol],
                 };
             })
         );
+
         return NextResponse.json(result);
     } catch (error) {
         console.error("Error in /api/alpaca/options/bulk:", error);

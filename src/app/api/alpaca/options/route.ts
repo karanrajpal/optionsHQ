@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAlpacaOptionsService } from '@/lib/alpaca';
 import { GetOptionChainParams } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/rest_v2';
-import { CoveredCallsOptionsStrategy } from '@/lib/option-strategies/CoveredCallsOptionsStrategy';
 import { OptionsWithStockData } from './bulk/route';
+import { OptionsDiscoveryService } from '@/lib/options-discovery-service';
 import { AlpacaCompositeService } from '@/lib/alpaca/composite-service';
 
 /**
@@ -77,29 +76,21 @@ export async function GET(request: NextRequest) {
     // Get strategyType from query
     const strategyType = searchParams.get('strategyType') || 'make-premiums';
 
-    // Create service and fetch data
-    const optionsService = createAlpacaOptionsService();
-    const data = await optionsService.getOptionsChain(requestParams);
+    // Use OptionsDiscoveryService to fetch options and stock data
+    const discoveryService = new OptionsDiscoveryService();
+    const options = await discoveryService.getOptionsChainWithAugmentedInformation(requestParams, strategyType);
 
-    // Augment data based on strategy
-    let options = data;
-    if (strategyType === 'covered-calls') {
-      const strategy = new CoveredCallsOptionsStrategy();
-      const augmentedData = strategy.augmentOptionsData(data);
-      options = strategy.chooseGoodOptions(augmentedData);
-    }
-    // For 'leaps', just return the data as is (or add logic later)
-
+    // Fetch stock info using AlpacaCompositeService
     const alpacaCompositeService = new AlpacaCompositeService();
-    const stockInfo = await alpacaCompositeService.getStockInfo(root_symbol);
+    const stockData = await alpacaCompositeService.getStockInfo(root_symbol);
 
     const result: OptionsWithStockData = {
       symbol: root_symbol,
       options,
-      stockData: stockInfo
+      stockData
     };
 
-    return NextResponse.json({result, success: true});
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error in /api/alpaca/options:', error);
 
@@ -107,8 +98,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        success: false,
-        error: errorMessage
+        error: true,
+        errorMessage
       },
       { status: 500 }
     );

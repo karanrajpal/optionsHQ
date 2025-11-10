@@ -31,4 +31,27 @@ export class AlpacaCompositeService {
       historicalBars,
     };
   }
+
+  async getStockInfos(symbols: string[]): Promise<Record<string, StockInfo>> {
+    const stockInfos: Record<string, StockInfo> = {};
+    const snapshots = await this.stocksService.getSnapshots(symbols);
+    const multiBars = await this.stocksService.getMultiBars(symbols, '1Day', '2023-01-01', new Date().toISOString());
+
+    for (const symbol of symbols) {
+      const asset = await this.stocksService.getAsset(symbol);
+      const snapshot = snapshots.find(s => (s as any).symbol === symbol);
+      if (!snapshot) {
+        console.warn(`Snapshot not found for symbol: ${symbol}`);
+        continue;
+      }
+      const historicalBars = multiBars[symbol] || [];
+      stockInfos[symbol] = {
+        asset,
+        snapshot,
+        historicalBars,
+      };
+    }
+
+    return stockInfos;
+  }
 }

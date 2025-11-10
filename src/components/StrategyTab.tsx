@@ -124,13 +124,9 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch options optionSearchDataWithStockInfo');
       }
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch options optionSearchDataWithStockInfo');
-      }
-      const data: OptionsWithStockData = result.result;
-      setOptionSearchDataWithStockInfo(data);
-      if (data.options.length === 0) {
+      const result: OptionsWithStockData = await response.json();
+      setOptionSearchDataWithStockInfo(result);
+      if (result.options.length === 0) {
         setError('No good options found for this ticker symbol');
       }
     } catch (err) {
@@ -205,8 +201,9 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
             <div key={symbol} className="mb-8">
               <StockCard
                 ticker={symbol}
-                latestPrice={optionsWithStockData.stockPositionData?.price || 0}
-                changePercent={optionsWithStockData.stockPositionData?.change_percent || 0}
+                latestPrice={optionsWithStockData.stockData?.snapshot.LatestQuote.AskPrice || 0}
+                changePrice={getChangeValueFromAlpacaSnapshot(optionsWithStockData.stockData?.snapshot)}
+                changePercent={getChangePercentFromAlpacaSnapshot(optionsWithStockData.stockData?.snapshot)}
                 quantity={optionsWithStockData.stockPositionData?.units || 0}
               />
               <OptionsDataTable
