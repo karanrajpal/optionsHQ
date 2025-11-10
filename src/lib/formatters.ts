@@ -49,7 +49,7 @@ export const extractDateFromContractSymbol = (contract: string) => {
     const dateMatch = contract.match(/\d+/);
     const dateString = dateMatch ? dateMatch[0] : '';
     const date = new Date(
-        `20${dateString.substring(0, 2)}-${dateString.substring(2, 4)}-${dateString.substring(4, 6)}`
+        `20${dateString.substring(0, 2)}-${dateString.substring(2, 4)}-${dateString.substring(4, 6)}T00:00:00-05:00`
     );
     return date;
 };
