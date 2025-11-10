@@ -3,6 +3,7 @@
 import { PageHeader } from '@/components/PageHeader';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StrategyTab } from '@/components/StrategyTab';
+import { AccountPicker } from '@/components/AccountPicker';
 
 export type AugmentedAlpacaOptionSnapshot = import('@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2').AlpacaOptionSnapshot & {
   expectedReturnPercentage?: number;
@@ -14,14 +15,19 @@ export default function Discover() {
   return (
     <main className="flex min-h-screen flex-col items-center p-7">
       <div className="w-full max-w-7xl space-y-2">
-        <PageHeader header="Options Discovery" />
+        <PageHeader
+          header="Options Discovery"
+          rightElement={<AccountPicker />}
+        />
         <div className="space-y-2">
           <Tabs defaultValue="covered-calls" className="w-full">
-            <TabsList>
-              <TabsTrigger value="covered-calls">Covered Calls</TabsTrigger>
-              <TabsTrigger value="cash-secured-puts">Cash Secured Puts</TabsTrigger>
-              <TabsTrigger value="leaps">LEAPS</TabsTrigger>
-            </TabsList>
+            <div className="flex justify-center">
+              <TabsList>
+                <TabsTrigger value="covered-calls">Covered Calls</TabsTrigger>
+                <TabsTrigger value="cash-secured-puts">Cash Secured Puts</TabsTrigger>
+                <TabsTrigger value="leaps">LEAPS</TabsTrigger>
+              </TabsList>
+            </div>
             <TabsContent value="covered-calls">
               <StrategyTab strategyType={"covered-calls"} />
             </TabsContent>

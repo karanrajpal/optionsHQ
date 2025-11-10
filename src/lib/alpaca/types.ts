@@ -13,7 +13,7 @@ export type ManualAlpacaAsset = {
     shortable: boolean;
     easy_to_borrow: boolean;
     fractionable: boolean;
-    attributes: string[];
+    attributes: ['fractional_eh_enabled', 'has_options'];
 };
 export interface StockInfo {
 	snapshot: AlpacaSnapshot;

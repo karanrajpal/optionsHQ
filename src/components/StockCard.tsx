@@ -1,8 +1,11 @@
 import { Item, ItemTitle } from '@/components/ui/item';
 import { Ticker, TickerPrice, TickerPriceChange, TickerSymbol } from '@/components/ui/shadcn-io/ticker';
-import { formatNumberWithCommas } from '@/lib/formatters';
+import { formatCurrency, formatNumberWithCommas } from '@/lib/formatters';
 import Link from 'next/link';
 import { Button } from './ui/button';
+import { useUserDataAccounts } from '@/context/UserDataAccountsProvider';
+import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
+import { SiChase, SiRobinhood } from 'react-icons/si';
 
 interface TickerPriceItemProps {
     ticker?: string;
@@ -13,7 +16,7 @@ interface TickerPriceItemProps {
 
 export const TickerPriceItem = ({ ticker, latestPrice, changePrice, changePercent }: TickerPriceItemProps) => {
     return (
-        <Item variant="default" className="w-fit">
+        <Item variant="default" className="w-fit p-2 ml-2">
             <ItemTitle>
                 <Ticker>
                     {ticker ? <TickerSymbol className='text-lg' symbol={ticker.toUpperCase()} /> : null}
@@ -36,12 +39,14 @@ type StockCardProps = {
     changePercent: number;
     changePrice?: number;
     quantity?: number;
+    averagePurchasePrice?: number;
 };
 
-export const StockCard = ({ ticker, latestPrice, changePercent, changePrice, quantity }: StockCardProps) => {
+export const StockCard = ({ ticker, latestPrice, changePercent, changePrice, quantity, averagePurchasePrice }: StockCardProps) => {
+    const { selectedAccount } = useSnaptradeAccount();
     return (
-        <div className="border rounded-lg shadow-sm bg-slate-100 dark:bg-gray-900">
-            <div className="flex justify-between items-center mr-2">
+        <div className="border rounded-t-lg shadow-sm bg-slate-100 dark:bg-gray-900 flex flex-wrap items-center justify-between">
+            <div className='flex flex-col'>
                 <Link href={`/stock/${ticker}`} className="block w-fit">
                     <TickerPriceItem
                         ticker={ticker}
@@ -50,19 +55,28 @@ export const StockCard = ({ ticker, latestPrice, changePercent, changePrice, qua
                         changePercent={changePercent}
                     />
                 </Link>
-                <div className="flex p-1">
-                    <Link href={`https://digital.fidelity.com/ftgw/digital/trade-options?ORDER_TYPE=O&SYMBOL=${ticker}`} target="_blank" rel="noopener noreferrer">
-                        <Button variant='outline' className="flex items-center px-4 py-2 text-sm font-medium">
-                            <img width={16} height={16} src="/fidelity.png" alt="Trade Icon" className="mr-2" />
-                            Trade
-                        </Button>
-                    </Link>
+                <div className="flex flex-wrap ml-4 mb-3">
+                    {quantity !== undefined && (
+                        <div className="text-sm text-muted-foreground">
+                            {formatNumberWithCommas(quantity)} shares
+                        </div>
+                    )}
+                    {averagePurchasePrice !== undefined && (
+                        <div className="ml-5 text-sm text-muted-foreground">
+                            Avg Cost: {formatCurrency(averagePurchasePrice)}
+                        </div>
+                    )}
                 </div>
             </div>
-            {quantity !== undefined && (
-                <div className="ml-5 mb-2 text-sm text-gray-400">
-                    {formatNumberWithCommas(quantity)} shares
-                </div>
+            {selectedAccount && (
+                <Link className='m-2' href={`https://digital.fidelity.com/ftgw/digital/trade-options?ORDER_TYPE=O&SYMBOL=${ticker}`} target="_blank" rel="noopener noreferrer">
+                    <Button variant='outline' className="flex items-center px-4 py-2 text-sm font-medium">
+                        {selectedAccount.institution_name === 'Fidelity' && <img width={16} height={16} src="/fidelity.png" alt="Trade Icon" className="mr-2" />}
+                        {selectedAccount.institution_name === 'Chase' && (<SiChase className="w-4 h-4" />)}
+                        {selectedAccount.institution_name === 'Robinhood' && (<SiRobinhood className="w-4 h-4" />)}
+                        Trade
+                    </Button>
+                </Link>
             )}
         </div>
     );

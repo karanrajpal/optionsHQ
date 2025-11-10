@@ -94,6 +94,11 @@ export async function GET(request: NextRequest) {
             candidates.map(async (candidate) => {
                 const symbol = candidate.symbol?.symbol?.symbol || "";
                 requestParams.root_symbol = symbol;
+                const canStockHaveOptions = stockInfos[symbol]?.asset.attributes.includes('has_options');
+                if (!canStockHaveOptions) {
+                    console.warn(`Skipping symbol without options: ${symbol}`);
+                    return;
+                }
                 const options = await discoveryService.getOptionsChainWithAugmentedInformation(requestParams, strategy);
                 result[symbol] = {
                     symbol,
