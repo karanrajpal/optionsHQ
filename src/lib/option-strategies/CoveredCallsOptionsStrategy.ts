@@ -28,7 +28,7 @@ export class CoveredCallsOptionsStrategy implements OptionsStrategy {
 
     public chooseGoodOptions(options: AugmentedAlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] {
         return options
-            .filter(option => option.expectedAnnualizedReturnPercentage && option.expectedAnnualizedReturnPercentage >= 7.2 && option.expectedAnnualizedReturnPercentage <= 14)
+            .filter(option => option.expectedAnnualizedReturnPercentage && option.expectedAnnualizedReturnPercentage >= 7.2 && option.expectedAnnualizedReturnPercentage <= 18)
             .sort((a, b) => (b.expectedAnnualizedReturnPercentage || 0) - (a.expectedAnnualizedReturnPercentage || 0));
     }
 
