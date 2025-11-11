@@ -1,4 +1,5 @@
 import { AlpacaSnapshot } from "@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2";
+import { OptionsWithStrategyInformation, SupportedStrategy } from "./option-strategies/option-information-service";
 
 // Format a number with commas (e.g., 200,000)
 export const formatNumberWithCommas = (value: number | string | null | undefined) => {
@@ -80,4 +81,19 @@ export const getChangePercentFromAlpacaSnapshot = (snapshot: AlpacaSnapshot | un
     const closePrice = snapshot.DailyBar ? snapshot.DailyBar.ClosePrice : 0;
     if (prevClosePrice === 0) return 0;
     return ((closePrice - prevClosePrice) / prevClosePrice) * 100;
+};
+
+export const getProfitLoss = (row: OptionsWithStrategyInformation) => {
+    if (!row?.units) return 0;
+    const sold = !!row.units && row.units < 0;
+    return ((Number(row.price) * 100) - Number(row.average_purchase_price)) * (sold ? -1 : 1);
+};
+
+export const strategyTypeToDisplayName: Record<SupportedStrategy, string> = {
+    'covered-calls': 'Covered Calls',
+    'cash-secured-put': 'Cash Secured Put',
+    'leap': 'LEAP',
+    'bull-put-credit-spread': 'Bull Put Credit Spread',
+    'bear-call-credit-spread': 'Bear Call Credit Spread',
+    'unknown': 'Unknown',
 };

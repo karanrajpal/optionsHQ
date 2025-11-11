@@ -1,3 +1,4 @@
+import { OptionInformationService } from "@/lib/option-strategies/option-information-service";
 import { SnaptradeService } from "@/utils/snaptrade/service";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,7 +22,10 @@ export async function GET(request: NextRequest) {
             accountId,
         );
         const data = await snaptradeService.getOptionHoldings();
-        return NextResponse.json(data.data);
+        const stockHoldings = (await snaptradeService.getAccountHoldings()).data;
+        const optionsHoldings = data.data || [];
+        const optionsWithStrategyInformation = OptionInformationService.categorizeOptionsByStrategy(optionsHoldings, stockHoldings);
+        return NextResponse.json(optionsWithStrategyInformation);
     } catch (error) {
         console.error("Error fetching option holdings:", error);
         return NextResponse.json({ error: "Failed to fetch option holdings" }, { status: 500 });

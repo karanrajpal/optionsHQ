@@ -6,12 +6,24 @@ import { ColumnDef, useReactTable, getCoreRowModel, getSortedRowModel, SortingSt
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
-import { formatCurrency, formatDate, getProfitLossColor } from "@/lib/formatters";
-import { OptionsPosition, SnapTradeHoldingsAccount } from "snaptrade-typescript-sdk";
+import { formatCurrency, formatDate, getProfitLoss, getProfitLossColor, strategyTypeToDisplayName } from "@/lib/formatters";
 import { AccountPicker } from "@/components/AccountPicker";
 import { PageHeader } from "@/components/PageHeader";
+import { OptionsWithStrategyInformation } from "@/lib/option-strategies/option-information-service";
 
-const optionsColumns: ColumnDef<OptionsPosition>[] = [
+const optionsColumns: ColumnDef<OptionsWithStrategyInformation>[] = [
+    // {
+    //     accessorKey: 'id',
+    //     header: 'Id',
+    //     enableSorting: true,
+    //     cell: ({ row }) => row.original.id || '',
+    // },
+    {
+        accessorKey: 'strategyType',
+        header: 'Strategy',
+        enableSorting: true,
+        cell: ({ row }) => strategyTypeToDisplayName[row.original.strategyType] || '',
+    },
     {
         accessorKey: 'symbol',
         header: 'Symbol',
@@ -22,6 +34,13 @@ const optionsColumns: ColumnDef<OptionsPosition>[] = [
             const symbolB = b.original.symbol?.option_symbol?.underlying_symbol.symbol || '';
             return symbolA.localeCompare(symbolB);
         },
+    },
+    {
+        accessorKey: 'strikePrice',
+        header: 'Strike Price',
+        enableSorting: true,
+        cell: ({ row }) => formatCurrency(Number(row.original.symbol?.option_symbol?.strike_price)),
+        sortingFn: (a, b) => Number(a.original.symbol?.option_symbol?.strike_price) - Number(b.original.symbol?.option_symbol?.strike_price),
     },
     {
         accessorKey: 'type',
@@ -63,28 +82,28 @@ const optionsColumns: ColumnDef<OptionsPosition>[] = [
         accessorKey: 'purchasePrice',
         header: 'Purchase Price',
         enableSorting: true,
-        cell: ({ row }) => formatCurrency(row.original.average_purchase_price),
+        cell: ({ row }) => formatCurrency((row.original.average_purchase_price || 0) / 100),
         sortingFn: (a, b) => Number(a.original.average_purchase_price) - Number(b.original.average_purchase_price),
     },
     {
         accessorKey: 'pl',
-        header: 'P/L',
+        header: 'Total P/L',
         enableSorting: true,
         cell: ({ row }) => {
-            const pl = (Number(row.original.price) * 100) - Number(row.original.average_purchase_price);
+            const pl = getProfitLoss(row.original);
             return (
                 <span className={getProfitLossColor(pl)}>
                     {formatCurrency(pl)}
                 </span>
             );
         },
-        sortingFn: (a, b) => ((Number(a.original.price) * 100) - Number(a.original.average_purchase_price)) - ((Number(b.original.price) * 100) - Number(b.original.average_purchase_price)),
+        sortingFn: (a, b) => (getProfitLoss(a.original) - getProfitLoss(b.original)),
     },
 ];
 
 export default function OptionsPage() {
     const { selectedAccount } = useSnaptradeAccount();
-    const [optionHoldings, setOptionHoldings] = useState<OptionsPosition[] | null>(null);
+    const [optionHoldings, setOptionHoldings] = useState<OptionsWithStrategyInformation[] | null>(null);
     const [loading, setLoading] = useState(true);
     const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
     const [sorting, setSorting] = useState<SortingState>([]);
