@@ -2,10 +2,7 @@ import { Item, ItemTitle } from '@/components/ui/item';
 import { Ticker, TickerPrice, TickerPriceChange, TickerSymbol } from '@/components/ui/shadcn-io/ticker';
 import { formatCurrency, formatNumberWithCommas } from '@/lib/formatters';
 import Link from 'next/link';
-import { Button } from './ui/button';
-import { useUserDataAccounts } from '@/context/UserDataAccountsProvider';
 import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
-import { SiChase, SiRobinhood } from 'react-icons/si';
 import { TradeButton } from './TradeButton';
 
 interface TickerPriceItemProps {
