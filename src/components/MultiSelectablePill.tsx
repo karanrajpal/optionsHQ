@@ -1,4 +1,3 @@
-import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -36,9 +35,6 @@ export function MultiSelectablePill({ options, selected, onChange, className }: 
             onClick={() => handleToggle(opt.value)}
           >
             <span>{opt.label}</span>
-            {isActive && (
-              <X size={16} className="ml-1" onClick={e => handleRemove(opt.value, e)} />
-            )}
           </Button>
         );
       })}
