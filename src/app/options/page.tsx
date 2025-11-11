@@ -2,11 +2,12 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ColumnDef, useReactTable, getCoreRowModel, getSortedRowModel, SortingState, flexRender } from '@tanstack/react-table';
+import { ColumnDef, useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, SortingState, flexRender, ColumnFiltersState } from '@tanstack/react-table';
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
 import { useEffect, useState } from "react";
 import { formatCurrency, formatDate, getProfitLoss, getProfitLossColor, strategyTypeToDisplayName } from "@/lib/formatters";
+import { MultiSelectablePill } from "@/components/MultiSelectablePill";
 import { AccountPicker } from "@/components/AccountPicker";
 import { PageHeader } from "@/components/PageHeader";
 import { OptionsWithStrategyInformation } from "@/lib/option-strategies/option-information-service";
@@ -23,6 +24,7 @@ const optionsColumns: ColumnDef<OptionsWithStrategyInformation>[] = [
         header: 'Strategy',
         enableSorting: true,
         cell: ({ row }) => strategyTypeToDisplayName[row.original.strategyType] || '',
+        filterFn: 'arrIncludesSome',
     },
     {
         accessorKey: 'symbol',
@@ -101,12 +103,14 @@ const optionsColumns: ColumnDef<OptionsWithStrategyInformation>[] = [
     },
 ];
 
+
 export default function OptionsPage() {
     const { selectedAccount } = useSnaptradeAccount();
     const [optionHoldings, setOptionHoldings] = useState<OptionsWithStrategyInformation[] | null>(null);
     const [loading, setLoading] = useState(true);
     const { snaptradeUserId, snaptradeUserSecret } = useUserDataAccounts();
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
     useEffect(() => {
         const fetchHoldings = async () => {
@@ -123,20 +127,40 @@ export default function OptionsPage() {
                 setLoading(false);
             }
         };
-
         fetchHoldings();
-    }, [selectedAccount?.id]);
+    }, [selectedAccount?.id, snaptradeUserId, snaptradeUserSecret]);
 
     const table = useReactTable({
         data: optionHoldings || [],
         columns: optionsColumns,
-        state: { sorting },
+        state: { sorting, columnFilters },
         onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
         manualSorting: false,
         debugTable: false,
     });
+
+    // Get all unique strategy types from optionHoldings
+    const strategyTypeOptions = optionHoldings
+        ? Array.from(new Set(optionHoldings.map(opt => opt.strategyType)))
+            .map(type => ({ value: type, label: strategyTypeToDisplayName[type] || type }))
+        : [];
+
+    // Get selected strategies from columnFilters
+    const selectedStrategies = columnFilters.find(f => f.id === 'strategyType')?.value as string[] | undefined || [];
+
+    // Handler for pill selection using column filter API
+    const handleStrategyFilterChange = (values: string[]) => {
+        setColumnFilters(prev => {
+            // Remove existing strategyType filter
+            const otherFilters = prev.filter(f => f.id !== 'strategyType');
+            if (values.length === 0) return otherFilters;
+            return [...otherFilters, { id: 'strategyType', value: values }];
+        });
+    };
 
     return (
         <div className="p-4 w-full space-y-1">
@@ -144,6 +168,17 @@ export default function OptionsPage() {
                 header="Options"
                 rightElement={<AccountPicker />}
             />
+
+            {/* Filter Pills */}
+            {strategyTypeOptions.length > 0 && (
+                <div className="mb-2">
+                    <MultiSelectablePill
+                        options={strategyTypeOptions}
+                        selected={selectedStrategies}
+                        onChange={handleStrategyFilterChange}
+                    />
+                </div>
+            )}
 
             {loading ? (
                 <div className="mt-4 w-full grid gap-4">
