@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { useUserDataAccounts } from '@/context/UserDataAccountsProvider';
 import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
 import { SiChase, SiRobinhood } from 'react-icons/si';
+import { TradeButton } from './TradeButton';
 
 interface TickerPriceItemProps {
     ticker?: string;
@@ -69,14 +70,10 @@ export const StockCard = ({ ticker, latestPrice, changePercent, changePrice, qua
                 </div>
             </div>
             {selectedAccount && (
-                <Link className='m-2' href={`https://digital.fidelity.com/ftgw/digital/trade-options?ORDER_TYPE=O&SYMBOL=${ticker}`} target="_blank" rel="noopener noreferrer">
-                    <Button variant='outline' className="flex items-center px-4 py-2 text-sm font-medium">
-                        {selectedAccount.institution_name === 'Fidelity' && <img width={16} height={16} src="/fidelity.png" alt="Trade Icon" className="mr-2" />}
-                        {selectedAccount.institution_name === 'Chase' && (<SiChase className="w-4 h-4" />)}
-                        {selectedAccount.institution_name === 'Robinhood' && (<SiRobinhood className="w-4 h-4" />)}
-                        Trade
-                    </Button>
-                </Link>
+                <TradeButton
+                    link={`https://digital.fidelity.com/ftgw/digital/trade-options?ORDER_TYPE=O&SYMBOL=${ticker}`}
+                    institutionName={selectedAccount.institution_name || ''}
+                />
             )}
         </div>
     );

@@ -18,8 +18,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useMemo, useState } from 'react';
+import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
 import { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
 import { extractDateFromContractSymbol, extractStrikePriceFromContractSymbol, getDaysToExpiration } from '@/lib/formatters';
+import { TradeButton } from './TradeButton';
 
 export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
   {
@@ -32,6 +34,7 @@ export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
           href={`/stock/${symbol}`}
           className="font-mono text-xs text-blue-600 hover:underline"
         >
+
           {symbol}
         </a>
       ) : null;
@@ -247,6 +250,39 @@ function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSn
       });
   } else if (strategyType === 'leaps') {
   }
+  // Always add Trade button as last column
+  augmentedColumns.push({
+    id: 'trade',
+    header: 'Trade',
+    cell: ({ row }) => {
+      const symbol = row.original.Symbol?.match(/^[A-Za-z]+/)?.[0];
+      const { selectedAccount } = useSnaptradeAccount();
+      if (!symbol || !selectedAccount) {
+        return null;
+      }
+      if (selectedAccount.institution_name === 'Fidelity') {
+        // Break the string to it's components. ORCL251219C00200000 is an example where the part before the date is the symbol. then the date, then C/P, then strike price
+        const optionSymbolParts = row.original.Symbol.match(/^([A-Za-z]+\d{6}[CP])(\d+)$/);
+        const everythingElsePart = optionSymbolParts?.[1];
+        const strikePricePart = optionSymbolParts?.[2];
+        if (!optionSymbolParts || !strikePricePart) {
+          return null;
+        }
+        const fidelityStrikePrice = parseFloat(strikePricePart.slice(0, 5) + '.' + strikePricePart.slice(5)).toString();
+        const fidelitySymbol = `${everythingElsePart}${fidelityStrikePrice}`;
+        const link = `https://digital.fidelity.com/ftgw/digital/trade-options?SECURITY_TYPE=O&SECURITY_ID=-${fidelitySymbol}`;
+        return <TradeButton link={link} institutionName={selectedAccount?.institution_name || ''} />;
+      } else if (selectedAccount.institution_name === 'Chase') {
+        const link = `https://www.chase.com/personal/investing/trade/options?symbol=${symbol}`;
+        return <TradeButton link={link} institutionName={selectedAccount?.institution_name || ''} />;
+      } else if (selectedAccount.institution_name === 'Robinhood') {
+        const link = `https://robinhood.com/options/trade/${symbol}`;
+        return <TradeButton link={link} institutionName={selectedAccount?.institution_name || ''} />;
+      }
+      return null;
+    },
+    enableSorting: false,
+  });
   return augmentedColumns;
 }
 
