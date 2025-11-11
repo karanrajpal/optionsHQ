@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { AccountPicker } from '@/components/AccountPicker';
 import { PageHeader } from '@/components/PageHeader';
+import Link from 'next/link';
 import Image from 'next/image';
 
 export type HoldingsPosition = NonNullable<AccountHoldingsAccount['positions']>[number];
@@ -26,18 +27,25 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
     {
         accessorKey: 'symbol',
         header: 'Symbol',
-        cell: ({ row }) => (
-            <span title={row.original.symbol?.symbol?.description ?? ''} className='flex items-center gap-2'>
-                <Image
-                    src={row.original.symbol?.symbol?.logo_url || `https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${row.original.symbol?.symbol?.symbol}.png`}
-                    alt={row.original.symbol?.symbol?.symbol || ''}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                />
-                {row.original.symbol?.symbol?.symbol}
-            </span>
-        ),
+        cell: ({ row }) => {
+            const symbol = row.original.symbol?.symbol?.symbol;
+            return (
+                <span title={row.original.symbol?.symbol?.description ?? ''} className='flex items-center gap-2'>
+                    <Image
+                        src={row.original.symbol?.symbol?.logo_url || `https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${symbol}.png`}
+                        alt={symbol || ''}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                    />
+                    {symbol ? (
+                        <Link href={`/stock/${symbol}`} className="text-blue-600 hover:underline">
+                            {symbol}
+                        </Link>
+                    ) : null}
+                </span>
+            );
+        },
         enableSorting: true,
         sortingFn: (a, b) => {
             const sa = a.original.symbol?.symbol?.symbol || '';
