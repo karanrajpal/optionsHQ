@@ -81,8 +81,8 @@ const optionsColumns: ColumnDef<OptionsWithStrategyInformation>[] = [
         sortingFn: (a, b) => Number(a.original.price) - Number(b.original.price),
     },
     {
-        accessorKey: 'purchasePrice',
-        header: 'Purchase Price',
+        accessorKey: 'premiumsCollectedPerContract',
+        header: 'Premium',
         enableSorting: true,
         cell: ({ row }) => formatCurrency((row.original.average_purchase_price || 0) / 100),
         sortingFn: (a, b) => Number(a.original.average_purchase_price) - Number(b.original.average_purchase_price),
@@ -171,7 +171,7 @@ export default function OptionsPage() {
 
             {/* Filter Pills */}
             {strategyTypeOptions.length > 0 && (
-                <div className="mb-2">
+                <div className="pb-2">
                     <MultiSelectablePill
                         options={strategyTypeOptions}
                         selected={selectedStrategies}

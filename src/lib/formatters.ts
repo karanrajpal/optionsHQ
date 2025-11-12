@@ -85,8 +85,7 @@ export const getChangePercentFromAlpacaSnapshot = (snapshot: AlpacaSnapshot | un
 
 export const getProfitLoss = (row: OptionsWithStrategyInformation) => {
     if (!row?.units) return 0;
-    const sold = !!row.units && row.units < 0;
-    return ((Number(row.price) * 100) - Number(row.average_purchase_price)) * (sold ? -1 : 1);
+    return ((Number(row.price) * 100) - Number(row.average_purchase_price)) * row.units;;
 };
 
 export const strategyTypeToDisplayName: Record<SupportedStrategy, string> = {
