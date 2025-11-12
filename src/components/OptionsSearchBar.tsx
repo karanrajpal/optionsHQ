@@ -67,7 +67,7 @@ export function OptionsSearchBar({
                     <Input
                         id="ticker"
                         type="text"
-                        placeholder="e.g., ORCL, TSLA, SPY"
+                        placeholder="Enter any ticker symbol"
                         value={ticker}
                         onChange={e => onTickerChange(e.target.value)}
                         onKeyDown={handleKeyPress}
