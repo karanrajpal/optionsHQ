@@ -22,6 +22,7 @@ import { useSnaptradeAccount } from '@/context/SnaptradeAccountsProvider';
 import { AugmentedAlpacaOptionSnapshot, StrategyType } from '@/app/discover/page';
 import { extractDateFromContractSymbol, extractStrikePriceFromContractSymbol, getDaysToExpiration } from '@/lib/formatters';
 import { TradeButton } from './TradeButton';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export const baseColumns: ColumnDef<AugmentedAlpacaOptionSnapshot>[] = [
   {
@@ -216,13 +217,16 @@ interface OptionsDataTableProps {
   strategyType: StrategyType;
 };
 
-function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[], strategyType: StrategyType): ColumnDef<AugmentedAlpacaOptionSnapshot>[] {
+function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSnapshot>[], strategyType: StrategyType, selectedAccount: any): ColumnDef<AugmentedAlpacaOptionSnapshot>[] {
   const augmentedColumns = [...columns];
   if (strategyType === 'covered-calls') {
     augmentedColumns.push(
       {
         accessorKey: 'expectedReturnPercentage',
-        header: 'Exp. Return %',
+        header: () => <Tooltip>
+          <TooltipTrigger asChild><span>Exp. Return %</span></TooltipTrigger>
+          <TooltipContent className='max-w-md'>{'Calculated based on the option\'s premium and the underlying asset\'s price.'}</TooltipContent>
+        </Tooltip>,
         cell: ({ row }) => {
           const expReturn = (row.original as any).expectedReturnPercentage;
           return expReturn !== undefined ? <div>{expReturn.toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
@@ -236,7 +240,9 @@ function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSn
       },
       {
         accessorKey: 'expectedAnnualizedReturnPercentage',
-        header: 'Exp. Ann. Return %',
+        header: () => <Tooltip><TooltipTrigger asChild><span>Exp. Ann. Return %</span></TooltipTrigger>
+          <TooltipContent className='max-w-md'>{'Exp. Ann. Return % annualized'}</TooltipContent>
+        </Tooltip>,
         cell: ({ row }) => {
           const expAnnReturn = row.original.expectedAnnualizedReturnPercentage;
           return expAnnReturn !== undefined ? <div>{expAnnReturn.toFixed(2)}%</div> : <div className="text-gray-400">-</div>;
@@ -256,7 +262,6 @@ function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSn
     header: 'Trade',
     cell: ({ row }) => {
       const symbol = row.original.Symbol?.match(/^[A-Za-z]+/)?.[0];
-      const { selectedAccount } = useSnaptradeAccount();
       if (!symbol || !selectedAccount) {
         return null;
       }
@@ -289,8 +294,9 @@ function addColumnDefsForStrategyType(columns: ColumnDef<AugmentedAlpacaOptionSn
 
 export function OptionsDataTable({ data, isLoading, error, strategyType }: OptionsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const { selectedAccount } = useSnaptradeAccount();
 
-  const columns = useMemo(() => addColumnDefsForStrategyType(baseColumns, strategyType), [baseColumns, strategyType]);
+  const columns = useMemo(() => addColumnDefsForStrategyType(baseColumns, strategyType, selectedAccount), [strategyType, selectedAccount]);
 
   const table = useReactTable({
     data,

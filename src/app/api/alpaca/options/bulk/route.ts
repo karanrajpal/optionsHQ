@@ -99,12 +99,14 @@ export async function GET(request: NextRequest) {
                     console.warn(`Skipping symbol without options: ${symbol}`);
                     return;
                 }
-                const options = await discoveryService.getOptionsChainWithAugmentedInformation(requestParams, strategy);
+                const stockInfo = stockInfos[symbol];
+                const stockPrice = stockInfo?.snapshot?.LatestTrade?.Price ?? stockInfo?.snapshot?.DailyBar?.ClosePrice;
+                const options = await discoveryService.getOptionsChainWithAugmentedInformation(requestParams, strategy, stockPrice);
                 result[symbol] = {
                     symbol,
                     options,
                     stockPositionData: candidate,
-                    stockData: stockInfos[symbol],
+                    stockData: stockInfo,
                 };
             })
         );

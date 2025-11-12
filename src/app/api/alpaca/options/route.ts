@@ -78,11 +78,17 @@ export async function GET(request: NextRequest) {
 
     // Use OptionsDiscoveryService to fetch options and stock data
     const discoveryService = new OptionsDiscoveryService();
-    const options = await discoveryService.getOptionsChainWithAugmentedInformation(requestParams, strategyType);
-
+    
     // Fetch stock info using AlpacaCompositeService
     const alpacaCompositeService = new AlpacaCompositeService();
     const stockData = await alpacaCompositeService.getStockInfo(root_symbol);
+    // Use snapshot.LatestTrade.Price or snapshot.DailyBar.ClosePrice as fallback
+    const stockPrice = stockData?.snapshot?.LatestTrade?.Price ?? stockData?.snapshot?.DailyBar?.ClosePrice;
+    const options = await discoveryService.getOptionsChainWithAugmentedInformation(
+      requestParams,
+      strategyType,
+      stockPrice
+    );
 
     const result: OptionsWithStockData = {
       symbol: root_symbol,

@@ -36,7 +36,7 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
     if (selectedAccountId === accountId) {
       setSelectedAccountId(null);
     }
-  }, [accounts, selectedAccountId]);
+  }, [accounts, selectedAccountId, setSelectedAccountId]);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -61,7 +61,7 @@ export const SnaptradeAccountsProvider = ({ children }: { children: ReactNode })
       }
     };
     fetchAccounts();
-  }, []);
+  }, [selectedAccountId, setSelectedAccountId, snaptradeUserId, snaptradeUserSecret]);
 
   const value = useMemo(
     () => ({ accounts, selectedAccount, setSelectedAccountId, removeAccount, accountsLoading }),

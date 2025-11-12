@@ -27,23 +27,21 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
     {
         accessorKey: 'symbol',
         header: 'Symbol',
-        cell: ({ row }) => {
+        cell: async ({ row }) => {
             const symbol = row.original.symbol?.symbol?.symbol;
             return (
-                <span title={row.original.symbol?.symbol?.description ?? ''} className='flex items-center gap-2'>
-                    <Image
-                        src={row.original.symbol?.symbol?.logo_url || `https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${symbol}.png`}
-                        alt={symbol || ''}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                    />
-                    {symbol ? (
-                        <Link href={`/stock/${symbol}`} className="text-blue-600 hover:underline">
-                            {symbol}
-                        </Link>
-                    ) : null}
-                </span>
+                <Link href={`/stock/${symbol}`} className="text-blue-600 hover:underline">
+                    <span title={row.original.symbol?.symbol?.description ?? ''} className='flex items-center gap-2'>
+                        <Image
+                            src={row.original.symbol?.symbol?.logo_url || `https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${symbol}.png`}
+                            alt={symbol || ''}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                        />
+                        {symbol ?? null}
+                    </span>
+                </Link>
             );
         },
         enableSorting: true,

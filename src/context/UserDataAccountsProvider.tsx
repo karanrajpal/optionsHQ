@@ -37,7 +37,7 @@ export const UserDataAccountsProvider = ({ children }: { children: ReactNode }) 
     if (user?.id) {
       fetchUserDataAccounts();
     }
-  }, [user?.id]);
+  }, [user?.id, setAlpacaApiKey, setAlpacaApiSecret, setSnaptradeUserId, setSnaptradeUserSecret]);
 
   const value = useMemo(
     () => ({ alpacaApiKey, alpacaApiSecret, snaptradeUserId, snaptradeUserSecret, isUserAccountDetailsLoading }),

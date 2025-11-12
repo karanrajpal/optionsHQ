@@ -3,21 +3,22 @@ import { getDaysToExpiration, extractStrikePriceFromContractSymbol } from '@/lib
 import { AugmentedAlpacaOptionSnapshot } from '@/app/discover/page';
 
 export interface OptionsStrategy {
-    augmentOptionsData(options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[];
+    augmentOptionsData(options: AlpacaOptionSnapshot[], stockPrice?: number): AugmentedAlpacaOptionSnapshot[];
     chooseGoodOptions(options: AugmentedAlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[];
     strategyDefaultParams: {
         expiration_date_gte?: string;
         expiration_date_lte?: string;
         type?: 'call' | 'put';
     };
-};
+}
 export class CoveredCallsOptionsStrategy implements OptionsStrategy {
-    public augmentOptionsData(options: AlpacaOptionSnapshot[]): AugmentedAlpacaOptionSnapshot[] {
+    public augmentOptionsData(options: AlpacaOptionSnapshot[], stockPrice: number): AugmentedAlpacaOptionSnapshot[] {
         return options.map(option => {
-            const strikePrice = extractStrikePriceFromContractSymbol(option.Symbol);
-            const expectedReturnPercentage = (option.LatestQuote.BidPrice / strikePrice) * 100;
+            // Use stockPrice if provided, otherwise fallback to strikePrice
+            const expectedReturnPercentage = (option.LatestQuote.BidPrice / stockPrice) * 100;
+            console.log('Expected Return Percentage:', option.Symbol, expectedReturnPercentage, stockPrice, option.LatestQuote.BidPrice);
             const daysToExpiration = getDaysToExpiration(option.Symbol);
-            const expectedAnnualizedReturnPercentage = expectedReturnPercentage * 365 / (daysToExpiration);
+            const expectedAnnualizedReturnPercentage = daysToExpiration > 0 ? expectedReturnPercentage * 365 / daysToExpiration : 0;
             return {
                 ...option,
                 expectedReturnPercentage,

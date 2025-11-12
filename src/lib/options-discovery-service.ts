@@ -5,7 +5,8 @@ import { CoveredCallsOptionsStrategy } from "@/lib/option-strategies/CoveredCall
 export class OptionsDiscoveryService {
     async getOptionsChainWithAugmentedInformation(
         requestParams: GetOptionChainParams,
-        strategyType: string = "covered-calls"
+        strategyType: string = "covered-calls",
+        stockPrice: number
     ) {
         const optionsService = createAlpacaOptionsService();
         let data;
@@ -17,7 +18,7 @@ export class OptionsDiscoveryService {
                 ...requestParams,
             };
             data = await optionsService.getOptionsChain(requestParamsWithDefaults);
-            const augmentedData = strategy.augmentOptionsData(data);
+            const augmentedData = strategy.augmentOptionsData(data, stockPrice);
             return strategy.chooseGoodOptions(augmentedData);
         }
         // For 'leaps' or other strategies, just return the data as is (or add logic later)

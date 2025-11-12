@@ -158,7 +158,7 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
         <div className="space-y-2">
           <StockCard
             ticker={(optionSearchDataWithStockInfo.stockData?.snapshot as any).symbol || ''}
-            latestPrice={optionSearchDataWithStockInfo.stockData?.snapshot.DailyBar.ClosePrice || 0}
+            latestPrice={optionSearchDataWithStockInfo.stockData?.snapshot.LatestTrade.Price || 0}
             changePrice={getChangeValueFromAlpacaSnapshot(optionSearchDataWithStockInfo.stockData?.snapshot)}
             changePercent={getChangePercentFromAlpacaSnapshot(optionSearchDataWithStockInfo.stockData?.snapshot)}
           />
@@ -201,7 +201,7 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
             <div key={symbol} className="mb-8">
               <StockCard
                 ticker={symbol}
-                latestPrice={optionsWithStockData.stockData?.snapshot.DailyBar.ClosePrice || 0}
+                latestPrice={optionsWithStockData.stockData?.snapshot.LatestTrade.Price || 0}
                 changePrice={getChangeValueFromAlpacaSnapshot(optionsWithStockData.stockData?.snapshot)}
                 changePercent={getChangePercentFromAlpacaSnapshot(optionsWithStockData.stockData?.snapshot)}
                 quantity={optionsWithStockData.stockPositionData?.units || 0}

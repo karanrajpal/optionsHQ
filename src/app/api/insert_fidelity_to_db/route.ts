@@ -68,7 +68,6 @@ const deriveFields = (transactions: Transaction[]): DerivedTransaction[] => {
 };
 
 export async function GET(request: Request) {
-    console.log('Request received:', request.method, request.url);
     try {
         const filePath = path.join(process.cwd(), 'data', 'Fidelity_Accounts_History.csv');
         const transactions = await parseCSV(filePath);
