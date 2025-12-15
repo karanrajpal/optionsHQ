@@ -20,7 +20,7 @@ import { AccountPicker } from '@/components/AccountPicker';
 import { PageHeader } from '@/components/PageHeader';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export type HoldingsPosition = NonNullable<AccountHoldingsAccount['positions']>[number];
 
