@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatCurrency, formatDateWithTimeAndZone, getProfitLossColor, formatNumberWithCommas } from '@/lib/formatters';
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { AccountHoldingsAccount } from "snaptrade-typescript-sdk";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,7 @@ import { AccountPicker } from '@/components/AccountPicker';
 import { PageHeader } from '@/components/PageHeader';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export type HoldingsPosition = NonNullable<AccountHoldingsAccount['positions']>[number];
 
@@ -131,12 +132,34 @@ export default function HoldingsPage() {
         state: { sorting },
     });
 
+    // Calculate total profit/loss from the current view of the table
+    const rows = table.getRowModel().rows;
+    const totalProfitLoss = useMemo(() => {
+        return rows.reduce((sum, row) => {
+            const pnl = Number(row.original.open_pnl) || 0;
+            return sum + pnl;
+        }, 0);
+    }, [rows]);
+
     return (
         <div className="p-4 w-full space-y-1">
             <PageHeader
                 header="Account Holdings"
                 rightElement={<AccountPicker />}
             />
+            
+            {/* Total Profit/Loss Card */}
+            {!loading && data.length > 0 && (
+                <Card className="w-fit">
+                    <CardHeader className="pb-3">
+                        <CardDescription>Total Profit/Loss</CardDescription>
+                        <CardTitle className={`text-3xl ${getProfitLossColor(totalProfitLoss)}`}>
+                            {formatCurrency(totalProfitLoss)}
+                        </CardTitle>
+                    </CardHeader>
+                </Card>
+            )}
+
             <div className='flex justify-between'>
                 <div></div>
                 <div className='flex items-center text-sm'>
