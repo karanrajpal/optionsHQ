@@ -164,13 +164,13 @@ export default function OptionsPage() {
     };
 
     // Calculate total profit/loss from the current filtered view of the table
+    const rows = table.getRowModel().rows;
     const totalProfitLoss = useMemo(() => {
-        const rows = table.getRowModel().rows;
         return rows.reduce((sum, row) => {
             const pnl = getProfitLoss(row.original);
             return sum + pnl;
         }, 0);
-    }, [table]);
+    }, [rows]);
 
     return (
         <div className="p-4 w-full space-y-1">
