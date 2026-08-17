@@ -329,7 +329,7 @@ export function OptionsDataTable({ data, isLoading, error, strategyType }: Optio
     <div className="rounded-b-lg border space-y-2">
       {data?.length === 0 && (
         <div className="p-4 text-center text-gray-500">
-          No options found.
+          No recommended options
         </div>
       )}
       {data?.length > 0 && (
@@ -374,7 +374,7 @@ export function OptionsDataTable({ data, isLoading, error, strategyType }: Optio
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No options found.
+                  No recommended options
                 </TableCell>
               </TableRow>
             )}

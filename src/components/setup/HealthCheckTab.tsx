@@ -1,58 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { LuActivity, LuRefreshCw } from "react-icons/lu";
-import { Button } from "@/components/ui/button";
+import { LuActivity } from "react-icons/lu";
 
-type ServiceStatus = "ok" | "error" | "loading" | "idle";
-
-interface HealthResult {
-  status: "ok" | "error";
-  message?: string;
-}
+type ServiceStatus = "ok" | "error" | "loading";
 
 export function HealthCheckTab() {
-  const [alpacaStatus, setAlpacaStatus] = useState<ServiceStatus>("idle");
-  const [snaptradeStatus, setSnaptradeStatus] = useState<ServiceStatus>("idle");
-  const [alpacaResult, setAlpacaResult] = useState<HealthResult | null>(null);
-  const [snaptradeResult, setSnaptradeResult] = useState<HealthResult | null>(null);
+  const [alpacaStatus, setAlpacaStatus] = useState<ServiceStatus>("loading");
+  const [snaptradeStatus, setSnaptradeStatus] = useState<ServiceStatus>("loading");
 
-  const runHealthCheck = async () => {
-    setAlpacaStatus("loading");
-    setSnaptradeStatus("loading");
-    setAlpacaResult(null);
-    setSnaptradeResult(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/health");
+        const data = await res.json();
+        if (cancelled) return;
+        setAlpacaStatus(data.alpaca?.status === "ok" ? "ok" : "error");
+        setSnaptradeStatus(data.snaptrade?.status === "ok" ? "ok" : "error");
+      } catch {
+        if (cancelled) return;
+        setAlpacaStatus("error");
+        setSnaptradeStatus("error");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
-    try {
-      const res = await fetch("/api/health");
-      const data = await res.json();
+  const StatusBadge = ({ status }: { status: ServiceStatus }) => {
+    const dotClass = status === "ok"
+      ? "bg-green-500"
+      : status === "error"
+        ? "bg-red-500"
+        : "bg-yellow-400 animate-pulse";
+    const label = status === "ok" ? "Healthy" : status === "error" ? "Unhealthy" : "Checking...";
 
-      setAlpacaStatus(data.alpaca?.status === "ok" ? "ok" : "error");
-      setAlpacaResult(data.alpaca);
-
-      setSnaptradeStatus(data.snaptrade?.status === "ok" ? "ok" : "error");
-      setSnaptradeResult(data.snaptrade);
-    } catch {
-      setAlpacaStatus("error");
-      setSnaptradeStatus("error");
-      setAlpacaResult({ status: "error", message: "Failed to reach health endpoint" });
-      setSnaptradeResult({ status: "error", message: "Failed to reach health endpoint" });
-    }
+    return (
+      <div className="flex items-center gap-2">
+        <span className={`inline-block h-3 w-3 rounded-full shrink-0 ${dotClass}`} />
+        <span className="text-sm font-medium">{label}</span>
+      </div>
+    );
   };
 
-  const StatusIndicator = ({ status }: { status: ServiceStatus }) => {
-    if (status === "loading") {
-      return <span className="inline-block h-3 w-3 rounded-full bg-yellow-400 animate-pulse" />;
-    }
-    if (status === "ok") {
-      return <span className="inline-block h-3 w-3 rounded-full bg-green-500" />;
-    }
-    if (status === "error") {
-      return <span className="inline-block h-3 w-3 rounded-full bg-red-500" />;
-    }
-    return <span className="inline-block h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600" />;
-  };
+  const services = [
+    { name: "Alpaca", description: "Stock & options market data API", status: alpacaStatus },
+    { name: "Snaptrade", description: "Brokerage account connectivity", status: snaptradeStatus },
+  ];
 
   return (
     <motion.div
@@ -72,49 +67,16 @@ export function HealthCheckTab() {
         </div>
       </div>
 
-      <div className="border-t pt-6">
-        <Button onClick={runHealthCheck} variant="outline" size="sm">
-          <LuRefreshCw className="mr-2 h-4 w-4" />
-          Run Health Check
-        </Button>
-
-        <div className="mt-6 space-y-4 max-w-lg">
-          {/* Alpaca */}
-          <div className="flex items-start justify-between rounded-lg border p-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold">Alpaca</h3>
-                <StatusIndicator status={alpacaStatus} />
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Stock & options market data API
-              </p>
-              {alpacaResult && (
-                <p className={`text-xs ${alpacaResult.status === "ok" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-                  {alpacaResult.message}
-                </p>
-              )}
+      <div className="border-t pt-6 space-y-4 max-w-lg">
+        {services.map((svc) => (
+          <div key={svc.name} className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <h3 className="font-semibold">{svc.name}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{svc.description}</p>
             </div>
+            <StatusBadge status={svc.status} />
           </div>
-
-          {/* Snaptrade */}
-          <div className="flex items-start justify-between rounded-lg border p-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold">Snaptrade</h3>
-                <StatusIndicator status={snaptradeStatus} />
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Brokerage account connectivity
-              </p>
-              {snaptradeResult && (
-                <p className={`text-xs ${snaptradeResult.status === "ok" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-                  {snaptradeResult.message}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </motion.div>
   );

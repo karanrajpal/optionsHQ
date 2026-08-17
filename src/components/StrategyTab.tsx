@@ -189,13 +189,17 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
           <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-800">{recommendedError}</div>
         )}
         {!recommendedLoading && !recommendedError && Object.keys(recommended).length === 0 && (
-          <div className="text-gray-500 p-4">No recommended options found.</div>
+          <div className="text-gray-500 p-4">No recommended options</div>
         )}
         {!recommendedLoading && !recommendedError && Object.entries(recommended)
           .sort(([, a], [, b]) => {
-            const portfolioValueA = (a.stockPositionData?.units || 0) * (a.stockPositionData?.price || 0);
-            const portfolioValueB = (b.stockPositionData?.units || 0) * (b.stockPositionData?.price || 0);
-            return portfolioValueB - portfolioValueA;
+            const aHasOptions = a.options?.length > 0;
+            const bHasOptions = b.options?.length > 0;
+            if (aHasOptions && !bHasOptions) return -1;
+            if (!aHasOptions && bHasOptions) return 1;
+            const valueA = (a.stockPositionData?.units || 0) * (a.stockPositionData?.price || 0);
+            const valueB = (b.stockPositionData?.units || 0) * (b.stockPositionData?.price || 0);
+            return valueB - valueA;
           })
           .map(([symbol, optionsWithStockData]) => (
             <div key={symbol} className="mb-8">

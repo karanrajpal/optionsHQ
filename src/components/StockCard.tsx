@@ -67,10 +67,12 @@ export const StockCard = ({ ticker, latestPrice, changePercent, changePrice, qua
                 </div>
             </div>
             {selectedAccount && (
-                <TradeButton
-                    link={`https://digital.fidelity.com/ftgw/digital/trade-options?ORDER_TYPE=O&SYMBOL=${ticker}`}
-                    institutionName={selectedAccount.institution_name || ''}
-                />
+                <div className="mr-3">
+                    <TradeButton
+                        link={`https://digital.fidelity.com/ftgw/digital/trade-options?ORDER_TYPE=O&SYMBOL=${ticker}`}
+                        institutionName={selectedAccount.institution_name || ''}
+                    />
+                </div>
             )}
         </div>
     );

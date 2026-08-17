@@ -9,7 +9,7 @@ export async function GET() {
     try {
         const service = new AlpacaStocksService();
         const account = await service.checkAccount();
-        results.alpaca = { status: "ok", message: account.id };
+        results.alpaca = { status: "ok" };
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         results.alpaca = { status: "error", message };
