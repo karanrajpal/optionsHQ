@@ -5,7 +5,7 @@ import { useWatchlist } from "@/context/WatchlistProvider";
 import { Button } from "@/components/ui/button";
 import { LuPlus, LuTrash2, LuTrendingUp, LuTrendingDown } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
+import { StockIcon } from "@/components/StockIcon";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function WatchlistPage() {
@@ -197,20 +197,12 @@ export default function WatchlistPage() {
                                     >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
-                                                <div className="flex-shrink-0 h-10 w-10 mr-3">
-                                                    <div
-                                                        className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-sm font-semibold text-gray-600 dark:text-gray-300"
-                                                        title={item.ticker_symbol}
-                                                    >
-                                                        <Image
-                                                            src={`https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${item.ticker_symbol}.png`}
-                                                            alt={item.ticker_symbol}
-                                                            width={32}
-                                                            height={32}
-                                                            className="rounded-full"
-                                                        />
-                                                    </div>
-                                                </div>
+                                                <StockIcon
+                                                    src={`https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${item.ticker_symbol}.png`}
+                                                    symbol={item.ticker_symbol}
+                                                    size={40}
+                                                    className="mr-3"
+                                                />
                                                 <div>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                                         <a href={`/stock/${item.ticker_symbol}`} className="text-blue-600 hover:underline">

@@ -11,12 +11,15 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSkeleton,
-  useSidebar
+  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +31,8 @@ import {
   LuList,
   LuSearch,
   LuSettings,
-  LuLogOut
+  LuLogOut,
+  LuRocket
 } from "react-icons/lu";
 import { MdOutlineBarChart, MdOutlineHome, MdOutlineStackedLineChart } from "react-icons/md";
 
@@ -38,6 +42,8 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { state, isMobile, openMobile, setOpenMobile, setOpen } = useSidebar();
   const collapsed = isMobile ? !openMobile : state === "collapsed";
+
+  // Removed local open state
 
   const handleSidebarMenuClick = () => {
     if (isMobile) {
@@ -75,21 +81,18 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="z-[51]">
       <SidebarContent className="gap-0">
-        {/* Home */}
-        <SidebarGroup className="p-0">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem className={`flex justify-center ${collapsed ? 'mt-2 mb-2' : ''}`}>
-                <SidebarMenuButton asChild size='lg' isActive={pathname === "/"} tooltip="Home" onClick={handleSidebarMenuClick}>
-                  <Link href="/">
-                    <MdOutlineHome className="!w-8 !h-8" />
-                    {!collapsed && <span className="text-base">Home</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarHeader className="relative z-10">
+          <div className={cn(
+            "flex items-center",
+            collapsed ? "flex-col gap-4" : "flex-row justify-between"
+          )}>
+            <Link href="/" className="font-semibold text-sidebar-foreground no-underline flex items-center gap-1">
+              <LuRocket size={25} className="shrink-0" />
+              {!collapsed && <span>OptionsHQ</span>}
+            </Link>
+            <SidebarTrigger className="h-10 w-10" />
+          </div>
+        </SidebarHeader>
 
         {/* Stocks Section */}
         {hasStocksGroup && (

@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { LuChartBar, LuSearch, LuList, LuActivity } from "react-icons/lu";
+import { LuChartBar, LuSearch, LuList } from "react-icons/lu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useModulePreferences } from "@/context/ModulePreferencesProvider";
 import { PortfolioTrackingTab } from "@/components/setup/PortfolioTrackingTab";
 import { OptionsDiscoveryTab } from "@/components/setup/OptionsDiscoveryTab";
 import { WatchlistTab } from "@/components/setup/WatchlistTab";
-import { KalshiMonitoringTab } from "@/components/setup/KalshiMonitoringTab";
 
-type ModuleTab = 'portfolio' | 'discovery' | 'watchlist' | 'kalshi';
+type ModuleTab = 'portfolio' | 'discovery' | 'watchlist';
 
 const moduleConfig = {
   portfolio: {
@@ -27,11 +26,6 @@ const moduleConfig = {
     title: "Watchlist",
     icon: LuList,
     component: WatchlistTab,
-  },
-  kalshi: {
-    title: "Kalshi Monitoring",
-    icon: LuActivity,
-    component: KalshiMonitoringTab,
   },
 };
 

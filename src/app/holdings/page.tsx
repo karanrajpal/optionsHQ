@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { AccountPicker } from '@/components/AccountPicker';
 import { PageHeader } from '@/components/PageHeader';
 import Link from 'next/link';
-import Image from 'next/image';
+import { StockIcon } from '@/components/StockIcon';
 
 export type HoldingsPosition = NonNullable<AccountHoldingsAccount['positions']>[number];
 
@@ -27,17 +27,15 @@ const holdingsColumns: ColumnDef<HoldingsPosition>[] = [
     {
         accessorKey: 'symbol',
         header: 'Symbol',
-        cell: async ({ row }) => {
+        cell: ({ row }) => {
             const symbol = row.original.symbol?.symbol?.symbol;
             return (
                 <Link href={`/stock/${symbol}`} className="text-blue-600 hover:underline">
                     <span title={row.original.symbol?.symbol?.description ?? ''} className='flex items-center gap-2'>
-                        <Image
+                        <StockIcon
                             src={row.original.symbol?.symbol?.logo_url || `https://raw.githubusercontent.com/nvstly/icons/refs/heads/main/ticker_icons/${symbol}.png`}
-                            alt={symbol || ''}
-                            width={32}
-                            height={32}
-                            className="rounded-full"
+                            symbol={symbol || ''}
+                            size={32}
                         />
                         {symbol ?? null}
                     </span>

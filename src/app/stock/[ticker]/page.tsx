@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { StockInfo } from '@/lib/alpaca/types';
-import Image from 'next/image';
+import { StockIcon } from '@/components/StockIcon';
 import dynamic from 'next/dynamic';
 import { TickerPriceItem } from '@/components/StockCard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -105,7 +105,7 @@ export default function StockPage() {
     return (
         <div className="flex flex-col items-center mt-16 w-full max-w-2xl mx-auto">
             <div className="flex items-center gap-4">
-                <Image src={logoUrl} alt={companyName} width={64} height={64} className="rounded-full bg-white" />
+                <StockIcon src={logoUrl} symbol={ticker} size={64} className="bg-white" />
                 <div className="flex flex-col items-start">
                     <h1 className="text-3xl font-bold">{companyName}</h1>
                     <div className="text-muted-foreground text-sm">{asset.symbol} | {asset.exchange}</div>

@@ -6,7 +6,6 @@ export interface ModulePreferences {
   portfolio_tracking_enabled: boolean;
   options_discovery_enabled: boolean;
   watchlist_enabled: boolean;
-  kalshi_monitoring_enabled: boolean;
 }
 
 type ModulePreferencesContextType = {
@@ -22,7 +21,6 @@ const DEFAULT_PREFERENCES: ModulePreferences = {
   portfolio_tracking_enabled: true,
   options_discovery_enabled: true,
   watchlist_enabled: true,
-  kalshi_monitoring_enabled: false,
 };
 
 export const ModulePreferencesProvider = ({ children }: { children: ReactNode }) => {

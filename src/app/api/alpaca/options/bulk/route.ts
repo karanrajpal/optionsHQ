@@ -88,32 +88,52 @@ export async function GET(request: NextRequest) {
         // Adding stock data for each symbol
         const alpacaCompositeService = new AlpacaCompositeService();
         const symbols = candidates.map((candidate) => candidate.symbol?.symbol?.symbol || "");
-        const stockInfos = await alpacaCompositeService.getStockInfos(symbols);
+        // Filter out symbols that aren't valid stock tickers (e.g., option contract symbols)
+        const isValidStockTicker = (s: string) => /^[A-Z]{1,5}$/.test(s);
+        const validSymbols = symbols.filter((s) => s && isValidStockTicker(s));
+        const skippedSymbols = symbols.filter((s) => s && !isValidStockTicker(s));
+        if (skippedSymbols.length > 0) {
+            console.warn(`Skipping non-stock symbols: ${skippedSymbols.join(', ')}`);
+        }
+
+        const stockInfos = await alpacaCompositeService.getStockInfos(validSymbols);
         const discoveryService = new OptionsDiscoveryService();
+
+        // Fetch options for each symbol individually so one failure doesn't kill the batch
         await Promise.all(
-            candidates.map(async (candidate) => {
-                const symbol = candidate.symbol?.symbol?.symbol || "";
-                requestParams.root_symbol = symbol;
-                const canStockHaveOptions = stockInfos[symbol]?.asset.attributes.includes('has_options');
-                if (!canStockHaveOptions) {
-                    console.warn(`Skipping symbol without options: ${symbol}`);
-                    return;
+            validSymbols.map(async (symbol) => {
+                try {
+                    requestParams.root_symbol = symbol;
+                    const canStockHaveOptions = stockInfos[symbol]?.asset.attributes.includes('has_options');
+                    if (!canStockHaveOptions) {
+                        console.warn(`Skipping symbol without options: ${symbol}`);
+                        return;
+                    }
+                    const stockInfo = stockInfos[symbol];
+                    const stockPrice = stockInfo?.snapshot?.LatestTrade?.Price ?? stockInfo?.snapshot?.DailyBar?.ClosePrice;
+                    const options = await discoveryService.getOptionsChainWithAugmentedInformation(requestParams, strategy, stockPrice);
+                    result[symbol] = {
+                        symbol,
+                        options,
+                        stockPositionData: candidates.find((c) => c.symbol?.symbol?.symbol === symbol),
+                        stockData: stockInfo,
+                    };
+                } catch (err) {
+                    const message = err instanceof Error ? err.message : String(err);
+                    console.error(`Error fetching options for ${symbol}: ${message}`);
                 }
-                const stockInfo = stockInfos[symbol];
-                const stockPrice = stockInfo?.snapshot?.LatestTrade?.Price ?? stockInfo?.snapshot?.DailyBar?.ClosePrice;
-                const options = await discoveryService.getOptionsChainWithAugmentedInformation(requestParams, strategy, stockPrice);
-                result[symbol] = {
-                    symbol,
-                    options,
-                    stockPositionData: candidate,
-                    stockData: stockInfo,
-                };
             })
         );
 
         return NextResponse.json(result);
     } catch (error) {
         console.error("Error in /api/alpaca/options/bulk:", error);
-        return NextResponse.json({ error: "Failed to fetch bulk options data" }, { status: 500 });
+        const message = error instanceof Error ? error.message : "Failed to fetch bulk options data";
+        const alpacaMatch = message.match(/code:\s*(\d+),\s*message:\s*(.*)/);
+        if (alpacaMatch) {
+            const status = parseInt(alpacaMatch[1], 10);
+            return NextResponse.json({ error: alpacaMatch[2] }, { status: status >= 400 && status < 600 ? status : 500 });
+        }
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

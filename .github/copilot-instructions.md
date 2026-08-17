@@ -14,14 +14,14 @@ applyTo: '**'
 - Use absolute imports (e.g., `src/components/...`) if the project is configured for it, otherwise use relative imports.
 - Write clear, concise, and descriptive comments where necessary, but avoid redundant comments.
 - Use async/await for asynchronous code, avoid .then/.catch chaining.
-- Use destructuring for props and object parameters where it improves readability.
+- Use destructuring for props inside the component and object parameters where it improves readability.
 
 ## React & Next.js Specific
 - **Do not import React** at the top of component files; Next.js does not require it.
 - Import hooks and functions directly from `react` (e.g., `import { useState } from 'react'`), **do not** use `React.useState` or similar patterns.
 - Use Next.js conventions for file and folder structure (e.g., `app/`, `components/`, `lib/`).
 - Use Next.js routing and API conventions for new pages and endpoints.
-- Use server and client components appropriately as per Next.js 13+ standards.
+- Use server and client components appropriately as per Next.js 15+ standards.
 
 ## Database & SQL Migrations
 - If any SQL migration or schema change is made by the coding agent, always create or update table definitions in a markdown file at `db/structure.md`.

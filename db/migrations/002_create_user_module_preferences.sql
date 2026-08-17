@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS user_module_preferences (
     portfolio_tracking_enabled BOOLEAN DEFAULT TRUE,
     options_discovery_enabled BOOLEAN DEFAULT TRUE,
     watchlist_enabled BOOLEAN DEFAULT TRUE,
-    kalshi_monitoring_enabled BOOLEAN DEFAULT FALSE,
     modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES neon_auth.users_sync(id) ON DELETE CASCADE
 );

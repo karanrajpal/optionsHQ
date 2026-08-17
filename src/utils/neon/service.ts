@@ -89,13 +89,11 @@ export class OptionsDatabase {
         portfolio_tracking_enabled?: boolean;
         options_discovery_enabled?: boolean;
         watchlist_enabled?: boolean;
-        kalshi_monitoring_enabled?: boolean;
     }) {
         const {
             portfolio_tracking_enabled = true,
             options_discovery_enabled = true,
             watchlist_enabled = true,
-            kalshi_monitoring_enabled = false,
         } = preferences;
 
         const data = await this.sql`
@@ -104,21 +102,18 @@ export class OptionsDatabase {
                 portfolio_tracking_enabled, 
                 options_discovery_enabled, 
                 watchlist_enabled, 
-                kalshi_monitoring_enabled,
                 modified_at
             ) values (
                 ${userId}, 
                 ${portfolio_tracking_enabled}, 
                 ${options_discovery_enabled}, 
                 ${watchlist_enabled}, 
-                ${kalshi_monitoring_enabled},
                 CURRENT_TIMESTAMP
             ) 
             on conflict (user_id) do update set
                 portfolio_tracking_enabled = excluded.portfolio_tracking_enabled,
                 options_discovery_enabled = excluded.options_discovery_enabled,
                 watchlist_enabled = excluded.watchlist_enabled,
-                kalshi_monitoring_enabled = excluded.kalshi_monitoring_enabled,
                 modified_at = CURRENT_TIMESTAMP
             returning *
         `;
@@ -129,7 +124,6 @@ export class OptionsDatabase {
         portfolio_tracking_enabled: boolean;
         options_discovery_enabled: boolean;
         watchlist_enabled: boolean;
-        kalshi_monitoring_enabled: boolean;
     }>) {
         const currentPrefs = await this.getModulePreferences(userId);
         
@@ -144,7 +138,6 @@ export class OptionsDatabase {
                 portfolio_tracking_enabled = ${updates.portfolio_tracking_enabled},
                 options_discovery_enabled = ${updates.options_discovery_enabled},
                 watchlist_enabled = ${updates.watchlist_enabled},
-                kalshi_monitoring_enabled = ${updates.kalshi_monitoring_enabled},
                 modified_at = CURRENT_TIMESTAMP
             where user_id = ${userId}
             returning *
