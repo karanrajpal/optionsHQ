@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { LuChartBar, LuSearch, LuList } from "react-icons/lu";
+import { LuChartBar, LuSearch, LuList, LuActivity } from "react-icons/lu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useModulePreferences } from "@/context/ModulePreferencesProvider";
 import { PortfolioTrackingTab } from "@/components/setup/PortfolioTrackingTab";
 import { OptionsDiscoveryTab } from "@/components/setup/OptionsDiscoveryTab";
 import { WatchlistTab } from "@/components/setup/WatchlistTab";
+import { HealthCheckTab } from "@/components/setup/HealthCheckTab";
 
-type ModuleTab = 'portfolio' | 'discovery' | 'watchlist';
+type ModuleTab = 'portfolio' | 'discovery' | 'watchlist' | 'health';
 
 const moduleConfig = {
   portfolio: {
@@ -26,6 +27,11 @@ const moduleConfig = {
     title: "Watchlist",
     icon: LuList,
     component: WatchlistTab,
+  },
+  health: {
+    title: "Healthcheck",
+    icon: LuActivity,
+    component: HealthCheckTab,
   },
 };
 

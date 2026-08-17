@@ -5,12 +5,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ColumnDef, useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, SortingState, flexRender, ColumnFiltersState } from '@tanstack/react-table';
 import { useSnaptradeAccount } from "@/context/SnaptradeAccountsProvider";
 import { useUserDataAccounts } from "@/context/UserDataAccountsProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { formatCurrency, formatDate, getProfitLoss, getProfitLossColor, strategyTypeToDisplayName } from "@/lib/formatters";
 import { MultiSelectablePill } from "@/components/MultiSelectablePill";
 import { AccountPicker } from "@/components/AccountPicker";
 import { PageHeader } from "@/components/PageHeader";
 import { OptionsWithStrategyInformation } from "@/lib/option-strategies/option-information-service";
+import { Card, CardHeader, CardDescription, CardTitle } from "@/components/ui/card";
 
 const optionsColumns: ColumnDef<OptionsWithStrategyInformation>[] = [
     // {
@@ -162,12 +163,33 @@ export default function OptionsPage() {
         });
     };
 
+    // Calculate total profit/loss from the current filtered view of the table
+    const rows = table.getRowModel().rows;
+    const totalProfitLoss = useMemo(() => {
+        return rows.reduce((sum, row) => {
+            const pnl = getProfitLoss(row.original);
+            return sum + pnl;
+        }, 0);
+    }, [rows]);
+
     return (
         <div className="p-4 w-full space-y-1">
             <PageHeader
                 header="Options"
                 rightElement={<AccountPicker />}
             />
+
+            {/* Total Profit/Loss Card */}
+            {!loading && optionHoldings && optionHoldings.length > 0 && (
+                <Card className="w-fit">
+                    <CardHeader className="pb-3">
+                        <CardDescription>Total Profit/Loss</CardDescription>
+                        <CardTitle className={`text-3xl ${getProfitLossColor(totalProfitLoss)}`}>
+                            {formatCurrency(totalProfitLoss)}
+                        </CardTitle>
+                    </CardHeader>
+                </Card>
+            )}
 
             {/* Filter Pills */}
             {strategyTypeOptions.length > 0 && (

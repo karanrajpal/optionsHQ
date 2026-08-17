@@ -16,6 +16,10 @@ export class SnaptradeService {
         });
     }
 
+    public async checkApiStatus() {
+        return await this.snaptrade.apiStatus.check();
+    }
+
     public async getAccountHoldings() {
         return await this.snaptrade.accountInformation.getUserHoldings({
             accountId: this.accountId as string,

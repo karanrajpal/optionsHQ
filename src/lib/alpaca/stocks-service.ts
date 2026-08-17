@@ -19,6 +19,10 @@ export class AlpacaStocksService {
     });
   }
 
+  async checkAccount() {
+    return await this.alpaca.getAccount();
+  }
+
   /**
    * Get snapshot data for a single stock symbol
    * @param symbol - Stock ticker symbol (e.g., "ORCL")
