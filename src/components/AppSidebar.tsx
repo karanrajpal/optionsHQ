@@ -19,6 +19,11 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -90,7 +95,15 @@ export function AppSidebar() {
               <LuRocket size={28} className="shrink-0" />
               {!collapsed && <span>OptionsHQ</span>}
             </Link>
-            <SidebarTrigger className="h-12 w-12 [&_svg]:!size-6" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <SidebarTrigger className="h-12 w-12 [&_svg]:!size-6 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" />
+              </TooltipTrigger>
+              <TooltipContent side="right" align="center" hidden={!collapsed}>
+                <p>Expand Sidebar</p>
+                <p className="text-xs text-muted-foreground">⌘ B</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </SidebarHeader>
 

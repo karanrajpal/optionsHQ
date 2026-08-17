@@ -139,6 +139,9 @@ export default function HoldingsPage() {
         }, 0);
     }, [rows]);
 
+    const cashBalance = holdings?.balances?.[0]?.cash ?? 0;
+    const isMarginUsed = cashBalance < 0;
+
     return (
         <div className="p-4 w-full space-y-1">
             <PageHeader
@@ -146,16 +149,29 @@ export default function HoldingsPage() {
                 rightElement={<AccountPicker />}
             />
             
-            {/* Total Profit/Loss Card */}
+            {/* Summary Cards */}
             {!loading && data.length > 0 && (
-                <Card className="w-fit">
-                    <CardHeader className="pb-3">
-                        <CardDescription>Total Profit/Loss</CardDescription>
-                        <CardTitle className={`text-3xl ${getProfitLossColor(totalProfitLoss)}`}>
-                            {formatCurrency(totalProfitLoss)}
-                        </CardTitle>
-                    </CardHeader>
-                </Card>
+                <div className="flex gap-4 flex-wrap">
+                    <Card className="w-fit">
+                        <CardHeader className="pb-3">
+                            <CardDescription>Total Profit/Loss</CardDescription>
+                            <CardTitle className={`text-3xl ${getProfitLossColor(totalProfitLoss)}`}>
+                                {formatCurrency(totalProfitLoss)}
+                            </CardTitle>
+                        </CardHeader>
+                    </Card>
+                    <Card className="w-fit">
+                        <CardHeader className="pb-3">
+                            <CardDescription>Cash Balance</CardDescription>
+                            <CardTitle className={`text-3xl ${getProfitLossColor(cashBalance)}`}>
+                                {formatCurrency(cashBalance)}
+                            </CardTitle>
+                            {isMarginUsed && (
+                                <Badge variant="destructive" className="w-fit mt-1">Margin Used</Badge>
+                            )}
+                        </CardHeader>
+                    </Card>
+                </div>
             )}
 
             <div className='flex justify-between'>
