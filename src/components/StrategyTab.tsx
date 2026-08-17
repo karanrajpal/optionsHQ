@@ -34,6 +34,18 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
   const [recommended, setRecommended] = useState<Record<string, OptionsWithStockData>>({});
   const [recommendedLoading, setRecommendedLoading] = useState(false);
   const [recommendedError, setRecommendedError] = useState<string | null>(null);
+
+  const [loadingText, setLoadingText] = useState('Looking at your portfolio...');
+
+  // Change loading text after 1 second
+  useEffect(() => {
+    if (!recommendedLoading) {
+      setLoadingText('Looking at your portfolio...');
+      return;
+    }
+    const timer = setTimeout(() => setLoadingText('Finding Suitable Options'), 1000);
+    return () => clearTimeout(timer);
+  }, [recommendedLoading]);
   // Fetch recommended options on mount or when strategyType changes
   useEffect(() => {
     let ignore = false;
@@ -180,10 +192,10 @@ export function StrategyTab({ strategyType }: StrategyTabProps) {
       <div className="mt-8">
         <h2 className="text-lg font-semibold mb-2">Recommended Options</h2>
         {(recommendedLoading || accountsLoading || isUserAccountDetailsLoading) && (
-          <>
-            <TextShimmer className='mb-2'>Looking at your portfolio...</TextShimmer>
+          <div className="flex flex-col items-center mt-8">
+            <TextShimmer className='mb-2'>{loadingText}</TextShimmer>
             <Skeleton className="h-40 w-full mb-4" />
-          </>
+          </div>
         )}
         {recommendedError && !recommendedLoading && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-800">{recommendedError}</div>

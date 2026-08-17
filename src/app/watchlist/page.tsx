@@ -60,18 +60,6 @@ export default function WatchlistPage() {
         }
     };
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-                <div className="max-w-6xl mx-auto">
-                    <div className="flex items-center justify-center py-12">
-                        <div className="text-gray-600 dark:text-gray-400">Loading watchlists...</div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
             <div className="max-w-6xl mx-auto">
@@ -83,26 +71,36 @@ export default function WatchlistPage() {
                 {/* Watchlist selector */}
                 <div className="mb-6 flex items-center gap-4">
                     <div className="flex gap-2 flex-wrap">
-                        {watchlists.map((watchlist) => (
-                            <Button
-                                key={watchlist.id}
-                                variant={selectedWatchlist?.id === watchlist.id ? "default" : "outline"}
-                                onClick={() => setSelectedWatchlistId(watchlist.id)}
-                            >
-                                {watchlist.name}
-                            </Button>
-                        ))}
-                        {!showNewWatchlistInput && (
-                            <Button
-                                variant="outline"
-                                onClick={() => setShowNewWatchlistInput(true)}
-                            >
-                                <LuPlus className="mr-2" />
-                                New Watchlist
-                            </Button>
+                        {isLoading ? (
+                            <>
+                                <Skeleton className="h-10 w-24 rounded-md" />
+                                <Skeleton className="h-10 w-32 rounded-md" />
+                                <Skeleton className="h-10 w-28 rounded-md" />
+                            </>
+                        ) : (
+                            <>
+                                {watchlists.map((watchlist) => (
+                                    <Button
+                                        key={watchlist.id}
+                                        variant={selectedWatchlist?.id === watchlist.id ? "default" : "outline"}
+                                        onClick={() => setSelectedWatchlistId(watchlist.id)}
+                                    >
+                                        {watchlist.name}
+                                    </Button>
+                                ))}
+                                {!showNewWatchlistInput && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setShowNewWatchlistInput(true)}
+                                    >
+                                        <LuPlus className="mr-2" />
+                                        New Watchlist
+                                    </Button>
+                                )}
+                            </>
                         )}
                     </div>
-                    {showNewWatchlistInput && (
+                    {!isLoading && showNewWatchlistInput && (
                         <div className="flex gap-2">
                             <Input
                                 placeholder="Watchlist name"
@@ -140,14 +138,33 @@ export default function WatchlistPage() {
                     </div>
                 )}
 
-                {isWatchListItemsLoading && (
-                    <div className="flex justify-center">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                    </div>
-                )}
-
                 {/* Watchlist items */}
-                {!selectedWatchlist ? (
+                {isWatchListItemsLoading ? (
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                        <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700">
+                            <Skeleton className="h-4 w-full" />
+                        </div>
+                        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className="px-6 py-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <Skeleton className="h-10 w-10 rounded-full" />
+                                        <div>
+                                            <Skeleton className="h-4 w-16 mb-1" />
+                                            <Skeleton className="h-3 w-32" />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-8">
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-8" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : !selectedWatchlist ? (
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-12 text-center shadow-sm">
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
                             {watchlists.length === 0

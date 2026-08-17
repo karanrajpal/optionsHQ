@@ -97,7 +97,7 @@ export function AppSidebar() {
             </Link>
             <Tooltip>
               <TooltipTrigger asChild>
-                <SidebarTrigger className="h-12 w-12 [&_svg]:!size-6 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" />
+                <SidebarTrigger className="h-12 w-12 [&_svg]:!size-6 text-gray-300 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-200" />
               </TooltipTrigger>
               <TooltipContent side="right" align="center" hidden={!collapsed}>
                 <p>Expand Sidebar</p>
