@@ -174,7 +174,7 @@ export default function HoldingsPage() {
                 </div>
             )}
 
-            <div className='flex justify-between'>
+            <div className='flex justify-between mb-2'>
                 <div></div>
                 <div className='flex items-center text-sm'>
                     {!loading && holdings?.cache_expired && <Badge variant='destructive'>Outdated</Badge>}
