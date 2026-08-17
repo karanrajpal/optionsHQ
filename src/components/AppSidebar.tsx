@@ -81,16 +81,16 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="z-[51]">
       <SidebarContent className="gap-0">
-        <SidebarHeader className="relative z-10">
+        <SidebarHeader className="relative z-10 mt-2">
           <div className={cn(
             "flex items-center",
             collapsed ? "flex-col gap-4" : "flex-row justify-between"
           )}>
-            <Link href="/" className="font-semibold text-sidebar-foreground no-underline flex items-center gap-1">
-              <LuRocket size={25} className="shrink-0" />
+            <Link href="/" className="font-semibold text-sidebar-foreground no-underline flex items-center gap-1 hover:text-blue-400 transition-colors">
+              <LuRocket size={28} className="shrink-0" />
               {!collapsed && <span>OptionsHQ</span>}
             </Link>
-            <SidebarTrigger className="h-10 w-10" />
+            <SidebarTrigger className="h-12 w-12 [&_svg]:!size-6" />
           </div>
         </SidebarHeader>
 
